@@ -1,0 +1,97 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/nightdrive-core",
+    "crates/nightdrive-llm",
+    "crates/nightdrive-audio-gen",
+    "crates/nightdrive-audio-master",
+    "crates/nightdrive-art",
+    "crates/nightdrive-visuals",
+    "crates/nightdrive-encoder",
+    "crates/nightdrive-youtube",
+    "crates/nightdrive-storage",
+    "crates/nightdrive-orchestrator",
+    "crates/nightdrive-cli",
+    "tests/witnesses",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Matt Gates <matt@ridgecellrepair.com>"]
+license = "Proprietary"
+repository = "https://github.com/suhteevah/nightdrive"
+
+[workspace.dependencies]
+# Async + runtime
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+async-trait = "0.1"
+
+# Errors
+thiserror = "2"
+anyhow = "1"
+
+# Observability — MANDATORY in every crate
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+tracing-appender = "0.2"
+
+# Serde
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# HTTP
+reqwest = { version = "0.12", features = ["json", "rustls-tls", "stream", "multipart"] }
+url = "2"
+
+# Time + IDs
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "v7", "serde"] }
+
+# Config
+config = "0.15"
+dotenvy = "0.15"
+
+# Storage
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "sqlite", "chrono", "uuid", "migrate"] }
+
+# CLI
+clap = { version = "4", features = ["derive", "env"] }
+
+# Process / IO
+tokio-util = { version = "0.7", features = ["io"] }
+bytes = "1"
+tempfile = "3"
+base64 = "0.22"
+
+# Audio
+hound = "3"
+rubato = "0.16"
+
+# Metrics
+prometheus = "0.14"
+
+# Internal
+nightdrive-core = { path = "crates/nightdrive-core" }
+nightdrive-llm = { path = "crates/nightdrive-llm" }
+nightdrive-audio-gen = { path = "crates/nightdrive-audio-gen" }
+nightdrive-audio-master = { path = "crates/nightdrive-audio-master" }
+nightdrive-art = { path = "crates/nightdrive-art" }
+nightdrive-visuals = { path = "crates/nightdrive-visuals" }
+nightdrive-encoder = { path = "crates/nightdrive-encoder" }
+nightdrive-youtube = { path = "crates/nightdrive-youtube" }
+nightdrive-storage = { path = "crates/nightdrive-storage" }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true

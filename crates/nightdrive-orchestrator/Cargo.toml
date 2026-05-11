@@ -1,0 +1,29 @@
+[package]
+name = "nightdrive-orchestrator"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "nightdrive-orchestrator"
+path = "src/main.rs"
+
+[dependencies]
+nightdrive-core.workspace = true
+nightdrive-llm.workspace = true
+nightdrive-storage.workspace = true
+nightdrive-audio-gen.workspace = true
+nightdrive-audio-master.workspace = true
+nightdrive-art.workspace = true
+nightdrive-encoder.workspace = true
+nightdrive-youtube.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+clap.workspace = true
+dotenvy.workspace = true
+chrono.workspace = true
+serde_json.workspace = true

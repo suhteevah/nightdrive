@@ -1,0 +1,46 @@
+[package]
+name = "nightdrive-witnesses"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[[test]]
+name = "core_loads_real_config"
+path = "core_loads_real_config.rs"
+
+[[test]]
+name = "llm_real_ollama"
+path = "llm_real_ollama.rs"
+
+[[test]]
+name = "storage_roundtrip"
+path = "storage_roundtrip.rs"
+
+[[test]]
+name = "youtube_resume_upload"
+path = "youtube_resume_upload.rs"
+
+[[test]]
+name = "art_real_sdxl"
+path = "art_real_sdxl.rs"
+
+[[test]]
+name = "cli_db_migrate"
+path = "cli_db_migrate.rs"
+
+[[test]]
+name = "retry_recovers_transient_500"
+path = "retry_recovers_transient_500.rs"
+
+[dev-dependencies]
+nightdrive-core.workspace = true
+nightdrive-llm.workspace = true
+nightdrive-storage.workspace = true
+nightdrive-youtube.workspace = true
+nightdrive-art.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "process", "fs"] }
+reqwest.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true

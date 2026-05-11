@@ -1,0 +1,71 @@
+# Rust build output
+/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Per-deployment runtime config (paths, URLs differ per host)
+config/nightdrive.toml
+
+# Pre-rendered SDXL cover library (regenerate via sidecar/generate_cover_library.py)
+assets/covers/library/
+
+# Local state / runtime artifacts
+/var/lib/nightdrive/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Editor / OS detritus
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Witness + audit ephemera (overwritten on each run)
+target/witness-*.log
+target/ollama-pull.log
+
+# Added by uploader (secret-leak hardening, 2026-04-18)
+.secrets
+VOXCLAW.md
+scratch/
+*.local
+nul
+id_rsa
+id_ed25519
+*-key
+.claude/.credentials.json
+C:Users*
+C:Windows*
+
+# Windows reserved device names (cause git add failures)
+nul
+con
+prn
+aux
+com1
+com2
+com3
+com4
+com5
+com6
+com7
+com8
+com9
+lpt1
+lpt2
+lpt3
+lpt4
+lpt5
+lpt6
+lpt7
+lpt8
+lpt9

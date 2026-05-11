@@ -1,0 +1,77 @@
+# nightdrive runtime config. Copy to /etc/nightdrive/nightdrive.toml on the orchestrator host.
+
+[paths]
+work_dir = "/var/lib/nightdrive"
+sqlite_db = "/var/lib/nightdrive/nightdrive.sqlite"
+tracks_dir = "/var/lib/nightdrive/tracks"
+
+[openclaw]
+base_url = "http://kokonoe.tailb85819.ts.net:11434"
+model = "qwen2.5:7b-instruct"
+temperature = 0.85
+max_tokens = 2048
+timeout_seconds = 120
+
+[audio_gen]
+base_url = "http://supermicro.tailb85819.ts.net:8080"
+model = "musicgen-large"
+sample_rate = 32000
+channels = 2
+segment_seconds = 28
+overlap_seconds = 2
+guidance_scale = 3.0
+
+[art]
+base_url = "http://supermicro.tailb85819.ts.net:8081"
+model = "sdxl"
+width = 1024
+height = 1024
+steps = 30
+cfg_scale = 7.0
+negative_prompt = "text, watermark, signature, low quality, blurry, jpeg artifacts"
+
+[mastering]
+target_lufs = -14.0
+true_peak_db = -1.0
+loudness_range = 11.0
+fade_in_seconds = 2.0
+fade_out_seconds = 4.0
+
+[visualizer]
+width = 1920
+height = 1080
+fps = 30
+quality_preset = "high"
+seed_from_track_id = true
+include_code_scroll = false
+
+[encoder]
+ffmpeg_path = "/usr/bin/ffmpeg"
+video_codec = "libx264"
+crf = 18
+preset = "slow"
+audio_codec = "aac"
+audio_bitrate = "320k"
+intro_seconds = 3
+outro_seconds = 3
+
+[youtube]
+default_privacy = "private"                   # private | unlisted | public
+default_category_id = "10"                    # 10 = Music
+schedule_offset_hours = 24
+publish_window_start_hour = 19                # publish in 19:00-23:00 local window
+publish_window_end_hour = 23
+declare_synthetic_content = true
+
+[livestream]
+visualizer_ws_port = 7373
+metadata_refresh_seconds = 1
+shuffle_buffer_size = 12
+min_replay_gap_hours = 24                     # don't replay a track within 24h
+
+[storage]
+max_track_age_days = 90                       # keep raw files this long
+keep_published_indefinitely = true
+
+[metrics]
+prometheus_port = 9091

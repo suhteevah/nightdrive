@@ -1,0 +1,13 @@
+[Unit]
+Description=nightdrive nightly batch timer
+
+[Timer]
+# Fire at 22:00 local every day. Persistent so a missed run (laptop suspended,
+# power blip) still fires on next boot.
+OnCalendar=*-*-* 22:00:00
+Persistent=true
+RandomizedDelaySec=10m
+Unit=nightdrive-nightly.service
+
+[Install]
+WantedBy=timers.target

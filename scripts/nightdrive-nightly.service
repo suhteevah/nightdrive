@@ -1,0 +1,29 @@
+[Unit]
+Description=nightdrive nightly batch generator
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=nightdrive
+Group=nightdrive
+EnvironmentFile=/etc/nightdrive/nightdrive.env
+WorkingDirectory=/opt/nightdrive
+ExecStart=/opt/nightdrive/bin/nightdrive-orchestrator run-batch --count 1
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=2h
+# Per-stage retries happen inside the orchestrator. systemd just needs to know
+# that 2h is the worst-case ceiling for one track (audio gen + mastering +
+# visuals + encode + upload + slack).
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/nightdrive
+PrivateTmp=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target

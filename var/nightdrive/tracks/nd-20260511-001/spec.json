@@ -1,0 +1,47 @@
+{
+  "track_id": "nd-20260511-001",
+  "title": "Digital Dreams (Synthwave for Coding)",
+  "subgenre": "synthwave",
+  "mood_tags": [
+    "chill",
+    "nostalgic",
+    "elevated",
+    "spacey"
+  ],
+  "bpm": 96,
+  "musical_key": "C# minor",
+  "duration_seconds": 240,
+  "sections": [
+    {
+      "name": "intro",
+      "bars": 8,
+      "instrumentation": "DX7 pad, Juno pluck"
+    },
+    {
+      "name": "main",
+      "bars": 16,
+      "instrumentation": "OB-8 lead, gated reverb drums"
+    },
+    {
+      "name": "bridge",
+      "bars": 8,
+      "instrumentation": "TB-3 bass, sidechained snare"
+    }
+  ],
+  "musicgen_prompt": "An introspective synthwave track with DX7 pads and Juno plucks in C# minor. Gated reverb drums and sidechained TB-3 bass create a deep, spacey vibe. Tempo: 96 BPM.",
+  "cover_prompt": "A retro-futuristic cityscape at night, with neon lights and digital screens reflecting off the rain-drenched streets.",
+  "youtube": {
+    "title": "Digital Dreams (Synthwave for Coding)",
+    "description": "Chill coding music for late nights or programming sessions. Elevate your work environment with this nostalgic synthwave track. Perfect for focus and relaxation.",
+    "tags": [
+      "coding",
+      "synthwave",
+      "chill",
+      "programming",
+      "late night",
+      "nostalgia",
+      "retro-futuristic"
+    ],
+    "category_id": "10"
+  }
+}

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>nightdrive · visualizer</title>
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; color: #f7c6ff; }
+  #stage { position: fixed; inset: 0; }
+  #hud {
+    position: fixed; left: 28px; bottom: 28px;
+    font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+    text-shadow: 0 0 12px #ff2bd6, 0 0 2px #fff;
+    pointer-events: none; user-select: none;
+    line-height: 1.55;
+  }
+  #hud .title { font-size: 22px; letter-spacing: 0.18em; color: #fff; }
+  #hud .meta  { color: #8be9ff; }
+  #brand {
+    position: fixed; right: 28px; top: 22px;
+    font-size: 11px; letter-spacing: 0.35em; opacity: 0.55;
+  }
+  #now {
+    position: fixed; right: 28px; bottom: 28px;
+    font-size: 11px; letter-spacing: 0.25em; opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div id="hud">
+  <div class="title" id="t-title">— synthwave for late code —</div>
+  <div class="meta"  id="t-meta">bpm · key · seed</div>
+  <div class="meta"  id="t-channel">nightdrive · 24/7 lofi synthwave for coding &amp; debugging</div>
+</div>
+<div id="brand">N I G H T D R I V E</div>
+<div id="now" id="t-clock">--:--</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+
+// ---------- WebSocket reactivity (OBS Browser Source friendly) ----------
+// The orchestrator pushes track metadata + low-rate audio level frames here.
+// Falls back to a synthetic envelope so the scene renders even with no socket.
+// Fallback uses the same scheme as the page (wss on https, ws on http/file).
+// OBS Browser Source loads the file:// or http://localhost origin, so the
+// fallback resolves to ws://127.0.0.1:9090/visualizer on loopback only.
+// For remote deployments pass ?ws=wss://host:port/visualizer explicitly.
+const _wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const wsUrl = new URL(window.location.href).searchParams.get("ws")
+  ?? `${_wsScheme}://127.0.0.1:9090/visualizer`;
+
+let level = 0;          // smoothed amplitude 0..1
+let levelTarget = 0;
+let beat = 0;           // beat impulse 0..1, decays each frame
+let trackSeed = 1337;
+let bpm = 92;
+let lastBeatAt = performance.now();
+
+const ui = {
+  title: document.getElementById("t-title"),
+  meta:  document.getElementById("t-meta"),
+  clock: document.getElementById("now"),
+};
+
+function connectWs() {
+  try {
+    const ws = new WebSocket(wsUrl);
+    ws.onopen   = () => console.log("[nightdrive] visualizer ws connected:", wsUrl);
+    ws.onclose  = () => { console.warn("[nightdrive] ws closed, retrying in 3s"); setTimeout(connectWs, 3000); };
+    ws.onerror  = (e) => console.warn("[nightdrive] ws error", e);
+    ws.onmessage = (ev) => {
+      try {
+        const m = JSON.parse(ev.data);
+        if (m.type === "track") {
+          ui.title.textContent = "▶ " + (m.title ?? "untitled");
+          ui.meta.textContent  = `${m.bpm ?? "??"} bpm · ${m.key ?? "?"} · seed ${m.seed ?? "0"}`;
+          bpm = m.bpm ?? bpm;
+          trackSeed = (m.seed ?? trackSeed) | 0;
+          reseedScene(trackSeed);
+        } else if (m.type === "level") {
+          // 0..1 amplitude tick from the audio thread
+          levelTarget = Math.min(1, Math.max(0, m.value));
+        } else if (m.type === "beat") {
+          beat = 1.0;
+          lastBeatAt = performance.now();
+        }
+      } catch (e) { /* ignore malformed frames */ }
+    };
+  } catch (e) {
+    console.warn("[nightdrive] ws connect failed, retrying", e);
+    setTimeout(connectWs, 3000);
+  }
+}
+connectWs();
+
+// ---------- Synthetic envelope fallback (so OBS still looks alive offline) ----------
+function syntheticTick(t) {
+  // Pseudo-bpm pulse so a dry run still feels musical for testing.
+  const period = 60_000 / bpm;
+  const phase = (t % period) / period;
+  const env = Math.pow(1 - Math.abs(phase * 2 - 1), 3);
+  if (levelTarget < 0.01) levelTarget = 0.25 + 0.55 * env;
+  if ((t - lastBeatAt) > period) { beat = 1.0; lastBeatAt = t; }
+}
+
+// ---------- Three.js retrowave scene ----------
+const canvas = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0a0118, 0.018);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+camera.position.set(0, 4.5, 12);
+camera.lookAt(0, 4, 0);
+
+// Sun disc (shader, two-tone with horizontal banding)
+const sunGeom = new THREE.CircleGeometry(7, 64);
+const sunMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uBeat: { value: 0 } },
+  vertexShader: `
+    varying vec2 vUv;
+    void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform float uBeat;
+    void main(){
+      vec2 p = vUv - 0.5;
+      float r = length(p);
+      // two-tone gradient: hot pink → magenta → indigo
+      vec3 top = vec3(1.0, 0.18, 0.86);
+      vec3 bot = vec3(1.0, 0.78, 0.28);
+      vec3 col = mix(bot, top, smoothstep(-0.5, 0.5, p.y + 0.05));
+      // horizontal banding (the iconic synthwave sun stripes)
+      float bands = step(0.5, fract((vUv.y + uTime * 0.04) * 14.0));
+      col *= mix(0.55, 1.0, 1.0 - bands * smoothstep(0.0, 0.45, 0.5 - vUv.y));
+      // beat flash
+      col += vec3(uBeat * 0.18);
+      // soft edge
+      float edge = smoothstep(0.5, 0.48, r);
+      gl_FragColor = vec4(col, edge);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+});
+const sun = new THREE.Mesh(sunGeom, sunMat);
+sun.position.set(0, 6, -40);
+scene.add(sun);
+
+// Grid floor (the road)
+let grid = makeGrid();
+function makeGrid() {
+  const g = new THREE.GridHelper(200, 80, 0xff2bd6, 0x6a1aff);
+  g.material.transparent = true;
+  g.material.opacity = 0.55;
+  g.position.y = 0;
+  return g;
+}
+scene.add(grid);
+
+// Mountain silhouettes (low-poly, seeded per track)
+let mountains = new THREE.Group();
+scene.add(mountains);
+
+function rand(seed) {
+  // mulberry32
+  let a = seed >>> 0;
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function reseedScene(seed) {
+  mountains.clear();
+  const rng = rand(seed);
+  const rows = 3;
+  for (let row = 0; row < rows; row++) {
+    const z = -60 - row * 25;
+    const segs = 28;
+    const pts = [];
+    for (let i = 0; i <= segs; i++) {
+      const x = -90 + (180 * i) / segs;
+      const h = 3 + rng() * (10 + row * 3);
+      pts.push(new THREE.Vector3(x, 0, z));
+      pts.push(new THREE.Vector3(x + 90/segs * 0.5, h, z));
+    }
+    pts.push(new THREE.Vector3(90, 0, z));
+    const geom = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({ color: row === 0 ? 0xff2bd6 : (row === 1 ? 0x8b5cf6 : 0x3b82f6), transparent: true, opacity: 0.55 - row * 0.12 });
+    const line = new THREE.Line(geom, mat);
+    mountains.add(line);
+  }
+}
+reseedScene(trackSeed);
+
+// Particle stars
+const starGeom = new THREE.BufferGeometry();
+const starCount = 600;
+const starPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount; i++) {
+  starPos[i*3+0] = (Math.random() - 0.5) * 240;
+  starPos[i*3+1] = Math.random() * 60 + 10;
+  starPos[i*3+2] = -Math.random() * 200;
+}
+starGeom.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xfff7e6, size: 0.25, transparent: true, opacity: 0.85 });
+scene.add(new THREE.Points(starGeom, starMat));
+
+// ---------- Render loop ----------
+const clock = new THREE.Clock();
+function frame() {
+  const t = performance.now();
+  syntheticTick(t);
+  // smooth envelope
+  level += (levelTarget - level) * 0.12;
+  // decay beat
+  beat *= 0.86;
+  // decay synthetic level so real ws frames can take over instantly
+  levelTarget *= 0.97;
+
+  const dt = clock.getDelta();
+  // road scroll
+  grid.position.z = (grid.position.z + dt * (8 + level * 14)) % 5;
+  // gentle camera bob with the beat
+  camera.position.y = 4.5 + Math.sin(t * 0.0009) * 0.25 + beat * 0.4;
+  camera.position.x = Math.sin(t * 0.00025) * 0.6;
+  camera.lookAt(0, 4 + level * 0.6, 0);
+
+  sunMat.uniforms.uTime.value = t * 0.001;
+  sunMat.uniforms.uBeat.value = beat;
+
+  // clock readout
+  const d = new Date();
+  ui.clock.textContent = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}  ·  ${(bpm|0)} bpm`;
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+frame();
+
+addEventListener("resize", () => {
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+</script>
+</body>
+</html>
