@@ -1,4 +1,4 @@
-//! NWS forecast fetch + deterministic-fake fallback.
+//! NWS forecast fetch + radar imagery + deterministic-fake fallback.
 //!
 //! Matt's 2026-05-11 framing: "if we pull in real time data and timestamp it
 //! we can embed older weather data as historical np." So even though the
@@ -8,17 +8,14 @@
 //! it was generated. When the livestream goes live (post-240-min catalog), the
 //! same code path serves the live data flow without changes.
 //!
-//! ## Region → city mapping
+//! ## Multi-city per region
 //!
-//! The radar region label (NW/NE/SE/SW, picked by track_id hash) maps to one
-//! representative city for the forecast pull. This ties the radar narrative
-//! to the forecast narrative — "Northwest radar shows ... Seattle's 5-day."
-//!
-//! ## Fallback
-//!
-//! If NWS is unreachable, the user-agent is wrong, the grid lookup fails, or
-//! any of the network steps error out, we synthesize a deterministic
-//! placeholder forecast from `track_id`. The pipeline never blocks on weather.
+//! Each radar region has 4 cities within the NEXRAD station's coverage area.
+//! All 4 are fetched in parallel at encode time and the encoder cycles through
+//! them every ~30s in the forecast panel — TWC "Local on the 8s" style. The
+//! radar GIF stays static (it's already regional). Synthetic fallback also
+//! produces 4 city stubs so the cycling layout is consistent regardless of
+//! NWS reachability.
 
 use chrono::{DateTime, Utc};
 use nightdrive_core::TrackId;
@@ -26,22 +23,57 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tracing::{debug, warn};
 
-/// NWS API requires a contact email in the User-Agent header. They reach out
-/// at this address if our requests start misbehaving — that's the protocol.
 const USER_AGENT: &str = "nightdrive/0.1 (mmichels88@gmail.com)";
 
-/// (region_label, city, latitude, longitude, radar_station). The lat/lon points
-/// are downtown-ish; NWS rounds to its grid cells anyway. radar_station is the
-/// 4-letter NEXRAD site code used to fetch the Ridge2 animated radar loop —
-/// KATX (Seattle), KOKX (NYC/Upton), KVTX (Los Angeles), KAMX (Miami).
-const REGION_CITIES: &[(&str, &str, f64, f64, &str)] = &[
-    ("NORTHWEST", "Seattle, WA", 47.6062, -122.3321, "KATX"),
-    ("NORTHEAST", "New York, NY", 40.7128, -74.0060, "KOKX"),
-    ("SOUTHWEST", "Los Angeles, CA", 34.0522, -118.2437, "KVTX"),
-    ("SOUTHEAST", "Miami, FL", 25.7617, -80.1918, "KAMX"),
+/// (region_label, radar_station, cities[])
+///
+/// Each city tuple is (display_name, full_label, lat, lon). `display_name`
+/// is what shows on the forecast panel header ("MIAMI"); `full_label` is the
+/// long form preserved in the archive ("Miami, FL"). 4 cities per region;
+/// the cycling assumes exactly that count.
+const REGIONS: &[(&str, &str, &[(&str, &str, f64, f64)])] = &[
+    (
+        "NORTHWEST",
+        "KATX",
+        &[
+            ("SEATTLE", "Seattle, WA", 47.6062, -122.3321),
+            ("TACOMA", "Tacoma, WA", 47.2529, -122.4443),
+            ("BELLINGHAM", "Bellingham, WA", 48.7519, -122.4787),
+            ("EVERETT", "Everett, WA", 47.9790, -122.2021),
+        ],
+    ),
+    (
+        "NORTHEAST",
+        "KOKX",
+        &[
+            ("NEW YORK", "New York, NY", 40.7128, -74.0060),
+            ("NEWARK", "Newark, NJ", 40.7357, -74.1724),
+            ("WHITE PLAINS", "White Plains, NY", 41.0339, -73.7629),
+            ("BRIDGEPORT", "Bridgeport, CT", 41.1865, -73.1952),
+        ],
+    ),
+    (
+        "SOUTHWEST",
+        "KVTX",
+        &[
+            ("LOS ANGELES", "Los Angeles, CA", 34.0522, -118.2437),
+            ("LONG BEACH", "Long Beach, CA", 33.7701, -118.1937),
+            ("SANTA BARBARA", "Santa Barbara, CA", 34.4208, -119.6982),
+            ("ANAHEIM", "Anaheim, CA", 33.8366, -117.9143),
+        ],
+    ),
+    (
+        "SOUTHEAST",
+        "KAMX",
+        &[
+            ("MIAMI", "Miami, FL", 25.7617, -80.1918),
+            ("FORT LAUDERDALE", "Fort Lauderdale, FL", 26.1224, -80.1373),
+            ("KEY WEST", "Key West, FL", 24.5551, -81.7800),
+            ("NAPLES", "Naples, FL", 26.1420, -81.7948),
+        ],
+    ),
 ];
 
-/// One day's worth of forecast data, exactly what the on-screen panel needs.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DayForecast {
     pub name: String,
@@ -52,22 +84,30 @@ pub struct DayForecast {
     pub low: i32,
 }
 
-/// Forecast bundle written to `paths.root/forecast.json` per track. The raw
-/// NWS response is preserved verbatim alongside the derived display values so
-/// future tooling can re-process without re-fetching.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CityForecast {
+    /// Short uppercase name for the on-screen panel header ("MIAMI").
+    pub display_name: String,
+    /// Long-form label preserved in the JSON archive ("Miami, FL").
+    pub full_label: String,
+    pub lat: f64,
+    pub lon: f64,
+    pub days: Vec<DayForecast>,
+    /// Raw NWS response when source == Nws for this city. Kept verbatim so
+    /// the historical archive is reproducible.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_nws: Option<serde_json::Value>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Forecast {
     pub fetched_at: DateTime<Utc>,
     pub source: ForecastSource,
     pub region: String,
-    pub city: String,
-    pub lat: f64,
-    pub lon: f64,
-    pub days: Vec<DayForecast>,
-    /// Raw NWS response when source == Nws. `null` when we fell back to
-    /// synthetic. Kept verbatim so the historical archive is reproducible.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub raw_nws: Option<serde_json::Value>,
+    pub radar_station: String,
+    /// 4 cities cycling through the on-screen panel, ~30s each. The first
+    /// city is the "primary" for any single-city display path.
+    pub cities: Vec<CityForecast>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -75,35 +115,302 @@ pub struct Forecast {
 pub enum ForecastSource {
     Nws,
     Synthetic,
+    /// Mixed mode — some cities pulled live, others fell back to synthetic
+    /// because their individual NWS calls failed.
+    Partial,
 }
 
-/// Resolve the (region, city, lat, lon, radar_station) tuple for this track.
-/// Pure function of the track id — region rotates NW/NE/SE/SW based on
+/// Resolve the (region, radar_station, cities) tuple for this track. Pure
+/// function of the track id — region rotates NW/NE/SE/SW based on
 /// `djb2(id) % 4`.
+pub fn region_for(
+    track_id: &TrackId,
+) -> (&'static str, &'static str, &'static [(&'static str, &'static str, f64, f64)]) {
+    let h = djb2(track_id.as_str());
+    let entry = &REGIONS[(h % REGIONS.len() as u64) as usize];
+    (entry.0, entry.1, entry.2)
+}
+
+/// Back-compat shim for callers wanting just the primary city.
 pub fn region_city_for(
     track_id: &TrackId,
 ) -> (&'static str, &'static str, f64, f64, &'static str) {
-    let h = djb2(track_id.as_str());
-    let entry = REGION_CITIES[(h % REGION_CITIES.len() as u64) as usize];
-    (entry.0, entry.1, entry.2, entry.3, entry.4)
+    let (region, station, cities) = region_for(track_id);
+    let primary = cities[0];
+    (region, primary.1, primary.2, primary.3, station)
+}
+
+/// Fetch live forecasts for all 4 cities in the track's region, in parallel.
+/// Synthetic fallback per-city: if a single NWS call fails the rest still
+/// land. Always returns a 4-city Forecast — the pipeline never blocks on
+/// weather.
+pub async fn fetch_or_synthesize(track_id: &TrackId) -> Forecast {
+    let (region, station, cities) = region_for(track_id);
+
+    // Kick off 4 NWS fetches in parallel via tokio::join_all over async blocks.
+    let http = match reqwest::Client::builder()
+        .user_agent(USER_AGENT)
+        .timeout(Duration::from_secs(15))
+        .build()
+    {
+        Ok(c) => c,
+        Err(e) => {
+            warn!(error = %e, "couldn't build HTTP client — full synthetic fallback");
+            return synthesize_full(track_id, region, station, cities);
+        }
+    };
+
+    let mut handles = Vec::with_capacity(cities.len());
+    for (i, &(disp, full, lat, lon)) in cities.iter().enumerate() {
+        let http = http.clone();
+        let track_id = track_id.clone();
+        handles.push(tokio::spawn(async move {
+            let result = fetch_one_city(&http, lat, lon).await;
+            match result {
+                Ok((days, raw)) => CityForecast {
+                    display_name: disp.to_string(),
+                    full_label: full.to_string(),
+                    lat,
+                    lon,
+                    days,
+                    raw_nws: Some(raw),
+                },
+                Err(e) => {
+                    warn!(
+                        city = disp,
+                        error = %e,
+                        "NWS fetch failed for city — synthesizing fallback for this slot"
+                    );
+                    synthesize_city(&track_id, disp, full, lat, lon, i)
+                }
+            }
+        }));
+    }
+
+    let mut city_results: Vec<CityForecast> = Vec::with_capacity(cities.len());
+    for h in handles {
+        match h.await {
+            Ok(c) => city_results.push(c),
+            Err(e) => {
+                warn!(error = %e, "join error on city fetch — falling back to synthetic");
+                // task panic — synthesize the slot from track_id alone
+                let idx = city_results.len();
+                let entry = cities[idx];
+                city_results.push(synthesize_city(track_id, entry.0, entry.1, entry.2, entry.3, idx));
+            }
+        }
+    }
+
+    // Source label reflects how many cities actually came from NWS.
+    let nws_count = city_results.iter().filter(|c| c.raw_nws.is_some()).count();
+    let source = match nws_count {
+        0 => ForecastSource::Synthetic,
+        n if n == city_results.len() => ForecastSource::Nws,
+        _ => ForecastSource::Partial,
+    };
+
+    Forecast {
+        fetched_at: Utc::now(),
+        source,
+        region: region.to_string(),
+        radar_station: station.to_string(),
+        cities: city_results,
+    }
+}
+
+/// Fetch one city's 5-day forecast from NWS. Two-hop: /points to resolve
+/// gridpoint, then /gridpoints/.../forecast for the actual periods.
+async fn fetch_one_city(
+    http: &reqwest::Client,
+    lat: f64,
+    lon: f64,
+) -> anyhow::Result<(Vec<DayForecast>, serde_json::Value)> {
+    let points_url = format!("https://api.weather.gov/points/{lat:.4},{lon:.4}");
+    debug!(%points_url, "NWS points lookup");
+    let points: serde_json::Value = http
+        .get(&points_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    let office = points
+        .get("properties")
+        .and_then(|p| p.get("gridId"))
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| anyhow::anyhow!("missing properties.gridId"))?;
+    let grid_x = points
+        .get("properties")
+        .and_then(|p| p.get("gridX"))
+        .and_then(|v| v.as_i64())
+        .ok_or_else(|| anyhow::anyhow!("missing properties.gridX"))?;
+    let grid_y = points
+        .get("properties")
+        .and_then(|p| p.get("gridY"))
+        .and_then(|v| v.as_i64())
+        .ok_or_else(|| anyhow::anyhow!("missing properties.gridY"))?;
+
+    let fc_url =
+        format!("https://api.weather.gov/gridpoints/{office}/{grid_x},{grid_y}/forecast");
+    let raw: serde_json::Value =
+        http.get(&fc_url).send().await?.error_for_status()?.json().await?;
+
+    let periods = raw
+        .get("properties")
+        .and_then(|p| p.get("periods"))
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| anyhow::anyhow!("missing properties.periods"))?;
+
+    let days = periods_to_days(periods)?;
+    Ok((days, raw))
+}
+
+/// NWS returns "periods" — 12-hour slices with names "Today/Tonight/Monday/
+/// Monday Night/...". Pair daytime + nighttime to produce 5 day-rows.
+fn periods_to_days(periods: &[serde_json::Value]) -> anyhow::Result<Vec<DayForecast>> {
+    let mut days: Vec<DayForecast> = Vec::with_capacity(5);
+    let mut i = 0usize;
+    while days.len() < 5 && i < periods.len() {
+        let p = &periods[i];
+        let is_day = p.get("isDaytime").and_then(|v| v.as_bool()).unwrap_or(true);
+        if !is_day {
+            i += 1;
+            continue;
+        }
+        let name = p
+            .get("name")
+            .and_then(|v| v.as_str())
+            .unwrap_or("---")
+            .to_string();
+        let day_temp = p
+            .get("temperature")
+            .and_then(|v| v.as_i64())
+            .ok_or_else(|| anyhow::anyhow!("period missing temperature"))? as i32;
+        let short = p
+            .get("shortForecast")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        let night_temp = periods
+            .get(i + 1)
+            .and_then(|np| np.get("temperature"))
+            .and_then(|v| v.as_i64())
+            .map(|t| t as i32)
+            .unwrap_or(day_temp - 12);
+
+        days.push(DayForecast {
+            name: short_day_name(&name),
+            glyph: condition_glyph(short),
+            current: day_temp,
+            high: day_temp,
+            low: night_temp.min(day_temp - 1),
+        });
+        i += 2;
+    }
+    Ok(days)
+}
+
+fn short_day_name(verbose: &str) -> String {
+    let upper = verbose.to_ascii_uppercase();
+    let prefixes = [("MON", "MON"), ("TUE", "TUE"), ("WED", "WED"), ("THU", "THU"),
+        ("FRI", "FRI"), ("SAT", "SAT"), ("SUN", "SUN"), ("TODAY", "TDY"), ("THIS", "TDY")];
+    for (prefix, short) in &prefixes {
+        if upper.starts_with(prefix) {
+            return short.to_string();
+        }
+    }
+    upper.chars().take(3).collect()
+}
+
+fn condition_glyph(short: &str) -> char {
+    let s = short.to_ascii_lowercase();
+    if s.contains("rain") || s.contains("shower") || s.contains("drizzle")
+        || s.contains("storm") || s.contains("thunder")
+    {
+        '~'
+    } else if s.contains("cloud") || s.contains("fog") || s.contains("haz")
+        || s.contains("overcast")
+    {
+        'o'
+    } else {
+        '*'
+    }
+}
+
+/// Synthesize a fallback forecast for ALL cities — used when the HTTP client
+/// can't even be constructed.
+fn synthesize_full(
+    track_id: &TrackId,
+    region: &str,
+    station: &str,
+    cities: &[(&str, &str, f64, f64)],
+) -> Forecast {
+    let city_results: Vec<CityForecast> = cities
+        .iter()
+        .enumerate()
+        .map(|(i, &(d, f, lat, lon))| synthesize_city(track_id, d, f, lat, lon, i))
+        .collect();
+    Forecast {
+        fetched_at: Utc::now(),
+        source: ForecastSource::Synthetic,
+        region: region.to_string(),
+        radar_station: station.to_string(),
+        cities: city_results,
+    }
+}
+
+/// Synthesize a single city's deterministic-fake 5-day forecast.
+fn synthesize_city(
+    track_id: &TrackId,
+    display: &str,
+    full: &str,
+    lat: f64,
+    lon: f64,
+    city_idx: usize,
+) -> CityForecast {
+    const DAYS: [&str; 5] = ["MON", "TUE", "WED", "THU", "FRI"];
+    let base = djb2(track_id.as_str())
+        .wrapping_add((city_idx as u64).wrapping_mul(0xC2B2_AE3D_27D4_EB4F));
+    let days = DAYS
+        .iter()
+        .enumerate()
+        .map(|(i, &name)| {
+            let seed = base.wrapping_add((i as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            const GLYPHS: [char; 4] = ['*', 'o', '~', '*'];
+            let glyph = GLYPHS[((seed >> 8) & 0x3) as usize];
+            let current = 60 + ((seed >> 16) % 25) as i32;
+            let high_offset = 4 + ((seed >> 24) % 9) as i32;
+            let low_offset = 6 + ((seed >> 32) % 9) as i32;
+            DayForecast {
+                name: name.to_string(),
+                glyph,
+                current,
+                high: current + high_offset,
+                low: current - low_offset,
+            }
+        })
+        .collect();
+    CityForecast {
+        display_name: display.to_string(),
+        full_label: full.to_string(),
+        lat,
+        lon,
+        days,
+        raw_nws: None,
+    }
 }
 
 /// Download the NWS Ridge2 animated radar loop GIF for `region`'s station
-/// and save it to `dest`. Returns `Ok(dest)` on success, `Err` on any HTTP
-/// failure (caller falls back to no-radar — the inset stays empty). The
-/// downloaded GIF is the historical record of what radar looked like at
-/// render time; once on disk it sits next to forecast.json in paths.root.
+/// and save it to `dest`. Returns Ok(dest) on success.
 pub async fn fetch_radar_gif(
     region: &str,
     dest: &std::path::Path,
 ) -> anyhow::Result<std::path::PathBuf> {
-    let station = REGION_CITIES
+    let station = REGIONS
         .iter()
         .find(|e| e.0 == region)
-        .map(|e| e.4)
+        .map(|e| e.1)
         .ok_or_else(|| anyhow::anyhow!("unknown region for radar: {region}"))?;
     let url = format!("https://radar.weather.gov/ridge/standard/{station}_loop.gif");
-
     let http = reqwest::Client::builder()
         .user_agent(USER_AGENT)
         .timeout(Duration::from_secs(30))
@@ -126,260 +433,6 @@ pub async fn fetch_radar_gif(
     Ok(dest.to_path_buf())
 }
 
-/// Try NWS first, fall back to synthetic-deterministic on any failure. Always
-/// returns a valid 5-day forecast — the pipeline never blocks on weather.
-pub async fn fetch_or_synthesize(track_id: &TrackId) -> Forecast {
-    let (region, city, lat, lon, _station) = region_city_for(track_id);
-    match fetch_nws(track_id, region, city, lat, lon).await {
-        Ok(f) => f,
-        Err(e) => {
-            warn!(
-                track_id = %track_id,
-                region,
-                city,
-                error = %e,
-                "NWS unreachable — falling back to deterministic synthetic forecast"
-            );
-            synthesize(track_id, region, city, lat, lon)
-        }
-    }
-}
-
-/// Real NWS round-trip: /points → /gridpoints/{office}/{x},{y}/forecast →
-/// flatten the next ~10 periods into 5 day-rows with hi/lo/current. Saves the
-/// raw NWS response into `Forecast.raw_nws` for the historical archive.
-async fn fetch_nws(
-    track_id: &TrackId,
-    region: &str,
-    city: &str,
-    lat: f64,
-    lon: f64,
-) -> anyhow::Result<Forecast> {
-    let http = reqwest::Client::builder()
-        .user_agent(USER_AGENT)
-        .timeout(Duration::from_secs(15))
-        .build()?;
-
-    // Step 1: resolve lat/lon → grid office + cell coordinates.
-    let points_url = format!("https://api.weather.gov/points/{lat:.4},{lon:.4}");
-    debug!(%points_url, "NWS points lookup");
-    let points: serde_json::Value = http
-        .get(&points_url)
-        .send()
-        .await?
-        .error_for_status()?
-        .json()
-        .await?;
-    let office = points
-        .get("properties")
-        .and_then(|p| p.get("gridId"))
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("missing properties.gridId in /points response"))?;
-    let grid_x = points
-        .get("properties")
-        .and_then(|p| p.get("gridX"))
-        .and_then(|v| v.as_i64())
-        .ok_or_else(|| anyhow::anyhow!("missing properties.gridX"))?;
-    let grid_y = points
-        .get("properties")
-        .and_then(|p| p.get("gridY"))
-        .and_then(|v| v.as_i64())
-        .ok_or_else(|| anyhow::anyhow!("missing properties.gridY"))?;
-
-    // Step 2: fetch the forecast for the resolved gridpoint.
-    let fc_url =
-        format!("https://api.weather.gov/gridpoints/{office}/{grid_x},{grid_y}/forecast");
-    debug!(%fc_url, "NWS forecast pull");
-    let raw: serde_json::Value = http
-        .get(&fc_url)
-        .send()
-        .await?
-        .error_for_status()?
-        .json()
-        .await?;
-
-    let periods = raw
-        .get("properties")
-        .and_then(|p| p.get("periods"))
-        .and_then(|v| v.as_array())
-        .ok_or_else(|| anyhow::anyhow!("missing properties.periods array"))?;
-
-    let days = periods_to_days(track_id, periods)?;
-
-    Ok(Forecast {
-        fetched_at: Utc::now(),
-        source: ForecastSource::Nws,
-        region: region.to_string(),
-        city: city.to_string(),
-        lat,
-        lon,
-        days,
-        raw_nws: Some(raw),
-    })
-}
-
-/// NWS returns "periods" — each is a 12-ish hour slice with name like
-/// "Today", "Tonight", "Monday", "Monday Night", etc. To produce 5 day-rows
-/// with hi/lo/current we pair daytime + nighttime periods.
-fn periods_to_days(
-    track_id: &TrackId,
-    periods: &[serde_json::Value],
-) -> anyhow::Result<Vec<DayForecast>> {
-    let mut days: Vec<DayForecast> = Vec::with_capacity(5);
-    let mut i = 0usize;
-    while days.len() < 5 && i < periods.len() {
-        let p = &periods[i];
-        let is_day = p.get("isDaytime").and_then(|v| v.as_bool()).unwrap_or(true);
-        if !is_day {
-            // Skip an opening "Tonight" — we want pairs that start with day.
-            i += 1;
-            continue;
-        }
-        let name = p
-            .get("name")
-            .and_then(|v| v.as_str())
-            .unwrap_or("---")
-            .to_string();
-        let day_temp = p
-            .get("temperature")
-            .and_then(|v| v.as_i64())
-            .ok_or_else(|| anyhow::anyhow!("period missing temperature"))? as i32;
-        let short = p
-            .get("shortForecast")
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
-
-        // Look at the next period for the matching night low.
-        let night_temp = periods
-            .get(i + 1)
-            .and_then(|np| np.get("temperature"))
-            .and_then(|v| v.as_i64())
-            .map(|t| t as i32)
-            .unwrap_or(day_temp - 12);
-
-        // For the first day-row, "current" is the daytime forecast high
-        // (NWS doesn't expose live current temperature here; that's a
-        // separate /stations/.../observations call). For the future rows,
-        // "current" doesn't really map; we fill it with the day's high
-        // again to keep the panel format consistent.
-        let current = day_temp;
-        let high = day_temp;
-        let low = night_temp.min(day_temp - 1);
-
-        days.push(DayForecast {
-            name: short_day_name(&name),
-            glyph: condition_glyph(short),
-            current,
-            high,
-            low,
-        });
-        i += 2;
-    }
-    // Pad up to 5 in case NWS returned fewer periods than expected (network
-    // weirdness, end-of-grid).
-    while days.len() < 5 {
-        let seed = djb2(track_id.as_str()).wrapping_add(days.len() as u64);
-        days.push(synthetic_day(seed, days.len()));
-    }
-    Ok(days)
-}
-
-/// NWS period names are verbose ("Monday", "Monday Night", "This Afternoon").
-/// Squash to 3-char day names that fit the VT323 panel layout.
-fn short_day_name(verbose: &str) -> String {
-    let upper = verbose.to_ascii_uppercase();
-    if upper.starts_with("MON") {
-        "MON".into()
-    } else if upper.starts_with("TUE") {
-        "TUE".into()
-    } else if upper.starts_with("WED") {
-        "WED".into()
-    } else if upper.starts_with("THU") {
-        "THU".into()
-    } else if upper.starts_with("FRI") {
-        "FRI".into()
-    } else if upper.starts_with("SAT") {
-        "SAT".into()
-    } else if upper.starts_with("SUN") {
-        "SUN".into()
-    } else if upper.starts_with("TODAY") || upper.starts_with("THIS") {
-        "TDY".into()
-    } else {
-        // Fall back to the first 3 letters of whatever NWS gave us.
-        upper.chars().take(3).collect()
-    }
-}
-
-/// Map NWS shortForecast strings to the three-glyph synthwave palette.
-fn condition_glyph(short: &str) -> char {
-    let s = short.to_ascii_lowercase();
-    if s.contains("rain")
-        || s.contains("shower")
-        || s.contains("drizzle")
-        || s.contains("storm")
-        || s.contains("thunder")
-    {
-        '~'
-    } else if s.contains("cloud") || s.contains("fog") || s.contains("haz") || s.contains("overcast")
-    {
-        'o'
-    } else {
-        '*'
-    }
-}
-
-/// Deterministic-fake forecast — same shape, same fields, no network. Used
-/// when NWS is unreachable or for offline tests.
-pub fn synthesize(
-    track_id: &TrackId,
-    region: &str,
-    city: &str,
-    lat: f64,
-    lon: f64,
-) -> Forecast {
-    const DAYS: [&str; 5] = ["MON", "TUE", "WED", "THU", "FRI"];
-    let base = djb2(track_id.as_str());
-    let days = DAYS
-        .iter()
-        .enumerate()
-        .map(|(i, &name)| {
-            let seed = base.wrapping_add((i as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let mut d = synthetic_day(seed, i);
-            d.name = name.to_string();
-            d
-        })
-        .collect();
-    Forecast {
-        fetched_at: Utc::now(),
-        source: ForecastSource::Synthetic,
-        region: region.to_string(),
-        city: city.to_string(),
-        lat,
-        lon,
-        days,
-        raw_nws: None,
-    }
-}
-
-fn synthetic_day(seed: u64, idx: usize) -> DayForecast {
-    const GLYPHS: [char; 4] = ['*', 'o', '~', '*'];
-    let glyph = GLYPHS[((seed >> 8) & 0x3) as usize];
-    let current = 60 + ((seed >> 16) % 25) as i32;
-    let high_offset = 4 + ((seed >> 24) % 9) as i32;
-    let low_offset = 6 + ((seed >> 32) % 9) as i32;
-    DayForecast {
-        name: ["MON", "TUE", "WED", "THU", "FRI"]
-            .get(idx)
-            .copied()
-            .unwrap_or("DAY")
-            .to_string(),
-        glyph,
-        current,
-        high: current + high_offset,
-        low: current - low_offset,
-    }
-}
-
 fn djb2(s: &str) -> u64 {
     let mut h: u64 = 5381;
     for b in s.bytes() {
@@ -394,26 +447,58 @@ mod tests {
     use chrono::NaiveDate;
 
     #[test]
-    fn region_city_round_trips() {
+    fn region_has_four_cities() {
         let id = TrackId::new(NaiveDate::from_ymd_opt(2026, 5, 11).unwrap(), 1);
-        let (region, city, lat, lon, _station) = region_city_for(&id);
-        assert!(["NORTHWEST", "NORTHEAST", "SOUTHWEST", "SOUTHEAST"].contains(&region));
-        assert!(!city.is_empty());
-        assert!(lat > 20.0 && lat < 50.0); // continental US range
-        assert!(lon > -130.0 && lon < -65.0);
+        let (_, _, cities) = region_for(&id);
+        assert_eq!(cities.len(), 4, "every region must have exactly 4 cities");
+    }
+
+    #[test]
+    fn synthesize_full_produces_4_cities() {
+        let id = TrackId::new(NaiveDate::from_ymd_opt(2026, 5, 11).unwrap(), 1);
+        let (region, station, cities) = region_for(&id);
+        let fc = synthesize_full(&id, region, station, cities);
+        assert_eq!(fc.cities.len(), 4);
+        assert_eq!(fc.source, ForecastSource::Synthetic);
+        for city in &fc.cities {
+            assert_eq!(city.days.len(), 5);
+            for day in &city.days {
+                assert!((60..=84).contains(&day.current));
+                assert!(day.high > day.current);
+                assert!(day.low < day.current);
+            }
+        }
     }
 
     #[test]
     fn synthetic_is_deterministic() {
         let id = TrackId::new(NaiveDate::from_ymd_opt(2026, 5, 11).unwrap(), 1);
-        let (region, city, lat, lon, _station) = region_city_for(&id);
-        let a = synthesize(&id, region, city, lat, lon);
-        let b = synthesize(&id, region, city, lat, lon);
-        for (x, y) in a.days.iter().zip(&b.days) {
-            assert_eq!(x.current, y.current);
-            assert_eq!(x.high, y.high);
-            assert_eq!(x.low, y.low);
+        let (region, station, cities) = region_for(&id);
+        let a = synthesize_full(&id, region, station, cities);
+        let b = synthesize_full(&id, region, station, cities);
+        for (cx, cy) in a.cities.iter().zip(&b.cities) {
+            assert_eq!(cx.display_name, cy.display_name);
+            for (x, y) in cx.days.iter().zip(&cy.days) {
+                assert_eq!(x.current, y.current);
+                assert_eq!(x.high, y.high);
+                assert_eq!(x.low, y.low);
+            }
         }
+    }
+
+    #[test]
+    fn different_cities_have_different_forecasts() {
+        let id = TrackId::new(NaiveDate::from_ymd_opt(2026, 5, 11).unwrap(), 1);
+        let (region, station, cities) = region_for(&id);
+        let fc = synthesize_full(&id, region, station, cities);
+        // Each city's seed is offset by `city_idx * golden-ratio constant`, so
+        // adjacent cities should produce visibly different numbers.
+        let c0 = &fc.cities[0];
+        let c1 = &fc.cities[1];
+        assert_ne!(
+            c0.days[0].current, c1.days[0].current,
+            "adjacent cities must produce distinct synthetic forecasts"
+        );
     }
 
     #[test]

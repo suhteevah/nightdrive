@@ -649,6 +649,89 @@ if the seams are gone.
 - Cosmetic: the SAO output sometimes has audible 1s crossfade seams. Tweak
   `[audio_gen].overlap_seconds` to 2-3 once we have a bench rig to measure.
 
+## 18. Session 2026-05-11 — Full TWC pipeline + 4 VODs queued
+
+### Last Updated
+2026-05-11
+
+### Project Status
+🟢 **Pipeline running end-to-end on YouTube.** 4 VODs queued to auto-publish on the NightDrive channel; each successive one is more feature-complete.
+
+### What Was Done This Session (the big arc)
+
+After §16 landed track #2 with MG continuation but no overlays, this session built out the whole video-production stack on top:
+
+1. **OAuth bootstrap → channel verification.** Built `nightdrive-cli youtube auth`, walked Matt through Google Cloud Console setup, got `NIGHTDRIVE_YT_REFRESH_TOKEN` into `.env`. After track #1 hit `403 thumbnail.forbidden`, Matt phone-verified the channel — custom thumbnails now work, also unlocks >15min uploads + livestreaming. See `memory/project_youtube_channel_verified.md`.
+
+2. **Type & VT323 typography pass.** Started with Cascadia Mono ("too soft" per Matt), swapped to VT323 (CRT/VHS pixel font, Google Fonts OFL). Bumped shadow/border, added BPM/key subtitle. Locked in `memory/feedback_vt323_locked.md`.
+
+3. **TWC-style 3-panel layout.** Iterated v1-v6 with Matt on the side panel design: title floats above panels in cover bleed, left = radar inset, right = 5-day forecast with pink HI + cyan LO + per-day glyphs. Panels meet at center seam x=960. Locked in `memory/feedback_twc_3panel_layout_locked.md`.
+
+4. **Real NWS forecast + radar.** Added `nightdrive_encoder::weather` module with parallel NWS `/points → /gridpoints/.../forecast` lookups. KAMX/KOKX/KVTX/KAMX radar GIFs downloaded + composited via ffmpeg `negate` (synthwave-magenta precip blobs, dark basemap). Every track archives full `forecast.json` (raw NWS response + timestamp) per Matt's "time capsule" framing. See `memory/feedback_radar_negate_locked.md`.
+
+5. **Multi-city forecast cycling.** 4 cities per region rotate every 30s on the forecast panel (TWC "Local on the 8s" pattern). Time-gated drawtext layers via `enable='between(mod(t,120),slot_start,slot_end)'`. SE: Miami / Fort Lauderdale / Key West / Naples — each pulls its own NWS gridpoint so temps actually differ per slot. See `memory/feedback_4city_cycling_locked.md`.
+
+6. **SDXL cover library.** Stood up a one-shot SDXL gen script (`sidecar/generate_cover_library.py`), attempted 25 covers but VRAM thrashing made each take 10-12 min instead of expected 30-45s. Killed at 2 covers, deferred. Orchestrator picks library covers via `djb2(track_id) % library_size`, falls back to ffmpeg gradient for unmapped tracks.
+
+7. **MusicGen engine.** Replaced SAO as default audio engine. Audiocraft Windows install was painful (av wheel build, xformers torch conflicts) — solved with `--only-binary :all: av`, `audiocraft --no-deps`, force-reinstall torch 2.5.1+cu121, and a **stub xformers package** (audiocraft's module-level import doesn't actually call xformers at runtime when `_efficient_attention_backend == 'torch'`). Full recipe in `memory/reference_audiocraft_windows_install.md`.
+
+8. **VRAM management lessons.** Killing chrome + discord freed ~2 GB. PyTorch's caching allocator can show "8.0/8.0 GB used" even at idle because it reserves blocks rather than releasing to OS. The real "performance gate" is whether per-segment time stays ~30s (good) or balloons to 8-9 min (thrashing — restart MG sidecar).
+
+### Tracks shipped (NightDrive channel)
+
+| video_id | title | engine | layout | upload time |
+|---|---|---|---|---|
+| `EGFUlex64L4` | Nocturnal Lanes (Synthwave for Coding) | SAO | gradient cover + showwaves | first VOD |
+| `FGPUo7oXCI4` | Night Drive Echoes (Chillsynth for Coding) | MG continuation | gradient cover + showwaves | second |
+| `zAEiQ4A-2ig` | Digital Dreams (Synthwave for Coding) | MG | 3-panel + single-city NWS + KAMX radar + VT323 + SDXL cover | third |
+| `2NvOEfVbv2c` | Midnight Pulse (Late Night Programming Mix) [Synthwave for Coding] | MG | 3-panel + **4-city rotation** + KAMX radar + VT323 + SDXL cover | fourth |
+
+All scheduled to auto-flip private→public 24h after upload.
+
+### Current State
+
+**Working:**
+- `run-batch --count N` end-to-end: LLM → MG audio → mastering → 3-panel encode → YouTube upload with custom thumbnail
+- NWS live data pull + KAMX/KOKX/KVTX/KAMX radar GIF download per track
+- 4-city forecast cycling on the right panel (30s/city, 120s loop)
+- VT323 title + subtitle + CTA overlays with proper shadows
+- Cover library fallback chain (SDXL sidecar → library → ffmpeg gradient)
+- `forecast.json` archive per track in `paths.root` — historical record of every track's weather snapshot
+- `radar.gif` archive per track for the same time-capsule purpose
+- Storage CRUD (sqlx, sqlite, witnessed)
+- Workspace audit green (build:0 test:0 stubs:3 witnesses:7 stages:0,1,3,7)
+
+**Broken / not yet shipped:**
+- Real SDXL sidecar (kokonoe 3070 Ti can't host SDXL + MG concurrently — VRAM-contended). Cover library only has 2 covers from the abandoned full gen.
+- Pipeline doesn't persist track rows to SQLite yet — storage is shipped, just not wired into orchestrator
+- `nightdrive-orchestrator resume / status / livestream` still bail!() — separate N2.x roadmap items
+
+### Blocking Issues
+
+- **cnc P100s arrival ~2026-05-17** is the unlock for N1.5 (real SAO/MG on cnc), N1.7 (real SDXL inference, multi-tenant), N1.13 (systemd on arch-controller). Until then everything runs on kokonoe + Windows.
+- **VRAM headroom on kokonoe**: MG-stereo-medium peaks at ~5 GB during inference, Windows desktop tax is ~1-2 GB, so we're always tight. PyTorch caching allocator can fragment under back-to-back model loads (SAO → MG → SDXL); fix is to kill + restart the sidecar between mode switches.
+
+### What's Next (prioritized)
+
+1. **Bench-runner row.** We've shipped 4 tracks but `docs/BENCH_LEDGER.md` hasn't been updated since 2026-05-10. The 7-day stale gate fires when witnesses ≥ 7 (which we are). Run the bench-runner agent to append a row for the pipeline.
+2. **Storage integration into pipeline_one.** Insert track row at stage 1 (after spec generated), update_state at each stage transition. Currently the storage crate is shipped but pipeline_one doesn't call it.
+3. **N2.1 resume subcommand.** Now real because pipeline_one is no longer stubbed. Query `tracks WHERE state != 'published'` and re-run from that stage forward.
+4. **SDXL library expansion.** Either fix the kokonoe SDXL thrashing (maybe by closing more apps + using `enable_model_cpu_offload`) or wait for cnc P100s and run library gen on the 16 GB cards.
+5. **Candle backend exploration.** Matt asked about this — see chat history. Confirmed we haven't actually benchmarked candle vs PyTorch for music generation. Following up means porting `MusicGenClient` to a candle backend and side-by-side benchmarking. The existing `candle-fork` (matt-voice-lora branch) already has Pascal compat patches.
+6. **Forecast panel polish:** Crop NWS branding/legend bar from the radar GIF before composite. Currently visible at top + bottom of the radar inset.
+
+### Notes for Next Session
+
+- The `var/nightdrive/tracks/nd-20260511-001/` directory has the artifacts from the most recent run (track #4). Earlier runs overwrote each other because track_id is `nd-{today}-001` and all 4 runs were today. Per-track persistence requires Sequence > 1 or different date — orchestrator's `run-batch` always uses sequence=1.
+- `var/` shouldn't be in git tracking — added to `.gitignore` this session but the files were already tracked from the initial commit. Need `git rm --cached var/` in a future session.
+- `.env` has live YT OAuth refresh token bound to NightDrive channel (`UCsS7L4PUedZ-zus3rV3AMDw`). Gitignored. Don't commit.
+- HF token is at `~/.cache/huggingface/token` (whoami: Suhteevah). audiocraft + diffusers auto-discover it.
+- MG sidecar runs on `:8082` (not :8080 — lattice-server holds that). Config field `[audio_gen].base_url = "http://127.0.0.1:8082"`.
+- VT323 lives at `assets/fonts/VT323-Regular.ttf` (downloaded from Google Fonts OFL). Committed; the rest of the font discussion is in `memory/feedback_vt323_locked.md`.
+- The `xformers` package in the synthwave-gen venv is a **stub** (`{site-packages}/xformers/__init__.py` + `ops.py`). Real xformers wheels demand torch versions that conflict with the rest of the venv. Stub satisfies audiocraft's module-level import; the runtime path uses torch SDPA. Don't `pip install xformers` — it'll wreck the venv.
+- Auto-publish schedule is 24h via `[youtube].schedule_offset_hours = 24` + `publishAt` in upload metadata. Tracks flip private → public on YouTube's side; we don't poll.
+- Memory directory at `~/.claude/projects/J--nightdrive/memory/` has 12 entries documenting every locked design decision this session. Read the index in `MEMORY.md` before redesigning anything.
+
 ---
 
 **Single-source-of-truth:** this file. Update it when decisions change.

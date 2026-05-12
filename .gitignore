@@ -15,6 +15,7 @@ config/nightdrive.toml
 assets/covers/library/
 
 # Local state / runtime artifacts
+/var/
 /var/lib/nightdrive/
 *.sqlite
 *.sqlite-journal

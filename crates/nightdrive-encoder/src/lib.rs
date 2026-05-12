@@ -156,7 +156,8 @@ impl FinalEncoder for FfmpegEncoder {
             archive = %forecast_archive.display(),
             source = ?forecast_data.source,
             region = %forecast_data.region,
-            city = %forecast_data.city,
+            cities = forecast_data.cities.len(),
+            primary_city = %forecast_data.cities.first().map(|c| c.full_label.as_str()).unwrap_or("?"),
             fetched_at = %forecast_data.fetched_at,
             radar_present = radar_path.is_some(),
             "forecast resolved + archived"
@@ -176,36 +177,56 @@ impl FinalEncoder for FfmpegEncoder {
             &format!("RADAR · {}", forecast_data.region),
         )
         .await?;
-        let fc_header_path = write_text(&text_dir, "fc_header.txt", "5-DAY FORECAST").await?;
 
-        let mut fc_paths: Vec<PathBuf> = Vec::new();
-        let mut hi_paths: Vec<PathBuf> = Vec::new();
-        let mut lo_paths: Vec<PathBuf> = Vec::new();
-        for (i, day) in forecast_data.days.iter().enumerate() {
-            fc_paths.push(
-                write_text(
-                    &text_dir,
-                    &format!("fc_d{}.txt", i + 1),
-                    &format!("{}   {}  {}°", day.name, day.glyph, day.current),
-                )
-                .await?,
-            );
-            hi_paths.push(
-                write_text(
-                    &text_dir,
-                    &format!("hi_d{}.txt", i + 1),
-                    &format!("HI {}", day.high),
-                )
-                .await?,
-            );
-            lo_paths.push(
-                write_text(
-                    &text_dir,
-                    &format!("lo_d{}.txt", i + 1),
-                    &format!("LO {}", day.low),
-                )
-                .await?,
-            );
+        // Per-city overlay files. 4 cities × (1 header + 5 fc + 5 hi + 5 lo) = 64
+        // text files per render. ffmpeg drawtext layers reference them
+        // individually with `enable=between(mod(t,120),slot_start,slot_end)`
+        // to cycle every 30s in TWC "Local on the 8s" style.
+        let mut city_headers: Vec<PathBuf> = Vec::with_capacity(forecast_data.cities.len());
+        let mut city_fc_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
+        let mut city_hi_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
+        let mut city_lo_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
+        for (city_idx, city) in forecast_data.cities.iter().enumerate() {
+            let hdr = write_text(
+                &text_dir,
+                &format!("fc_header_c{city_idx}.txt"),
+                &format!("5-DAY FORECAST · {}", city.display_name),
+            )
+            .await?;
+            city_headers.push(hdr);
+
+            let mut fc = Vec::with_capacity(city.days.len());
+            let mut hi = Vec::with_capacity(city.days.len());
+            let mut lo = Vec::with_capacity(city.days.len());
+            for (d_idx, day) in city.days.iter().enumerate() {
+                fc.push(
+                    write_text(
+                        &text_dir,
+                        &format!("fc_c{city_idx}_d{}.txt", d_idx + 1),
+                        &format!("{}   {}  {}°", day.name, day.glyph, day.current),
+                    )
+                    .await?,
+                );
+                hi.push(
+                    write_text(
+                        &text_dir,
+                        &format!("hi_c{city_idx}_d{}.txt", d_idx + 1),
+                        &format!("HI {}", day.high),
+                    )
+                    .await?,
+                );
+                lo.push(
+                    write_text(
+                        &text_dir,
+                        &format!("lo_c{city_idx}_d{}.txt", d_idx + 1),
+                        &format!("LO {}", day.low),
+                    )
+                    .await?,
+                );
+            }
+            city_fc_paths.push(fc);
+            city_hi_paths.push(hi);
+            city_lo_paths.push(lo);
         }
 
         let cta_active = !self.cfg.cta_text.trim().is_empty();
@@ -222,10 +243,10 @@ impl FinalEncoder for FfmpegEncoder {
             &title_path,
             &subtitle_path,
             &radar_header_path,
-            &fc_header_path,
-            &fc_paths,
-            &hi_paths,
-            &lo_paths,
+            &city_headers,
+            &city_fc_paths,
+            &city_hi_paths,
+            &city_lo_paths,
             cta_path.as_deref(),
             radar_path.is_some(),
         );
@@ -304,6 +325,11 @@ impl FinalEncoder for FfmpegEncoder {
     }
 }
 
+/// One city's 30-second slot in the forecast rotation. With 4 cities cycling
+/// the total loop is 120s, which loops 2-3 times per typical 240-360s track.
+const CYCLE_SECONDS: f64 = 120.0;
+const SLOT_SECONDS: f64 = 30.0;
+
 #[allow(clippy::too_many_arguments)]
 fn build_filter_graph(
     overlays_ok: bool,
@@ -311,10 +337,10 @@ fn build_filter_graph(
     title_path: &Path,
     subtitle_path: &Path,
     radar_header_path: &Path,
-    fc_header_path: &Path,
-    fc_paths: &[PathBuf],
-    hi_paths: &[PathBuf],
-    lo_paths: &[PathBuf],
+    city_headers: &[PathBuf],
+    city_fc_paths: &[Vec<PathBuf>],
+    city_hi_paths: &[Vec<PathBuf>],
+    city_lo_paths: &[Vec<PathBuf>],
     cta_path: Option<&Path>,
     radar_present: bool,
 ) -> String {
@@ -383,7 +409,7 @@ fn build_filter_graph(
         drawtext_layer(font, subtitle_path, "0x00FFFF", 40, "(w-text_w)/2", "130")
             + ":borderw=3:bordercolor=black:shadowcolor=black@0.9:shadowx=5:shadowy=5",
     );
-    // Panel headers.
+    // Radar panel header (static — radar IS regional).
     add(
         &mut graph,
         &mut prev,
@@ -391,38 +417,58 @@ fn build_filter_graph(
         drawtext_layer(font, radar_header_path, "0x00FFFF", 36, "40", "240")
             + ":borderw=2:bordercolor=black",
     );
-    add(
-        &mut graph,
-        &mut prev,
-        &mut layer_idx,
-        drawtext_layer(font, fc_header_path, "0x00FFFF", 36, "1000", "240")
-            + ":borderw=2:bordercolor=black",
-    );
-    // 5 rows × (white prefix + pink HI + cyan LO), pitch 90px from y=320.
-    for (i, ((fc, hi), lo)) in fc_paths.iter().zip(hi_paths).zip(lo_paths).enumerate() {
-        let y = 320 + (i as i32) * 90;
-        let y_str = y.to_string();
+    // 4-city cycling forecast panel: each city gets a 30s slot, total cycle
+    // 120s, loops for the song length. `enable=between(mod(t,120),a,b)`
+    // makes a drawtext visible only when current time mod 120 is in [a,b).
+    for (city_idx, header) in city_headers.iter().enumerate() {
+        let slot_start = (city_idx as f64) * SLOT_SECONDS;
+        let slot_end = slot_start + SLOT_SECONDS;
+        let enable_expr = format!(
+            ":enable='between(mod(t\\,{cycle:.0})\\,{a:.0}\\,{b:.0})'",
+            cycle = CYCLE_SECONDS,
+            a = slot_start,
+            b = slot_end,
+        );
+        // Header for this city (cycles to match the forecast rows).
         add(
             &mut graph,
             &mut prev,
             &mut layer_idx,
-            drawtext_layer(font, fc, "white", 48, "1000", &y_str)
-                + ":borderw=2:bordercolor=black",
+            drawtext_layer(font, header, "0x00FFFF", 36, "1000", "240")
+                + ":borderw=2:bordercolor=black"
+                + &enable_expr,
         );
-        add(
-            &mut graph,
-            &mut prev,
-            &mut layer_idx,
-            drawtext_layer(font, hi, "0xFF66CC", 48, "1370", &y_str)
-                + ":borderw=2:bordercolor=black",
-        );
-        add(
-            &mut graph,
-            &mut prev,
-            &mut layer_idx,
-            drawtext_layer(font, lo, "0x00FFFF", 48, "1620", &y_str)
-                + ":borderw=2:bordercolor=black",
-        );
+        let fc_paths = &city_fc_paths[city_idx];
+        let hi_paths = &city_hi_paths[city_idx];
+        let lo_paths = &city_lo_paths[city_idx];
+        for (i, ((fc, hi), lo)) in fc_paths.iter().zip(hi_paths).zip(lo_paths).enumerate() {
+            let y = 320 + (i as i32) * 90;
+            let y_str = y.to_string();
+            add(
+                &mut graph,
+                &mut prev,
+                &mut layer_idx,
+                drawtext_layer(font, fc, "white", 48, "1000", &y_str)
+                    + ":borderw=2:bordercolor=black"
+                    + &enable_expr,
+            );
+            add(
+                &mut graph,
+                &mut prev,
+                &mut layer_idx,
+                drawtext_layer(font, hi, "0xFF66CC", 48, "1370", &y_str)
+                    + ":borderw=2:bordercolor=black"
+                    + &enable_expr,
+            );
+            add(
+                &mut graph,
+                &mut prev,
+                &mut layer_idx,
+                drawtext_layer(font, lo, "0x00FFFF", 48, "1620", &y_str)
+                    + ":borderw=2:bordercolor=black"
+                    + &enable_expr,
+            );
+        }
     }
     if let Some(p) = cta_path {
         add(
