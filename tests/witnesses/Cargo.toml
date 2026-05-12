@@ -32,6 +32,10 @@ path = "cli_db_migrate.rs"
 name = "retry_recovers_transient_500"
 path = "retry_recovers_transient_500.rs"
 
+[[test]]
+name = "resume_skips_terminal_tracks"
+path = "resume_skips_terminal_tracks.rs"
+
 [dev-dependencies]
 nightdrive-core.workspace = true
 nightdrive-llm.workspace = true

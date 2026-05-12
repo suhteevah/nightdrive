@@ -10,7 +10,9 @@ use anyhow::{bail, Context};
 use clap::{Parser, Subcommand};
 use nightdrive_core::config::AppConfig;
 use nightdrive_core::observability;
-use tracing::{error, info, instrument};
+use nightdrive_core::TrackState;
+use nightdrive_storage::{Db, Tracks, Uploads};
+use tracing::{error, info, instrument, warn};
 
 #[derive(Parser)]
 #[command(name = "nightdrive-orchestrator", version)]
@@ -68,14 +70,27 @@ async fn main() -> anyhow::Result<()> {
 async fn run_batch(cfg: &AppConfig, count: u32, dry_run: bool) -> anyhow::Result<()> {
     info!(count, dry_run, "starting batch");
 
+    // One DB handle for the whole batch — the pool is cheap to clone if a
+    // future change wants to fan tracks across tokio tasks.
+    let db = Db::connect_and_migrate(&cfg.paths.sqlite_db)
+        .await
+        .context("open sqlite + run migrations")?;
+
     for sequence in 1..=count {
         let track_id = nightdrive_core::TrackId::new(chrono::Utc::now().date_naive(), sequence);
         let span = tracing::info_span!("track", id = %track_id, sequence);
         let _enter = span.enter();
 
-        if let Err(e) = pipeline_one(cfg, &track_id, dry_run).await {
+        if let Err(e) = pipeline_one(cfg, &db, &track_id, dry_run).await {
             error!(error = %e, error.chain = ?e, "pipeline failed for track");
-            // continue with the next track — one failure doesn't abort the batch
+            // Best-effort: mark Failed so `resume` doesn't try to revive it.
+            // "track not found" is the expected path when stage 1 itself
+            // failed before the Tracks::insert landed — log + move on.
+            if let Err(mark_err) =
+                Tracks::update_state(&db, &track_id, TrackState::Failed).await
+            {
+                warn!(error = %mark_err, "couldn't mark track failed (likely pre-insert)");
+            }
         }
     }
 
@@ -84,9 +99,16 @@ async fn run_batch(cfg: &AppConfig, count: u32, dry_run: bool) -> anyhow::Result
 }
 
 /// The full pipeline for one track. Each stage is its own instrumented call.
-#[instrument(skip(cfg), fields(track_id = %track_id))]
+///
+/// Storage transitions happen at every stage boundary so `resume` (and any
+/// future operator-facing status query) can see exactly where a track is.
+/// Stages 2 and 3 run in parallel and `join!` together, so the state machine
+/// skips directly from `SpecGenerated` to `CoverRendered` once the join
+/// completes — both audio and cover are durable on disk by then.
+#[instrument(skip(cfg, db), fields(track_id = %track_id))]
 async fn pipeline_one(
     cfg: &AppConfig,
+    db: &Db,
     track_id: &nightdrive_core::TrackId,
     dry_run: bool,
 ) -> anyhow::Result<()> {
@@ -101,9 +123,123 @@ async fn pipeline_one(
     use nightdrive_llm::CompositionLlm;
     let spec = llm.generate_spec(track_id).await?;
     tokio::fs::write(paths.spec_json(), serde_json::to_vec_pretty(&spec)?).await?;
+    // Persist track row immediately so a stage-2+ failure is recoverable via
+    // `resume`. Seed is derived from track_id deterministically so re-renders
+    // of the same id produce the same audio + cover.
+    let seed = djb2_hash(track_id.as_str()) as i64;
+    Tracks::insert(db, &spec, seed).await?;
+    Tracks::update_state(db, track_id, TrackState::SpecGenerated).await?;
 
     // -- Stage 2+3: audio + cover in parallel -----------------------------
     info!("stage=2-3 audio_gen and cover (parallel)");
+    run_audio_and_cover(cfg, &spec, &paths).await?;
+    // Audio and cover both landed; the state machine compresses the two
+    // parallel stages into one transition.
+    Tracks::update_state(db, track_id, TrackState::CoverRendered).await?;
+
+    // -- Stage 4: master ---------------------------------------------------
+    info!("stage=4 master");
+    {
+        use nightdrive_audio_master::AudioMaster;
+        let master = nightdrive_audio_master::FfmpegMaster::new(cfg.mastering.clone());
+        master.run(&paths).await?;
+    }
+    Tracks::update_state(db, track_id, TrackState::AudioMastered).await?;
+
+    // -- Stage 5: visualizer (MVP placeholder via ffmpeg showwaves) -------
+    // The wgpu visualizer is N3.1 (multi-week). MVP path per ROADMAP §10:
+    // "Visuals at this stage can be a static cover art + waveform (ffmpeg
+    // showwaves filter) — ugly but ships." The showwaves overlay actually
+    // lives inside nightdrive-encoder's filter graph so this stage is a
+    // structural no-op until N3.1 lands.
+    info!("stage=5 visualizer (placeholder: showwaves overlay baked into stage 6)");
+
+    // -- Stage 6: final encode --------------------------------------------
+    info!("stage=6 final encode");
+    {
+        use nightdrive_encoder::FinalEncoder;
+        let encoder = nightdrive_encoder::FfmpegEncoder::new(cfg.encoder.clone());
+        encoder.compose(&paths, &spec).await?;
+        // Re-encode the cover.png to JPEG for the thumbnail (YouTube caps
+        // thumbnails at 2 MB / JPEG; SDXL covers are PNG often 1-2 MB+).
+        nightdrive_encoder::make_thumbnail(&paths).await?;
+    }
+    Tracks::update_state(db, track_id, TrackState::VideoEncoded).await?;
+
+    // -- Stage 7: upload ---------------------------------------------------
+    if dry_run {
+        info!("dry_run=true, skipping upload");
+        return Ok(());
+    }
+    info!("stage=7 upload");
+    // Insert the upload row in `queued` state BEFORE the PUT begins so a
+    // mid-upload crash leaves a discoverable trail. set_youtube_id flips to
+    // `complete` on success; a failed upload stays `queued` for `resume`.
+    let upload_id = Uploads::insert(db, track_id).await?;
+    let creds = nightdrive_youtube::YoutubeCredentials::from_env()?;
+    let yt = nightdrive_youtube::YoutubeClient::new(creds)?;
+    use nightdrive_youtube::YoutubeUploader;
+    let req = nightdrive_youtube::UploadRequest {
+        spec: &spec,
+        paths: &paths,
+        privacy: match cfg.youtube.default_privacy.as_str() {
+            "public" => nightdrive_youtube::Privacy::Public,
+            "unlisted" => nightdrive_youtube::Privacy::Unlisted,
+            _ => nightdrive_youtube::Privacy::Private,
+        },
+        scheduled_publish_at: Some(
+            chrono::Utc::now() + chrono::Duration::hours(cfg.youtube.schedule_offset_hours),
+        ),
+        declare_synthetic_content: cfg.youtube.declare_synthetic_content,
+    };
+    let result = yt.upload_video(req).await?;
+    Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
+    // Custom-thumbnail upload requires the YouTube channel to be phone-verified
+    // (Channel → Settings → Verify). Until that's done the API returns
+    // 403 youtube.thumbnail.forbidden. The video itself uploads fine and
+    // YouTube auto-generates a thumbnail from frame samples — that's good
+    // enough for MVP, so we log + continue rather than fail the pipeline.
+    if let Err(e) = yt.set_thumbnail(&result.video_id, &paths.thumbnail_jpg()).await {
+        let msg = e.to_string();
+        if msg.contains("403") && msg.contains("thumbnail") {
+            tracing::warn!(
+                video_id = %result.video_id,
+                "thumbnail set 403 — channel needs phone verification at \
+                 youtube.com/verify; using YouTube's auto-generated thumbnail"
+            );
+        } else {
+            return Err(e.into());
+        }
+    }
+
+    Tracks::update_state(db, track_id, TrackState::Published).await?;
+    info!(video_id = %result.video_id, "track published");
+    Ok(())
+}
+
+/// djb2 hash of a track id. Same function used by nightdrive-audio-gen and
+/// nightdrive-art so seed-derived behavior (audio segment seeds, cover
+/// palette, cover library pick) stays symmetric across crates.
+fn djb2_hash(s: &str) -> u64 {
+    let mut h: u64 = 5381;
+    for b in s.bytes() {
+        h = h.wrapping_mul(33).wrapping_add(b as u64);
+    }
+    h
+}
+
+/// Render audio (stage 2) and cover (stage 3) in parallel.
+///
+/// Extracted from `pipeline_one` so `resume_one` can call the same
+/// implementation when picking up a track in `SpecGenerated` /
+/// `AudioRendered` state. Does NOT touch the storage state machine —
+/// callers handle their own transitions so resume + run-batch can update
+/// the same row from different angles.
+async fn run_audio_and_cover(
+    cfg: &AppConfig,
+    spec: &nightdrive_core::CompositionSpec,
+    paths: &nightdrive_core::TrackPaths,
+) -> anyhow::Result<()> {
     let audio_task = {
         let cfg = cfg.audio_gen.clone();
         let spec = spec.clone();
@@ -163,76 +299,6 @@ async fn pipeline_one(
     let (audio_res, art_res) = tokio::join!(audio_task, art_task);
     audio_res??;
     art_res??;
-
-    // -- Stage 4: master ---------------------------------------------------
-    info!("stage=4 master");
-    {
-        use nightdrive_audio_master::AudioMaster;
-        let master = nightdrive_audio_master::FfmpegMaster::new(cfg.mastering.clone());
-        master.run(&paths).await?;
-    }
-
-    // -- Stage 5: visualizer (MVP placeholder via ffmpeg showwaves) -------
-    // The wgpu visualizer is N3.1 (multi-week). MVP path per ROADMAP §10:
-    // "Visuals at this stage can be a static cover art + waveform (ffmpeg
-    // showwaves filter) — ugly but ships." The showwaves overlay actually
-    // lives inside nightdrive-encoder's filter graph so this stage is a
-    // structural no-op until N3.1 lands.
-    info!("stage=5 visualizer (placeholder: showwaves overlay baked into stage 6)");
-
-    // -- Stage 6: final encode --------------------------------------------
-    info!("stage=6 final encode");
-    {
-        use nightdrive_encoder::FinalEncoder;
-        let encoder = nightdrive_encoder::FfmpegEncoder::new(cfg.encoder.clone());
-        encoder.compose(&paths, &spec).await?;
-        // Re-encode the cover.png to JPEG for the thumbnail (YouTube caps
-        // thumbnails at 2 MB / JPEG; SDXL covers are PNG often 1-2 MB+).
-        nightdrive_encoder::make_thumbnail(&paths).await?;
-    }
-
-    // -- Stage 7: upload ---------------------------------------------------
-    if dry_run {
-        info!("dry_run=true, skipping upload");
-        return Ok(());
-    }
-    info!("stage=7 upload");
-    let creds = nightdrive_youtube::YoutubeCredentials::from_env()?;
-    let yt = nightdrive_youtube::YoutubeClient::new(creds)?;
-    use nightdrive_youtube::YoutubeUploader;
-    let req = nightdrive_youtube::UploadRequest {
-        spec: &spec,
-        paths: &paths,
-        privacy: match cfg.youtube.default_privacy.as_str() {
-            "public" => nightdrive_youtube::Privacy::Public,
-            "unlisted" => nightdrive_youtube::Privacy::Unlisted,
-            _ => nightdrive_youtube::Privacy::Private,
-        },
-        scheduled_publish_at: Some(
-            chrono::Utc::now() + chrono::Duration::hours(cfg.youtube.schedule_offset_hours),
-        ),
-        declare_synthetic_content: cfg.youtube.declare_synthetic_content,
-    };
-    let result = yt.upload_video(req).await?;
-    // Custom-thumbnail upload requires the YouTube channel to be phone-verified
-    // (Channel → Settings → Verify). Until that's done the API returns
-    // 403 youtube.thumbnail.forbidden. The video itself uploads fine and
-    // YouTube auto-generates a thumbnail from frame samples — that's good
-    // enough for MVP, so we log + continue rather than fail the pipeline.
-    if let Err(e) = yt.set_thumbnail(&result.video_id, &paths.thumbnail_jpg()).await {
-        let msg = e.to_string();
-        if msg.contains("403") && msg.contains("thumbnail") {
-            tracing::warn!(
-                video_id = %result.video_id,
-                "thumbnail set 403 — channel needs phone verification at \
-                 youtube.com/verify; using YouTube's auto-generated thumbnail"
-            );
-        } else {
-            return Err(e.into());
-        }
-    }
-
-    info!(video_id = %result.video_id, "track published");
     Ok(())
 }
 
@@ -382,11 +448,164 @@ async fn placeholder_cover(
     Ok(())
 }
 
-#[instrument(skip(_cfg))]
-async fn resume(_cfg: &AppConfig) -> anyhow::Result<()> {
-    // TODO(nightdrive): find tracks where state IN (spec_generated, audio_rendered, ...)
-    // and re-run the pipeline from that stage forward.
-    bail!("resume not yet implemented in N1.1; see ROADMAP.md N1.12")
+/// Pick up every non-terminal track and re-run it from its current state.
+///
+/// Terminal states (`Published`, `Failed`) are skipped. Everything else gets
+/// dispatched to [`resume_one`] which inspects [`TrackState`] and runs only
+/// the stages that haven't completed yet. Per-track failures don't abort the
+/// resume — same one-failure-isn't-batch-abort policy as `run_batch`.
+#[instrument(skip(cfg))]
+async fn resume(cfg: &AppConfig) -> anyhow::Result<()> {
+    let db = Db::connect_and_migrate(&cfg.paths.sqlite_db)
+        .await
+        .context("open sqlite for resume")?;
+    resume_with_db(cfg, &db, false).await
+}
+
+/// Inner [`resume`] body that takes an already-opened DB handle. Extracted
+/// so the witness can drive it against a tempdir SQLite without going
+/// through the cfg.paths.sqlite_db path.
+#[instrument(skip(cfg, db), fields(dry_run))]
+async fn resume_with_db(cfg: &AppConfig, db: &Db, dry_run: bool) -> anyhow::Result<()> {
+    // Pull every non-terminal track. Each state gets its own `list(Some(_))`
+    // call rather than a `WHERE state NOT IN (...)` join because the typed
+    // storage API only exposes the filtered list.
+    let non_terminal_states = [
+        TrackState::Pending,
+        TrackState::SpecGenerated,
+        TrackState::AudioRendered,
+        TrackState::CoverRendered,
+        TrackState::AudioMastered,
+        TrackState::VideoEncoded,
+    ];
+    let mut needs_resume: Vec<nightdrive_storage::TrackRow> = Vec::new();
+    for state in non_terminal_states {
+        let rows = Tracks::list(db, Some(state))
+            .await
+            .with_context(|| format!("list tracks in state {state:?}"))?;
+        needs_resume.extend(rows);
+    }
+    info!(count = needs_resume.len(), dry_run, "resuming non-terminal tracks");
+    if needs_resume.is_empty() {
+        return Ok(());
+    }
+
+    for row in needs_resume {
+        let track_id = row.id.clone();
+        let state_label = row.state.as_str();
+        let span = tracing::info_span!("resume_track", id = %track_id, from_state = state_label);
+        let _enter = span.enter();
+        if let Err(e) = resume_one(cfg, db, row, dry_run).await {
+            error!(error = %e, error.chain = ?e, "resume failed for track");
+            if let Err(mark_err) =
+                Tracks::update_state(db, &track_id, TrackState::Failed).await
+            {
+                warn!(error = %mark_err, "couldn't mark resumed track failed");
+            }
+        }
+    }
+    info!("resume complete");
+    Ok(())
+}
+
+/// Resume a single track from its stored state. State transitions are
+/// idempotent (re-running a completed stage just overwrites the on-disk
+/// artifact with the deterministic-seed re-render). The dispatch is
+/// monotonic: each `if` only fires when the row's recorded progress is
+/// before that stage.
+async fn resume_one(
+    cfg: &AppConfig,
+    db: &Db,
+    row: nightdrive_storage::TrackRow,
+    dry_run: bool,
+) -> anyhow::Result<()> {
+    let spec: nightdrive_core::CompositionSpec = serde_json::from_str(&row.spec_json)
+        .with_context(|| format!("parse spec_json for {}", row.id))?;
+    let track_id = spec.track_id.clone();
+    let paths = nightdrive_core::TrackPaths::new(&cfg.paths.work_dir, &track_id);
+    tokio::fs::create_dir_all(&paths.root)
+        .await
+        .with_context(|| format!("mkdir {}", paths.root.display()))?;
+    // Re-materialize spec.json on disk if missing — the encoder filter graph
+    // doesn't read it but some downstream tooling does, and it's free.
+    if tokio::fs::metadata(paths.spec_json()).await.is_err() {
+        tokio::fs::write(paths.spec_json(), serde_json::to_vec_pretty(&spec)?).await?;
+    }
+
+    // `AudioRendered` is currently unreachable from the run-batch wiring
+    // (stages 2 and 3 commit together as `CoverRendered`), but the storage
+    // enum has it and the resume logic should still do the right thing if
+    // it's ever set manually. Treat it like `SpecGenerated`: re-run both
+    // stages 2 and 3. The audio re-render is wasteful but the seed is
+    // deterministic so the output is bit-identical.
+    let needs_audio_cover = matches!(
+        row.state,
+        TrackState::Pending | TrackState::SpecGenerated | TrackState::AudioRendered
+    );
+    let needs_master = needs_audio_cover || row.state == TrackState::CoverRendered;
+    let needs_encode = needs_master || row.state == TrackState::AudioMastered;
+    let needs_upload = needs_encode || row.state == TrackState::VideoEncoded;
+
+    if needs_audio_cover {
+        info!("resume stage=2-3 audio_gen and cover (parallel)");
+        run_audio_and_cover(cfg, &spec, &paths).await?;
+        Tracks::update_state(db, &track_id, TrackState::CoverRendered).await?;
+    }
+    if needs_master {
+        info!("resume stage=4 master");
+        use nightdrive_audio_master::AudioMaster;
+        let master = nightdrive_audio_master::FfmpegMaster::new(cfg.mastering.clone());
+        master.run(&paths).await?;
+        Tracks::update_state(db, &track_id, TrackState::AudioMastered).await?;
+    }
+    if needs_encode {
+        info!("resume stage=6 encode");
+        use nightdrive_encoder::FinalEncoder;
+        let encoder = nightdrive_encoder::FfmpegEncoder::new(cfg.encoder.clone());
+        encoder.compose(&paths, &spec).await?;
+        nightdrive_encoder::make_thumbnail(&paths).await?;
+        Tracks::update_state(db, &track_id, TrackState::VideoEncoded).await?;
+    }
+    if needs_upload {
+        if dry_run {
+            info!("resume dry_run=true, skipping upload — state stays VideoEncoded");
+            return Ok(());
+        }
+        info!("resume stage=7 upload");
+        let upload_id = Uploads::insert(db, &track_id).await?;
+        let creds = nightdrive_youtube::YoutubeCredentials::from_env()?;
+        let yt = nightdrive_youtube::YoutubeClient::new(creds)?;
+        use nightdrive_youtube::YoutubeUploader;
+        let req = nightdrive_youtube::UploadRequest {
+            spec: &spec,
+            paths: &paths,
+            privacy: match cfg.youtube.default_privacy.as_str() {
+                "public" => nightdrive_youtube::Privacy::Public,
+                "unlisted" => nightdrive_youtube::Privacy::Unlisted,
+                _ => nightdrive_youtube::Privacy::Private,
+            },
+            scheduled_publish_at: Some(
+                chrono::Utc::now() + chrono::Duration::hours(cfg.youtube.schedule_offset_hours),
+            ),
+            declare_synthetic_content: cfg.youtube.declare_synthetic_content,
+        };
+        let result = yt.upload_video(req).await?;
+        Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
+        if let Err(e) = yt.set_thumbnail(&result.video_id, &paths.thumbnail_jpg()).await {
+            let msg = e.to_string();
+            if msg.contains("403") && msg.contains("thumbnail") {
+                warn!(
+                    video_id = %result.video_id,
+                    "thumbnail set 403 — channel needs phone verification"
+                );
+            } else {
+                return Err(e.into());
+            }
+        }
+        Tracks::update_state(db, &track_id, TrackState::Published).await?;
+        info!(video_id = %result.video_id, "resumed track published");
+    }
+    Ok(())
 }
 
 #[instrument(skip(_cfg))]

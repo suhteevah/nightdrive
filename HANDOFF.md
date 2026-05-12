@@ -732,6 +732,110 @@ All scheduled to auto-flip private→public 24h after upload.
 - Auto-publish schedule is 24h via `[youtube].schedule_offset_hours = 24` + `publishAt` in upload metadata. Tracks flip private → public on YouTube's side; we don't poll.
 - Memory directory at `~/.claude/projects/J--nightdrive/memory/` has 12 entries documenting every locked design decision this session. Read the index in `MEMORY.md` before redesigning anything.
 
+## 19. Session 2026-05-12 — Candle scoped, bench-row, storage wired, resume shipped
+
+Worked through HANDOFF §18's "What's Next" punch list in order: 5, 1, 2, 3.
+
+### 19.1 Candle backend scoped (item 5)
+`docs/candle-backend-exploration.md` written. TL;DR: **defer**. Upstream
+candle has a half-baked MusicGen example (text encoder only, decoder
+`prepare_decoder_attention_mask` is `todo!()`, no `generate_continuation`,
+no T5, no stereo, no 32 kHz EnCodec wiring). PR #2145 sat unmerged for
+~13 months; issue #975 ("AudioGen/MusicGen") is `help wanted` with no
+maintainer engagement. Effort to bridge: 3-6 weeks of focused Rust work
+tracking a model audiocraft already ships correctly. Performance ceiling
+is likely worse, not better. Keep the Python audiocraft sidecar. Re-open
+when PR #2145 lands or a third-party crate publishes a working port.
+
+### 19.2 Bench ledger fresh (item 1)
+`docs/BENCH_LEDGER.md` now has 10 real rows from the live YouTube uploads
+(7 stage rows for track #1 SAO, 1 pipeline_full for track #1, 1 for
+track #2 MG, 1 for track #4 with full TWC stack). **Track #2 (MG
+continuation) at 1072 s busts the ROADMAP 10-min wall-time gate by 79%**
+— documented in the row's `note` column rather than silently massaged.
+Cost-of-seamless: continuation re-encodes the prefix through EnCodec each
+call. Accepted per §16's "worth it if the seams are gone." The 7-day
+stale gate is reset to 1 day old.
+
+### 19.3 Storage wired into pipeline_one (item 2)
+`crates/nightdrive-orchestrator/src/main.rs`:
+
+- `run_batch` opens `Db::connect_and_migrate` once before the loop.
+- `pipeline_one(cfg, db, track_id, dry_run)` now persists at every stage
+  boundary: `Tracks::insert` right after stage 1 spec succeeds, then
+  `update_state` to `SpecGenerated` → `CoverRendered` (after the
+  parallel 2+3 join) → `AudioMastered` → `VideoEncoded` → `Published`.
+- Upload stage inserts an `Uploads` row in `queued` state *before* the
+  PUT begins, then `set_youtube_id` flips it to `complete`. A
+  mid-upload crash leaves a discoverable trail.
+- `run_batch` catch-and-continue: on per-track Err, best-effort
+  `Tracks::update_state(Failed)`. "track not found" is tolerated and
+  logged (means stage 1 itself failed before insert).
+- Note: state machine compresses parallel stages 2+3 directly into
+  `CoverRendered`. `AudioRendered` is unreachable from the run-batch
+  wiring but kept in the enum for storage compatibility + future
+  sequential-rendering paths.
+
+### 19.4 N2.1 resume subcommand (item 3)
+`resume` is no longer a `bail!()`. Three new functions in `main.rs`:
+
+- `run_audio_and_cover(cfg, spec, paths)` — extracted from
+  `pipeline_one` so resume can call the same parallel audio+cover
+  block without duplication.
+- `resume_with_db(cfg, db, dry_run)` — inner body that lists every
+  non-terminal track (`Pending`, `SpecGenerated`, `AudioRendered`,
+  `CoverRendered`, `AudioMastered`, `VideoEncoded`) and dispatches to
+  `resume_one` per row.
+- `resume_one(cfg, db, row, dry_run)` — deserializes `spec_json` from
+  the DB, re-materializes `spec.json` on disk if missing, then runs a
+  monotonic dispatch chain: each `needs_*` boolean fires only when the
+  row's stored state is at-or-before that stage. Stage transitions
+  identical to `pipeline_one`. Per-track failures bubble up to
+  `resume_with_db`'s catch-and-continue mark-Failed path.
+
+`tests/witnesses/resume_skips_terminal_tracks.rs` (`// stage: 0`,
+witness #8): spawns the actual built `nightdrive-orchestrator` binary
+against a tempdir SQLite pre-populated with one `Published`, one
+`Failed`, and one `VideoEncoded` track. Strips
+`NIGHTDRIVE_YT_*` env vars so the VideoEncoded row's stage-7 upload
+fails deterministically at `YoutubeCredentials::from_env()`. Asserts:
+exit 0 (catch-and-continue), Published row untouched, Failed row
+untouched, VideoEncoded row flipped to Failed. Real binary, real
+SQLite, no mocks — passes in 4.01s.
+
+### 19.5 Current audit
+
+```
+OK - audit clean (build:0 test:0 stubs:2 witnesses:8)
+```
+
+Stubs dropped from 3 to 2: `resume` is now real. Only `status` and
+`livestream` remain stubbed in `crates/nightdrive-orchestrator/src/main.rs`
+(N1.12-status, N2.4-livestream player).
+
+Witness count climbed from 7 to 8 across stages 0, 1, 3, 7.
+
+### 19.6 What's next (carried forward from §18 with deltas)
+
+Resolved by this session: 1, 2, 3, 5.
+
+Still open:
+- **`status` subcommand** (the only remaining N1.12 stub) — print last
+  successful batch timestamp, last failed track + reason, count per
+  TrackState, livestream service status. Database surface is all there;
+  it's purely a presentation layer.
+- **N2.2 Track dedup** — orphaned `uploads` rows in `queued` state (the
+  pattern §19.3 introduces) aren't yet re-processed by resume. Resume
+  only looks at `tracks.state`. Either: (a) extend resume to scan
+  `uploads.status='queued'` for re-tries, or (b) keep the current
+  semantics and document the operator cleanup recipe.
+- **N3.1 wgpu visualizer** — the big multi-week stage-5 unlock.
+- **N4.2 Telegram escalation, N4.4 Disk-pressure guard, N4.6
+  Prometheus exporter** — S-effort, on the post-MVP punch list.
+- **Forecast panel polish** (item 6 carried forward — Matt keeps the
+  NWS branding visible as a color guide, deliberately not cropped).
+- **cnc P100s arrival ~2026-05-17** still gates N1.5, N1.7, N1.13.
+
 ---
 
 **Single-source-of-truth:** this file. Update it when decisions change.

@@ -33,3 +33,13 @@ table with a new caption.
 | 2026-05-10 | (head) | 5 | nd-bench-001 | - | - | nightdrive | crate-not-shipped |
 | 2026-05-10 | (head) | 6 | nd-bench-001 | - | - | nightdrive | crate-not-shipped |
 | 2026-05-10 | (head) | 7 | nd-bench-001 | - | - | nightdrive | crate-not-shipped |
+| 2026-05-11 | (head) | 1             | EGFUlex64L4       |     74 |             - | nightdrive | live-vod; ollama qwen2.5:7b-instruct on kokonoe |
+| 2026-05-11 | (head) | 2             | EGFUlex64L4       |    244 |          6800 | nightdrive | live-vod; sao 8x35s segs, 1s xfade (seam-audible, bumped to 3s after) |
+| 2026-05-11 | (head) | 3             | EGFUlex64L4       |      1 |             - | nightdrive | live-vod; sdxl-unreachable, ffmpeg-gradient fallback |
+| 2026-05-11 | (head) | 4             | EGFUlex64L4       |     21 |             - | nightdrive | live-vod; ffmpeg loudnorm 2-pass -12.68->-14.0 LUFS |
+| 2026-05-11 | (head) | 5             | EGFUlex64L4       |      0 |             - | nightdrive | live-vod; showwaves overlay folded into stage 6 |
+| 2026-05-11 | (head) | 6             | EGFUlex64L4       |     60 |             - | nightdrive | live-vod; ffmpeg mux 67MB h264 crf18 + aac320k + faststart |
+| 2026-05-11 | (head) | 7             | EGFUlex64L4       |     40 |             - | nightdrive | live-vod; yt data api v3 chunked PUT |
+| 2026-05-11 | (head) | pipeline_full | EGFUlex64L4       |    440 |          6800 | nightdrive | live-vod; sao+ffmpeg-gradient+showwaves; 4m34s output, 67MB mp4 |
+| 2026-05-11 | (head) | pipeline_full | FGPUo7oXCI4       |   1072 |          5000 | nightdrive | live-vod; mg-stereo-medium continuation 12 segs (1 fresh + 11 cont, 5s prefix); 57MB mp4; 2.4x sao penalty = encodec overhead |
+| 2026-05-11 | (head) | pipeline_full | 2NvOEfVbv2c       |      - |             - | nightdrive | live-vod; mg+twc3panel+4city+kamx-radar+vt323+sdxllib; per-stage wall not split in §18 |
