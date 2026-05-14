@@ -29,6 +29,8 @@ allowed under the revenue threshold. No CC-BY-NC strike risk here.
 """
 from __future__ import annotations
 
+import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -36,20 +38,41 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
+parser = argparse.ArgumentParser(description="generate cover-art library entries")
+parser.add_argument(
+    "--max", type=int, default=0,
+    help="cap on new covers to generate (0 = all missing slots). Lets us "
+         "back-fill the library N at a time instead of one ~25-minute run.",
+)
+parser.add_argument(
+    "--low-vram", action="store_true",
+    help="enable attention slicing + sequential CPU offload so SDXL fits in "
+         "~4 GB free VRAM. Each cover takes 2-3x longer; use when other "
+         "apps are competing for VRAM on the 3070 Ti.",
+)
+parser.add_argument(
+    "--album", type=str, default=None,
+    help="generate the 12 covers for an album defined in docs/albums/<slug>.json. "
+         "Overrides the default library prompt list and writes to "
+         "assets/covers/albums/<slug>/track-NN.png instead of assets/covers/library/. "
+         "Each cover's prompt comes from the JSON's tracks[i].cover_prompt field.",
+)
+args = parser.parse_args()
+
 MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0"
 DEVICE = "cuda:0"
-OUT_DIR = Path(__file__).resolve().parent.parent / "assets" / "covers" / "library"
+REPO_ROOT = Path(__file__).resolve().parent.parent
 NEGATIVE = (
     "text, watermark, signature, logo, low quality, blurry, jpeg artifacts, "
     "low resolution, deformed, ugly, distorted, cropped, frame, border, "
     "people faces, human figures with detailed faces"
 )
 
-# 25 hand-tuned synthwave prompts. Variation across: time-of-day, setting,
-# foreground subject, color palette, and stylistic era marker. Bigger
-# variety per axis than per-image so the library doesn't feel same-y when
-# tracks rotate through.
-PROMPTS = [
+# 25 hand-tuned synthwave prompts for the random library. Variation across:
+# time-of-day, setting, foreground subject, color palette, and stylistic era
+# marker. Bigger variety per axis than per-image so the library doesn't feel
+# same-y when tracks rotate through. This list is *not* used in --album mode.
+LIBRARY_PROMPTS = [
     "synthwave 1985 album cover, neon palm trees on a beach at sunset, magenta and orange sky, chrome typography in distance, retro futurism, no text",
     "outrun aesthetic, lone vintage red sports car driving on infinite empty highway, dusk sky transitioning from purple to pink, vanishing point chrome grid horizon, retro 80s",
     "Miami Vice synthwave, palm tree silhouettes against neon orange and pink sunset over the ocean, art deco architectural lines, 1980s nostalgia",
@@ -77,6 +100,29 @@ PROMPTS = [
     "synthwave horizon at twilight, two suns setting over chrome wireframe ocean, neon pink and orange gradient sky, retro futurism, no text or figures",
 ]
 
+# Now pick which prompt set + output dir we're running with. Album mode
+# overrides both; default is the 25-slot random library.
+if args.album:
+    album_path = REPO_ROOT / "docs" / "albums" / f"{args.album}.json"
+    if not album_path.exists():
+        sys.exit(f"[lib-gen] album JSON not found: {album_path}")
+    album = json.loads(album_path.read_text(encoding="utf-8"))
+    PROMPTS = [t["cover_prompt"] for t in album["tracks"]]
+    OUT_DIR = REPO_ROOT / "assets" / "covers" / "albums" / args.album
+    # Per-album seed family: djb2 of the slug, then XOR per-track index in
+    # the loop below. Regenerating a single track's cover is deterministic.
+    _h = 5381
+    for _b in args.album.encode("utf-8"):
+        _h = ((_h * 33) + _b) & 0xFFFFFFFF
+    ALBUM_SEED_BASE = _h
+    OUT_FILENAME = lambda idx, seed: OUT_DIR / f"track-{idx:02d}.png"
+    print(f"[lib-gen] album mode: {args.album} ({len(PROMPTS)} tracks)")
+else:
+    PROMPTS = LIBRARY_PROMPTS
+    OUT_DIR = REPO_ROOT / "assets" / "covers" / "library"
+    ALBUM_SEED_BASE = None
+    OUT_FILENAME = lambda idx, seed: OUT_DIR / f"cover-{idx:02d}-seed{seed}.png"
+
 print(f"[lib-gen] loading {MODEL_ID} (fp16)...")
 t0 = time.time()
 
@@ -89,7 +135,6 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
     variant="fp16",
     use_safetensors=True,
 )
-pipe = pipe.to(DEVICE)
 # Use the DPMSolver scheduler for faster convergence at lower step counts.
 # Default scheduler (Euler) needs ~30 steps for stable SDXL output; DPM++
 # 2M Karras gets there in ~20 with comparable quality.
@@ -97,10 +142,21 @@ from diffusers import DPMSolverMultistepScheduler
 pipe.scheduler = DPMSolverMultistepScheduler.from_config(
     pipe.scheduler.config, use_karras_sigmas=True, algorithm_type="dpmsolver++"
 )
-# VAE slicing alone (no attention slicing) keeps peak VRAM under 8 GB on the
-# 3070 Ti while keeping each step fast. The attention-slicing flag was
-# tripling inference time in the first cut.
-pipe.enable_vae_slicing()
+if args.low_vram:
+    # Sequential CPU offload moves model components to GPU only while in use,
+    # then back to CPU. Combined with attention + VAE slicing this fits SDXL
+    # in ~4 GB of free VRAM at the cost of ~2-3x slower inference. Use when
+    # Chrome/Discord/etc are holding 2-3 GB and you don't want to close them.
+    pipe.enable_sequential_cpu_offload()
+    pipe.enable_attention_slicing()
+    pipe.enable_vae_slicing()
+    print("[lib-gen] low-vram mode: sequential CPU offload + slicing enabled")
+else:
+    pipe = pipe.to(DEVICE)
+    # VAE slicing alone (no attention slicing) keeps peak VRAM under 8 GB on
+    # the 3070 Ti while keeping each step fast. The attention-slicing flag was
+    # tripling inference time in the first cut.
+    pipe.enable_vae_slicing()
 print(f"[lib-gen] model loaded in {time.time() - t0:.1f}s")
 
 free, total = torch.cuda.mem_get_info(0)
@@ -109,15 +165,25 @@ print(f"[lib-gen] VRAM: {(total - free) / 2**30:.2f} / {total / 2**30:.2f} GB us
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 successful = 0
+new_generated = 0
 for idx, prompt in enumerate(PROMPTS, start=1):
-    # Deterministic seed per prompt slot so re-runs produce identical covers.
-    seed = 1000 + idx
-    out_path = OUT_DIR / f"cover-{idx:02d}-seed{seed}.png"
+    # Library mode: seed = 1000 + slot index (matches existing cover filenames).
+    # Album mode: seed = djb2(slug) XOR (idx * golden-ratio constant) — stable
+    # per-track but distinct per-album.
+    if ALBUM_SEED_BASE is None:
+        seed = 1000 + idx
+    else:
+        seed = (ALBUM_SEED_BASE ^ (idx * 0x9E3779B9)) & 0x7FFFFFFF
+    out_path = OUT_FILENAME(idx, seed)
 
     if out_path.exists():
         print(f"[lib-gen] [{idx:02d}/{len(PROMPTS)}] skip (exists): {out_path.name}")
         successful += 1
         continue
+
+    if args.max > 0 and new_generated >= args.max:
+        print(f"[lib-gen] hit --max {args.max}; stopping. {len(PROMPTS) - idx + 1} prompts unrun.")
+        break
 
     print(f"[lib-gen] [{idx:02d}/{len(PROMPTS)}] generating: {prompt[:70]}...")
     t0 = time.time()
@@ -137,6 +203,7 @@ for idx, prompt in enumerate(PROMPTS, start=1):
         image.save(out_path)
         elapsed = time.time() - t0
         successful += 1
+        new_generated += 1
         print(f"[lib-gen]   wrote {out_path.name} in {elapsed:.1f}s")
     except torch.cuda.OutOfMemoryError as e:
         torch.cuda.empty_cache()

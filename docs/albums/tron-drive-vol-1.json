@@ -1,0 +1,305 @@
+{
+  "album_slug": "tron-drive-vol-1",
+  "title": "Tron Drive, Vol. 1",
+  "theme": "tron_grid",
+  "track_count": 12,
+  "tonic_progression": "Am -> Em -> Bm -> F#m (Phrygian) -> C#m (Dorian) -> G#m (Locrian-shaded) -> G#m -> Dm (Aeolian) -> Am (Phrygian-shaded) -> Em -> Bm -> Am",
+  "bpm_arc": [104, 108, 110, 112, 100, 96, 98, 102, 108, 110, 112, 100],
+  "narrative_arc": "Twelve tracks read as a single descent into a closed digital system and the listener's partial return from it. Tracks 1-4 are the approach and entry: the user identifies the grid from outside (1), traces its perimeter (2), accelerates along an outer light-trail (3), and crosses the threshold into the lattice (4). Tracks 5-8 are the dissolution arc inside the machine: the listener's identity disassembles into geometric primitives (5), drifts through an ambient memory-cache layer with the BPM at the album's floor (6), encounters their own derez signature reflected back through a recognizer subroutine (7), and recompiles in a colder shape than they entered (8). Tracks 9-12 are the ascent and exit, but it is not a reversal — it is a return on the opposite face of the Mobius strip: a sprint along the light-cycle game grid (9), the system clock running faster as the listener races toward the I/O tower (10), the moment of breach where the user re-enters their original execution space (11), and a closer that lands back on A minor — the same tonic that opened the album — but voiced one octave higher on a derezzing FM bell rather than a warm pad, so the ring is closed and the listener is not. They emerged, but they emerged changed.",
+  "recurring_motifs": [
+    {
+      "motif": "Grid pulse — five-note ascending PWM-arpeggio circuit (1-2-b3-5-b7, played sixteenth notes, tight gate, the album's system-clock signature)",
+      "introduced_in": 1,
+      "returns_in": [4, 9, 12],
+      "transformation": "Track 1 introduces it as a distant probe — heavily filtered, low in the mix, the listener detecting the grid from outside. Track 4 brings it to the foreground at the moment of entry, unfiltered and locked tight to the kick, the circuit accepting the user. Track 9 fragments it into a stuttered glitch-version during the light-cycle sprint — same five pitches, retriggered and gated 32nd-note style, the clock running faster than the user. Track 12 plays it whole one last time, but transposed up an octave on FM bell with a long derez tail (filter close from 20 kHz to silence over the final 16 bars) — the system shutting down behind the user as they exit."
+    },
+    {
+      "motif": "Derez chord — a Phrygian bII slide (a minor chord falling a half-step to its bII major then back to the tonic minor, played on sidechained PWM stack — the album's dissolution gesture)",
+      "introduced_in": 4,
+      "returns_in": [7, 11],
+      "transformation": "Track 4 introduces it once at the threshold-cross, a single articulation as the user enters the lattice. Track 7 makes it the structural backbone of the chorus — the recognizer subroutine pulse, repeated every 4 bars throughout the chorus sections, hard sidechain, the listener's identity literally dissolving and reforming in step with the chord motion. Track 11 returns it as the breach gesture — a single articulation again, mirroring track 4's single articulation, but reversed in feel (track 4 was entering the grid; track 11 is exiting). The two single-articulation appearances bookend the dissolution arc."
+    }
+  ],
+  "tracks": [
+    {
+      "track_number": 1,
+      "title": "On The Grid (From Outside)",
+      "role": "opener",
+      "key": "A minor",
+      "bpm": 104,
+      "duration_seconds": 240,
+      "mood_tags": ["nocturnal", "mechanical", "approach", "cold-blue"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "cold deep-sub drone on A, no rhythm, single FM bell pings on bar 1 of each 4-bar phrase, distant filtered noise sweep"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ heavily-filtered grid pulse motif buried at -18 dB, hard square sub bass on root, soft kick on 1"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ wide PWM pad opens, gated reverb snare on 2 and 4, sidechain on pad, vocoder-style mute-syllable texture (no actual phonemes)"},
+        {"name": "bridge", "bars": 8, "instrumentation": "drums drop, just grid pulse motif and pad — the listener notices the system"},
+        {"name": "outro", "bars": 8, "instrumentation": "pad sustains A, grid pulse fades to silence, FM bell ping on the final bar"}
+      ],
+      "musicgen_prompt": "synthwave 104 BPM A minor, cold deep sub drone, distant filtered five-note PWM arpeggio buried low in the mix, hard square sub bass, gated reverb snare on 2 and 4, soft kick, wide PWM pad with vocoder texture, FM bell pings, sense of approaching a glowing wireframe grid from outside at night, mechanical and patient and cold, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from a great distance toward a glowing cyan wireframe grid stretching to a vanishing point on a deep-black horizon, the grid floor lit from underneath by electric-blue light, a single thin magenta line bisecting the grid horizontally, no terrain, no palm trees, no sunset, no warm colors, deep black sky with faint white pinpoint stars, geometric and mathematical, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "—",
+      "tempo_relationship_to_prior": "—",
+      "composer_notes": "Sets the tonic (A minor — same opening pitch as Sunset Drive, but the palette is the opposite: cold PWM saws and FM bell instead of warm DX7 pad). GRID PULSE MOTIF is introduced here heavily filtered and low — the listener should sense it before consciously hearing it. Outro ends on tonic (A) with no V — the album begins on stillness, not motion. Next track moves to Em (V of Am as a pivot) for the perimeter trace. Do not let MusicGen sneak in a warm pad or a major chord; the entire album lives in minor."
+    },
+    {
+      "track_number": 2,
+      "title": "Perimeter Trace",
+      "role": "cruiser",
+      "key": "E minor",
+      "bpm": 108,
+      "duration_seconds": 240,
+      "mood_tags": ["mechanical", "tracking", "blue-cyan", "scanning"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "filtered hard-square sub bass on E, kick on every beat, no melody yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ chugging muted-PWM arpeggio root-fifth-octave, gated reverb snare on 2 and 4, sidechain pad"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ thin PWM lead playing a 4-bar geometric phrase, layered cold pads, hard sidechain"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead drops, arpeggio takes center, second PWM voice an octave up"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full mix, lead doubled with FM bell counter-line"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on B (V of Em), pad sustains"}
+      ],
+      "musicgen_prompt": "synthwave 108 BPM E minor, chugging muted-PWM arpeggio, hard kick on every beat, gated reverb snare on 2 and 4, thin PWM saw lead playing a geometric four-bar phrase, hard sidechained cold pads, FM bell counter-line, sense of a chrome vehicle tracing the perimeter of a glowing wireframe grid at night, mechanical and locked-in, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from above and behind a chrome wireframe vehicle moving along the outer edge of a cyan grid floor, the grid stretching to a vanishing point ahead, electric-blue light pouring up through the grid lines, a single magenta light-trail behind the vehicle, deep black sky, no terrain, no warm colors, no palm trees, geometric and abstract, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Am — the album's first lift uses the same cycle-of-fifths logic Sunset used, but only inside the minor mode (no relative-major lift). The listener feels motion without warmth.",
+      "tempo_relationship_to_prior": "+4 BPM. First step of the mechanical accelerando.",
+      "composer_notes": "First true cruiser. The PWM saw must read as cold and tight, not warm and analog — this is the album's voice differentiator from Sunset. Outro B (V of Em) pivots cleanly to Bm of track 3."
+    },
+    {
+      "track_number": 3,
+      "title": "Light Trail",
+      "role": "cruiser",
+      "key": "B minor",
+      "bpm": 110,
+      "duration_seconds": 240,
+      "mood_tags": ["accelerating", "geometric", "electric", "tight"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "kick + hard-square sub, no melody, white-noise riser at bar 8"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ tight 16th-note PWM arp on B-D-F#, gated snare, layered cold pads"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ aggressive saw stack lead playing a fast 2-bar phrase, hard sidechain, FM bell counter"},
+        {"name": "breakdown", "bars": 8, "instrumentation": "kick drops, just arp + pad + a single sustained FM bell note"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full kit returns, lead saws layered three deep"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on F# (V of Bm), pad sustains, white-noise tail"}
+      ],
+      "musicgen_prompt": "synthwave 110 BPM B minor, tight sixteenth-note PWM arpeggio, hard kick on every beat, gated reverb snare, aggressive triple-stacked saw lead, hard sidechained cold pads, FM bell counter-melody, white-noise risers, sense of a chrome light-cycle accelerating along a magenta light-trail across a cyan wireframe grid, mechanical and electric, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, low angle close behind a chrome light-cycle accelerating across a cyan wireframe grid floor, a long magenta light-trail extending behind the cycle, electric-blue grid lines streaking past in motion blur, deep black sky overhead with faint pinpoint stars, no terrain, no warm colors, no palm trees, geometric and futuristic, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Em — second step of the cycle-of-fifths ascending ladder, still strictly inside the minor mode. Sharpening the harmonic palette without warming it.",
+      "tempo_relationship_to_prior": "+2 BPM. The accelerando tightens — Sunset used +4/+6 jumps for openness; Tron uses smaller, more mechanical increments to suggest a system clock advancing.",
+      "composer_notes": "Triple-stacked saws are the album's signature heavy texture — borrowed from Justice's 'Cross' and Daft Punk's 'Derezzed.' Keep the lead phrase short (2 bars repeated) so the listener locks into the loop. Outro F# (V of Bm) pivots to F#m of track 4 — a deceptive resolution that takes the dominant pitch and reroots it as a Phrygian tonic, signaling the threshold-cross."
+    },
+    {
+      "track_number": 4,
+      "title": "Enter The Lattice",
+      "role": "bridge-into-peak",
+      "key": "F# minor (Phrygian)",
+      "bpm": 112,
+      "duration_seconds": 270,
+      "mood_tags": ["threshold", "saturated", "crossing", "exposed"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad swell on F#, reverse cymbal up to bar 1, single low FM bell hit"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ kick on every beat, hard-square sub, grid pulse motif UNFILTERED and locked to the kick, gated snare"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "build: snare rolls, riser, filter open, white noise sweep up"},
+        {"name": "chorus", "bars": 16, "instrumentation": "wide PWM lead in F# Phrygian (note the b2 — G natural — in the lead phrase), layered cold pads, full kit, DEREZ CHORD articulated once at bar 8 of the chorus (F#m -> G major -> F#m, sidechain pumping hard on the G)"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, just grid pulse motif + pad — the user is inside"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full return, double-octave lead, derez chord articulated once more"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on C# (V of F#m), pad holds into silence"}
+      ],
+      "musicgen_prompt": "synthwave 112 BPM F sharp minor with Phrygian flat-two flavor (G natural in the melody), wide PWM saw lead, five-note ascending arpeggio locked to a hard kick, hard sidechained layered cold pads, gated reverb drums, reverse cymbal swells, white-noise riser, a chromatic descending chord slide at the chorus midpoint, sense of a chrome vehicle crossing the threshold from outside the wireframe grid into the lattice interior, exposed and mechanical and bright, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from directly behind a chrome light-cycle at the exact moment it crosses a glowing magenta threshold-line into a deeper level of a cyan wireframe lattice, the lattice geometry visibly more dense beyond the threshold, electric-blue grid lines bending toward the vanishing point, deep black sky, a single flare of white light at the crossing point, no terrain, no warm colors, no palm trees, geometric and exposed, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a half-step from B-tonic-territory via the deceptive F# pivot — F#m as a Phrygian tonic gives the album its first modal-color shift. The b2 (G natural) in the lead is the album's first 'wrong-feeling-right' pitch and signals the user has crossed into a foreign harmonic space.",
+      "tempo_relationship_to_prior": "+2 BPM. The album's BPM ceiling in the first arc; we will hold here briefly, then descend into the dissolution.",
+      "composer_notes": "PEAK TRACK 1 OF THE ENTRY ARC. GRID PULSE MOTIF moves to the foreground unfiltered — its structural payoff after the buried introduction in track 1. DEREZ CHORD is introduced here for the first time, articulated only ONCE per chorus — it should land as an event, not a refrain (that comes in track 7). 270s long because the threshold-cross deserves room. Outro C# (V of F#m) is a major chord — it pivots to C#m of track 5 as a parallel-minor reroot, which begins the dissolution descent."
+    },
+    {
+      "track_number": 5,
+      "title": "Disassembly",
+      "role": "dissolution",
+      "key": "C# minor (Dorian)",
+      "bpm": 100,
+      "duration_seconds": 270,
+      "mood_tags": ["dissolving", "fragmented", "blue-violet", "weightless"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad alone on C#, very slow filter sweep, individual FM bell pings spaced 4 bars apart"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ a single sustained PWM note holding the root with very slow LFO, kick at half-tempo (kick on 1 and 3 only), no snare yet"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ saw lead playing fragmented phrases with long rests, layered cold pads at the front of the mix, brushed gated snare on 4 only (not 2 and 4) — the rhythm is decaying"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead drops, the sustained PWM note returns, FM bell pings move from spaced to clustered"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "lead returns, octave-up FM bell shadow, drums spacious"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on G# (V of C#m), pad sustains, drums drop out"}
+      ],
+      "musicgen_prompt": "synthwave 100 BPM C sharp minor with Dorian major-six (A sharp in passing), single sustained PWM note with slow LFO, half-tempo kick on beats one and three only, brushed gated snare on beat four only, fragmented saw lead with long rests, FM bell pings clustering and dispersing, layered cold pads at the front of the mix, sense of a digital body disassembling into geometric primitives at low gravity, weightless and blue-violet, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, a chrome humanoid figure mid-derez visibly disassembling into thousands of small cyan and magenta cubes drifting upward and outward against a deep-black background, electric-blue wireframe grid floor below catching the falling fragments, no terrain, no warm colors, no palm trees, geometric and abstract, no people complete (the figure is mid-dissolution), no text, 1024x1024",
+      "key_relationship_to_prior": "Parallel-minor reroot from C# major (the V of F#m at the close of track 4) to C# minor with a Dorian color (raised 6th). The pivot uses the C# pitch as a common tone but reframes it as a darker, more modal tonic. Modal interchange instead of cycle-of-fifths is the album's descent logic.",
+      "tempo_relationship_to_prior": "-12 BPM. The album's largest single BPM drop, intentionally so — the dissolution arc happens in slower time. Sunset's mirror-symmetric descent doesn't apply here; Tron's descent is into ambient depth, not into evening quiet.",
+      "composer_notes": "FIRST TRACK OF THE DISSOLUTION ARC. The rhythm is intentionally decayed: kick on 1 and 3 (not every beat), snare on 4 (not 2 and 4). The listener should feel the system clock skipping cycles. 270s long because the disassembly needs room to unfold. Outro G# (V of C#m) is itself a minor chord (G#m) — pivots into G#m of track 6 as a same-tonic transition, the album sinking even deeper."
+    },
+    {
+      "track_number": 6,
+      "title": "Memory Cache",
+      "role": "ambient-floor",
+      "key": "G# minor (Locrian-shaded)",
+      "bpm": 96,
+      "duration_seconds": 300,
+      "mood_tags": ["ambient", "deep", "still", "violet-black"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "deep sub drone on G#, single FM bell ping every 8 bars, no rhythm at all"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ a sustained PWM pad with very slow filter open, sub bass moves to root-fifth oscillation every 4 bars, soft kick at quarter-tempo (every 4 beats)"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ ambient saw lead floating on long sustained notes (no rhythmic figure), atmospheric pads with reverse-reverb texture, brushed snare on 4 of every other bar"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop entirely, just pad + sub + FM bell — pure ambient floor"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "ambient lead returns, layered an octave up with FM bell shadow"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close, deep sub fades, FM bell ping on the final bar holds into silence"}
+      ],
+      "musicgen_prompt": "synthwave 96 BPM G sharp minor with Locrian color (flat-five passing tone), deep sub drone, very slow ambient PWM pad, quarter-tempo soft kick on every fourth beat only, brushed snare on beat four of every other bar, ambient sustained saw lead, reverse-reverb atmospheric pads, FM bell pings spaced eight bars apart, sense of drifting through a deep memory-cache layer of a closed digital system at low velocity, still and violet-black and weightless, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view through a vast translucent cyan crystal lattice extending in all directions into deep black space, suspended geometric polyhedra floating between the lattice nodes glowing soft violet from within, a thin magenta horizontal line far in the distance suggesting a horizon, no grid floor visible, no terrain, no warm colors, no palm trees, abstract and architectural and still, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Same tonic continuation (G# was the V of C#m at the close of track 5, reframed here as a Locrian-shaded G#m). The harmonic logic is descending modal interchange: each track is more 'shaded' than the last. Locrian (b2 b3 b5 b6 b7) is the darkest diatonic mode and lives at the album's harmonic floor.",
+      "tempo_relationship_to_prior": "-4 BPM. The album's BPM floor at 96. Sunset's mirror-arc dropped to 82; Tron's drops only to 96 because the audience is coding, not sleeping — even the ambient floor maintains a pulse.",
+      "composer_notes": "AMBIENT FLOOR TRACK. The longest track on the album at 300s, with the slowest internal motion. Locrian color is used as passing flavor only — never resolve to the b5 explicitly; it should feel implied, like a stray electron. This is the dissolution arc's gravity well. Don't let MusicGen add an aggressive lead or a four-on-the-floor kick — the prompt is explicit about quarter-tempo kick. Outro pivots up a perfect fourth via common-tone D# to Dm Aeolian of track 7."
+    },
+    {
+      "track_number": 7,
+      "title": "Recognizer",
+      "role": "dissolution-peak",
+      "key": "D minor (Aeolian)",
+      "bpm": 98,
+      "duration_seconds": 270,
+      "mood_tags": ["recognized", "exposed", "cold-bright", "mechanical-fear"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad in Dm, soft kick on every other beat, white-noise scan-tone sweeping slowly"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ tight PWM arpeggio root-fifth-octave, kick on every beat, gated snare on 2 and 4, hard-square sub"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ DEREZ CHORD as the structural backbone (Dm -> Eb major -> Dm articulated every 4 bars, hard sidechain on the Eb), PWM lead playing a sparse melody over the chord motion, layered cold pads"},
+        {"name": "verse2", "bars": 16, "instrumentation": "derez chord drops out, arpeggio takes center, FM bell counter-line"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "derez chord returns at full strength, lead doubled in octaves, drums at full mix"},
+        {"name": "outro", "bars": 8, "instrumentation": "derez chord articulated one final time, filter close on A (V of Dm), pad holds, kick fades"}
+      ],
+      "musicgen_prompt": "synthwave 98 BPM D minor Aeolian, tight PWM arpeggio, hard kick on every beat, gated reverb snare on 2 and 4, hard-square sub bass, a chromatic descending chord slide repeated every four bars as the structural backbone of the chorus with hard sidechain pumping, sparse PWM saw lead over the chord motion, FM bell counter-line, white-noise scan-tone, sense of a giant geometric recognizer subroutine sweeping a beam across the user, exposed and cold-bright and mechanical, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from below looking up at a massive geometric recognizer craft hovering over a cyan wireframe grid floor, the craft's underside lit with rotating magenta and cyan circuit patterns, a single beam of white light scanning down toward the viewer, electric-blue grid lines on the floor below, deep black sky, no terrain, no warm colors, no palm trees, no people, geometric and threatening and immense, no text, 1024x1024",
+      "cover_notes_internal": "This is the album's hero structural cover — should read as the iconic image on the playlist thumbnail grid alongside track 9 (Light-Cycle Sprint).",
+      "key_relationship_to_prior": "Up a perfect fourth from G#m to Dm (the common tone is the D pitch — G#m contains D as its flat-five Locrian color, and Dm reroots that D as the new tonic). Modal interchange: from Locrian-shaded back to plain Aeolian — the harmony resolves slightly, but only enough to expose the listener clearly so the recognizer can see them.",
+      "tempo_relationship_to_prior": "+2 BPM. The album begins its re-acceleration here, but the rhythm only just starts to feel mechanical-tight again.",
+      "composer_notes": "DEREZ CHORD MOVES INTO STRUCTURAL POSITION — articulated every 4 bars throughout the chorus, the chord-motion sidechain becoming the track's central rhythmic identity. This is the motif's structural payoff after its single-articulation debut in track 4. The listener should feel their identity dissolving and reforming in step with the chord. 270s long because the recognizer scan needs sustained pressure. Don't let MusicGen make this 'aggressive' in an EDM sense — the texture should be cold and clinical, not euphoric. Outro A (V of Dm) pivots into Am of track 8 (perfect-fifth descending — first directional reversal of the descent)."
+    },
+    {
+      "track_number": 8,
+      "title": "Recompile (Colder Shape)",
+      "role": "dissolution-resolution",
+      "key": "A minor (Phrygian-shaded)",
+      "bpm": 102,
+      "duration_seconds": 240,
+      "mood_tags": ["reforming", "tighter", "changed", "cyan-on-black"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad in Am with a passing Bb (Phrygian b2) on bar 4, soft kick, no rhythm yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ PWM arpeggio playing a NEW pattern (not the grid-pulse motif — the listener has been reshaped, so the melodic material is reshaped too), kick on every beat, gated snare, hard-square sub"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ PWM lead playing a deliberate, locked-in melody in A Phrygian (note the Bb b2), layered cold pads, sidechain medium"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead drops, new arpeggio foregrounded, FM bell shadow"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "lead returns, double-octave, full mix"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on E (V of Am), pad sustains, kick fades"}
+      ],
+      "musicgen_prompt": "synthwave 102 BPM A minor with Phrygian flat-two passing color (B-flat in the melody), tight PWM arpeggio playing a new geometric pattern, hard kick on every beat, gated reverb snare on 2 and 4, hard-square sub bass, locked-in PWM saw lead playing a deliberate four-bar phrase, layered cold pads with medium sidechain, FM bell shadow on the lead, sense of a chrome figure recompiling from disassembled fragments into a tighter, more geometric shape than it began, mechanical and changed, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, a chrome humanoid figure mid-recompile visibly reassembling from cyan and magenta cubes but in a slightly more angular and faceted form than a normal human shape, deep-black background, electric-blue wireframe grid floor reflecting the figure faintly, no terrain, no warm colors, no palm trees, geometric and architectural, no people (the figure is more polyhedron than person), no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Dm to Am — the same A pitch that opened the album is reached again as a tonic, but this time shaded Phrygian (with the B-flat passing tone). The listener has returned to the album's home pitch but in a colder modal frame. This is the structural midpoint hinge.",
+      "tempo_relationship_to_prior": "+4 BPM. The album's re-acceleration becomes clearly directional here.",
+      "composer_notes": "STRUCTURAL HINGE TRACK. The album returns to A as a tonic for the first time since track 1, but the listener has been changed by the dissolution arc — so the melodic material is new (not the grid-pulse motif, which is reserved for the exit arc) and the mode is Phrygian-shaded instead of plain Aeolian. The Phrygian b2 (Bb) is the album's mark-of-passage. Outro E (V of Am) pivots cleanly to Em of track 9 — the exit arc begins by retracing the entry-arc's keys but at higher velocity."
+    },
+    {
+      "track_number": 9,
+      "title": "Light-Cycle Sprint",
+      "role": "peak",
+      "key": "E minor",
+      "bpm": 108,
+      "duration_seconds": 270,
+      "mood_tags": ["sprint", "geometric", "mechanical-joy", "cyan-magenta-flash"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "kick on every beat + hard-square sub + sidechain pad, no melody yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ GLITCH-STUTTERED grid pulse motif (same five pitches retriggered at 32nd-note rate, gated), gated snare on 2 and 4, layered cold pads"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "build: snare rolls, white-noise riser, filter open"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ triple-stacked saw lead playing a 2-bar geometric phrase, glitch-stuttered grid pulse continues underneath, hard sidechain pumping on every quarter, FM bell counter-line"},
+        {"name": "verse2", "bars": 16, "instrumentation": "drop lead, glitch-stuttered grid pulse foregrounded"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full mix, lead doubled in octaves"},
+        {"name": "bridge", "bars": 8, "instrumentation": "drums drop, glitch-stuttered grid pulse solo over pad — the listener takes a breath at full speed"},
+        {"name": "chorus3", "bars": 16, "instrumentation": "full return, biggest version of the mix"},
+        {"name": "outro", "bars": 8, "instrumentation": "lead sustains B (V of Em), filter close, drums fade"}
+      ],
+      "musicgen_prompt": "synthwave 108 BPM E minor, hard kick on every beat, hard-square sub bass, gated reverb snare on 2 and 4, a five-note arpeggio retriggered and gated at 32nd-note rate to create a glitch-stuttered texture, triple-stacked saw lead playing an aggressive two-bar geometric phrase, hard sidechain pumping on every quarter note, FM bell counter-line, white-noise risers, layered cold pads, sense of a chrome light-cycle sprinting at maximum velocity across a cyan wireframe grid leaving magenta light-trails, mechanical and exhilarated, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, low-angle view of two chrome light-cycles at full sprint across a cyan wireframe grid floor, magenta and cyan light-trails extending behind each, motion blur on the grid lines streaking past, deep black sky overhead with faint pinpoint stars, the vanishing point glowing white-hot from the speed, no terrain, no warm colors, no palm trees, geometric and electric, no people visible (the cycles are autonomous), no text, 1024x1024",
+      "cover_notes_internal": "This is the album's hero playlist-thumbnail cover alongside track 7 (Recognizer).",
+      "key_relationship_to_prior": "Up a perfect fifth from Am to Em — the same step that took the album from track 1 to track 2. The exit arc explicitly retraces the entry arc's harmonic ladder, but at higher BPM and with the grid pulse motif now glitch-stuttered instead of cleanly arpeggiated. The listener notices the architectural rhyme.",
+      "tempo_relationship_to_prior": "+6 BPM. The exit arc accelerates faster than the entry arc — the listener is running, not approaching.",
+      "composer_notes": "PEAK TRACK OF THE EXIT ARC. GRID PULSE MOTIF returns GLITCH-STUTTERED — same five pitches as track 1 and 4, but retriggered at 32nd-note rate. This is the system clock running faster than the user, the structural climax of the album's machine-tightening logic. 270s long to give the bridge breathing room at altitude. Don't let MusicGen smooth out the glitch-stutter — the gated retriggering is the point. Outro B (V of Em) pivots to Bm of track 10."
+    },
+    {
+      "track_number": 10,
+      "title": "I/O Tower",
+      "role": "peak",
+      "key": "B minor",
+      "bpm": 110,
+      "duration_seconds": 270,
+      "mood_tags": ["climbing", "imminent", "vertical", "white-hot"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "kick + hard-square sub + ascending filter sweep on PWM pad, no melody yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ tight 16th-note PWM arp climbing through B-D-F#-A, gated snare, layered cold pads, FM bell on the high"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ triple-stacked saw lead playing an ascending 4-bar phrase that resolves up to a high B each cycle, hard sidechain, FM bell counter-line on the resolution"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead drops, arp foregrounded with FM bell shadow"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "lead returns, octave-up doubling, full mix"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on F# (V of Bm), pad sustains on a held high B, drums fade"}
+      ],
+      "musicgen_prompt": "synthwave 110 BPM B minor, tight sixteenth-note PWM arpeggio climbing through root-third-fifth-seventh, hard kick on every beat, gated reverb snare on 2 and 4, triple-stacked saw lead playing an ascending four-bar phrase that resolves on a high root each cycle, hard sidechained cold pads, FM bell counter-melody on the resolution, ascending filter sweep, sense of a chrome figure climbing the vertical face of a glowing white-hot I-O tower against a cyan wireframe grid horizon, imminent and vertical, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view looking up the vertical face of a tall white-hot cylindrical I-O tower extending upward into a deep-black sky from a cyan wireframe grid floor, the tower's surface lined with cyan and magenta circuit patterns, faint horizontal magenta beams emitting from the tower's apex, no terrain, no warm colors, no palm trees, geometric and architectural and vertical, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Em to Bm — the second step of the exit arc's retrace of the entry arc's ladder. The architectural rhyme with tracks 2 to 3 is now unmistakable.",
+      "tempo_relationship_to_prior": "+2 BPM. Matching the entry arc's +2 step from track 2 to track 3, but at +2 above the entry arc's BPM at that position — the exit is mechanical-faster.",
+      "composer_notes": "Climbing-phrase lead is the album's most directly euphoric melodic gesture — it should resolve up to a high root each cycle, the listener feels the I/O tower rising. Outro F# (V of Bm) is reused exactly as in track 3 — this is the architectural rhyme made audible. Pivots deceptively into F#m... no, actually we pivot to Am for track 11. The deceptive resolution from F#-dominant to A-minor (a chromatic-mediant-style move) is the audible signature of the breach moment in track 11."
+    },
+    {
+      "track_number": 11,
+      "title": "Breach",
+      "role": "exit",
+      "key": "A minor",
+      "bpm": 112,
+      "duration_seconds": 270,
+      "mood_tags": ["breaking-through", "white-flash", "release", "still-mechanical"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "white-noise riser building over 8 bars, pad opening on A, no rhythm yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ tight PWM arpeggio, kick on every beat, gated snare, hard-square sub, the rhythmic engine at maximum tightness"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "build: white-noise sweep, snare roll, filter open all the way"},
+        {"name": "chorus", "bars": 16, "instrumentation": "DEREZ CHORD articulated ONCE at bar 1 of the chorus (Am -> Bb major -> Am, hard sidechain on the Bb) — mirroring track 4's single articulation but reversed in feel (track 4 was entering; this is exiting), then triple-stacked saw lead playing a 4-bar phrase resolving on the high A, layered cold pads, full mix"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, white-noise wash, pad sustains, a single FM bell ping echoes through reverb"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "drums return, lead doubled, no derez chord this time (the breach has happened; the gesture isn't repeated)"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on E (V of Am), pad sustains on a held high A, drums fade, white-noise tail"}
+      ],
+      "musicgen_prompt": "synthwave 112 BPM A minor, tight PWM arpeggio, hard kick on every beat, gated reverb snare on 2 and 4, hard-square sub bass, triple-stacked saw lead playing a four-bar phrase resolving on a high root, a single chromatic descending chord slide articulated once at the chorus start with hard sidechain on the upper chord, layered cold pads, white-noise riser and white-noise wash, FM bell pings, sense of a chrome figure breaking through the boundary of a closed digital system into a brighter execution space beyond, white-flash and release but still mechanical, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from inside a glowing cyan wireframe lattice the exact moment a chrome figure breaks through the outer boundary into a blinding white space beyond, the lattice cracking outward in geometric fractures around the breach point, magenta light leaking through the fractures, deep-black space visible at the edges, no terrain, no warm colors, no palm trees, geometric and explosive but still cold, no people (the breaching figure is silhouetted), no text, 1024x1024",
+      "key_relationship_to_prior": "Down a half-step from B to A via a deceptive cadence (F# dominant of B is reread as F# enharmonic to the major-third in D, which slides chromatically down to A). The breach is harmonically a release move — the listener exits the rising fifth-cycle architecture and lands back on the album's home pitch. The fact that A minor is also track 1's tonic primes the closer.",
+      "tempo_relationship_to_prior": "+2 BPM. The album's BPM ceiling at 112 — tied with track 4's threshold-cross BPM, deliberately. The two single-articulation derez-chord tracks share their tempo.",
+      "composer_notes": "EXIT MOMENT. DEREZ CHORD RETURNS AS A SINGLE ARTICULATION — exactly one strike, mirroring track 4's single strike. Track 4 was the entry gesture; this is the exit gesture. The chord is the same shape (minor-tonic to bII major to minor-tonic) but the listener's relationship to it has reversed. 270s long to give the breach moment full structural weight. Outro E (V of Am) pivots cleanly to Am of track 12 — the closing ring."
+    },
+    {
+      "track_number": 12,
+      "title": "Derez (User Exits)",
+      "role": "closer",
+      "key": "A minor",
+      "bpm": 100,
+      "duration_seconds": 300,
+      "mood_tags": ["resolved-but-changed", "fading", "cyan-fading-to-black", "alone"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "deep pad in Am, slow filter open over 30 seconds, single FM bell pings every 4 bars"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ GRID PULSE MOTIF on FM bell ONE OCTAVE UP from the album's introduction (track 1 had it low and filtered; here it is high and clear), soft kick on 1, hard-square sub on the root"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ brushed gated snare on 2 and 4 very soft, mellow PWM saw lead playing a single sustained line, layered cold pads, sidechain pulled way back"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, FM bell grid pulse motif alone with deep reverb, pad sustains"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "drums return softly, lead octave-doubled, full but quiet mix"},
+        {"name": "coda", "bars": 16, "instrumentation": "lead drops out, GRID PULSE MOTIF on FM bell one final time WHOLE with a slow filter close from 20 kHz to silence over the full 16 bars — the system shutting down behind the user as they exit, pad fades, drums fade, the final ping holds into silence"}
+      ],
+      "musicgen_prompt": "synthwave 100 BPM A minor, deep warm cold PWM pad, FM bell playing a five-note ascending arpeggio one octave higher than expected with slow filter closing from bright to dark over the final minute, soft kick on beat one, hard-square sub bass on the root, brushed gated reverb snare very soft, mellow saw lead on a single sustained line, sense of a chrome figure exiting a closed digital system as the grid derezzes behind them, resolved but changed, cyan fading to black, instrumental, no vocals",
+      "cover_prompt": "synthwave tron 1982 album cover, view from behind a chrome figure walking away from the viewer toward a distant horizon line where the last cyan wireframe grid lines are visibly derezzing into geometric fragments and fading to deep black, a single thin magenta light-trail behind the figure, the sky completely black above with a single white pinpoint star centered high, no terrain, no warm colors, no palm trees, geometric and quiet and final, no faces visible, no text, 1024x1024",
+      "key_relationship_to_prior": "Same tonic as track 11 (Am) — the closing pair shares a tonic the same way Sunset's tracks 6 and 7 shared D major. But where Sunset's repeated tonic was the held-breath plateau at the peak, Tron's is the resolution-after-exit: the listener has emerged from the breach and lands on the home pitch, which is also the album's opening pitch (track 1). The ring is closed.",
+      "tempo_relationship_to_prior": "-12 BPM. The same magnitude as track 5's dissolution-arc entry. Symmetry: the closer drops out of mechanical-velocity at the same rate the dissolution did. The listener arrives at rest, but the rest is colder than the album's opening rest.",
+      "composer_notes": "CLOSER. GRID PULSE MOTIF RETURNS WHOLE, ONE OCTAVE UP, ON FM BELL, with a long derez tail (filter close from 20 kHz to silence over the final 16 bars). Track 1 had the motif low and filtered, suggesting the system at a distance; here it is high and bright, with the system shutting down behind the user. The mirror is the album's closing image. 300s long to give the coda its full derez tail. The album ends on Am — the same tonic that opened the record — but the listener has been changed. Do not let MusicGen add a fade-up tail, a stinger, or any rhythmic figure in the final 16 bars; the filter close to silence is the composition. The ring is closed; the listener is not."
+    }
+  ],
+  "album_notes": {
+    "overall_form": "Mobius-strip ring over 12 tracks. The album begins and ends in A minor, but the listener arrives at the closing tonic from the opposite face of the strip than they departed. Three arcs: Entry (tracks 1-4): the user identifies the grid from outside and crosses the threshold into the lattice, accelerating from 104 to 112 BPM and moving through Am -> Em -> Bm -> F#m Phrygian. Dissolution (tracks 5-8): the user disassembles, drifts through an ambient memory-cache floor, encounters a recognizer, and recompiles in a colder shape. Tempo descends to the album's floor at 96 BPM in track 6 then begins a slow re-acceleration. Modal interchange (Dorian -> Locrian -> Aeolian -> Phrygian) replaces the cycle-of-fifths logic of the entry arc — each track is more 'shaded' than the last. The arc returns to A minor in track 8, but Phrygian-shaded, signaling the listener has been changed. Exit (tracks 9-12): the user retraces the entry arc's harmonic ladder (Em -> Bm -> Am) at higher velocity (108-112 BPM ceiling), the grid pulse motif now glitch-stuttered, the derez chord returning as the single-articulation breach gesture mirroring its single-articulation entry gesture, and lands on a closing A minor that is the same pitch as the opener but voiced one octave higher on a derezzing FM bell. The ring closes; the listener does not.",
+    "key_strategy": "All minor keys, no major tonics anywhere on the album. The entry arc uses cycle-of-fifths ascending strictly inside the minor mode (Am -> Em -> Bm), with the threshold-cross at track 4 pivoting deceptively to F#m Phrygian (the F# pitch is the V of Bm at the close of track 3, reread as a Phrygian tonic — the b2 G natural in track 4's lead is the album's first modal-color shift). The dissolution arc uses modal interchange instead of cycle-of-fifths: C#m Dorian (parallel-minor reroot from the C# dominant of F#m) -> G#m Locrian-shaded (same-tonic continuation as common-tone G# pivot from the V of C#m, reframed as a Locrian tonic) -> Dm Aeolian (perfect-fourth pivot from G#m via common-tone D, returning to plain Aeolian for the recognizer's clinical exposure of the listener) -> Am Phrygian-shaded (perfect-fourth descent from Dm; arrives at the album's home pitch but with the Bb b2 marking the listener's passage). The exit arc retraces the entry-arc ladder (Em -> Bm -> Am) — the audible architectural rhyme is the album's most direct structural signature — and closes on Am, the opening pitch, voiced higher to mark the change. The ring closes on the same pitch in a different register, a different modal flavor (plain Aeolian closer rather than Phrygian-shaded hinge), and a different palette (FM bell rather than PWM pad). The album never resolves to a major tonic — the user does not exit happy; they exit changed.",
+    "tempo_strategy": "Tight mechanical BPM range 96-112 throughout — Sunset spanned 82-112 with a wide arch; Tron's narrower band reinforces the closed-system mechanical-pulse feel. Entry arc: 104 -> 108 -> 110 -> 112 (mechanical accelerando in +2 and +4 increments — Sunset's larger steps would feel too organic for a digital system). Dissolution arc: 100 -> 96 -> 98 -> 102 (the album's BPM floor at track 6 = 96, the ambient memory-cache layer; then slow re-acceleration as the user recompiles). Exit arc: 108 -> 110 -> 112 -> 100 (the exit retraces the entry-arc tempo ladder but +2 BPM higher at each rung — the user runs faster on the way out than the way in — and the closer drops to 100 BPM for the derez tail, the only true tempo-deceleration on the album). The BPM ceiling 112 appears twice: track 4 (threshold cross) and track 11 (breach moment) — the two single-articulation derez-chord tracks. The BPM floor 96 appears once: track 6 (memory cache). Never crosses below 80 or above 118 (validation safe).",
+    "motif_strategy": "Two motifs, each with four structural appearances across the album — one more than Sunset's three appearances per motif, because Tron's machine-tightening logic demands stricter architectural rhyme. (1) Grid pulse motif — five-note ascending PWM arpeggio (1-2-b3-5-b7), introduced FILTERED AND LOW in track 1 (distant probe, the user detecting the grid), brought UNFILTERED AND FOREGROUND in track 4 (the threshold cross, the circuit accepting the user), returned GLITCH-STUTTERED at 32nd-note rate in track 9 (the system clock running faster than the user during the light-cycle sprint), and played WHOLE ON FM BELL ONE OCTAVE UP with a long derez tail in track 12 (the system shutting down behind the exiting user). (2) Derez chord — Phrygian bII slide (minor tonic -> bII major -> minor tonic), introduced as a SINGLE ARTICULATION at the chorus midpoint of track 4 (the threshold cross event), moved to STRUCTURAL BACKBONE status repeated every 4 bars throughout the chorus sections of track 7 (the recognizer's scan, the listener's identity dissolving and reforming in step with the chord), and returned as a SINGLE ARTICULATION at the chorus start of track 11 (the breach event, mirroring track 4 but reversed in feel). The bracketing single-articulation appearances of the derez chord at tracks 4 and 11 frame the dissolution arc (tracks 5-8) as a structural unit. The grid pulse motif's four appearances mark the album's four phase transitions: outside the grid (track 1), entering the grid (track 4), at maximum velocity inside the grid (track 9), and exiting the grid (track 12).",
+    "tracklist_continuity": "Each track ends on a pitch that primes the next track's tonic — sometimes via dominant relationship (V of next tonic), sometimes via common-tone modal pivot, sometimes via deceptive resolution at structural hinges. Specifically: 1 ends on Am tonic (no V — the album begins on stillness, not motion; primes the perfect-fifth ascent to Em). 2 ends on B (V of Em, also tonic of track 3). 3 ends on F# (V of Bm, deceptively reread as Phrygian tonic of track 4). 4 ends on C# (V of F#m, common-tone pivot to track 5's C#m as parallel-minor reroot). 5 ends on G# (V of C#m, common-tone pivot to track 6's G#m as same-tonic continuation). 6 ends on D# (Locrian flat-five color of G#m, reread as common-tone D pitch in track 7's Dm Aeolian). 7 ends on A (V of Dm, also tonic of track 8 — the perfect-fifth descent prepares the structural-hinge return to A minor). 8 ends on E (V of Am, also tonic of track 9 — the exit arc begins by retracing the entry arc's first step). 9 ends on B (V of Em, also tonic of track 10 — matches track 2's outro pitch exactly, the architectural rhyme made audible). 10 ends on F# (V of Bm, deceptively resolved down to A in track 11 — chromatic-mediant-style breach move). 11 ends on E (V of Am, also tonic of track 12 — the closing ring). The listener will not consciously hear most of these pivots — they will only feel that each transition is inevitable rather than abrupt, and that the exit arc's harmonic ladder rhymes architecturally with the entry arc.",
+    "visual_continuity_notes": "Twelve covers follow the album's narrative arc as a single descent-immersion-ascent journey through a closed digital system. The aesthetic vocabulary is locked: cyan-on-deep-black backgrounds, electric-blue wireframe grids, magenta light-trails, chrome figures and vehicles, faint white pinpoint stars, geometric purity, no terrain, no warm colors, no palm trees, no sunsets, no warm-magenta sunset palettes (cool-magenta only, used sparingly as accent against the cyan-dominant palette). Track 1: distant grid horizon from outside, mathematical and quiet. Track 2: chrome vehicle tracing the grid perimeter. Track 3: chrome light-cycle accelerating along a magenta light-trail. Track 4: threshold-cross moment, the lattice density increasing past the magenta line. Track 5: chrome humanoid figure mid-derez disassembling into cubes. Track 6: vast translucent crystal lattice in deep ambient space (no grid floor visible). Track 7: massive geometric recognizer craft hovering over the grid, beam scanning down — this is the album's hero playlist-thumbnail cover. Track 8: chrome figure mid-recompile in a slightly more angular geometric form. Track 9: two chrome light-cycles at full sprint — the album's second hero cover. Track 10: vertical I/O tower extending upward from the grid floor. Track 11: breach moment, the lattice cracking outward into white space. Track 12: chrome figure walking away from the viewer toward a derezzing horizon. The covers should read as one cohesive work with a Daft Punk Tron Legacy / Disney Tron 1982 + 2010 aesthetic — emphatically NOT a sunset palette. The listener scrolling through the playlist thumbnail grid should see cold mechanical precision over warm nostalgia.",
+    "execution_notes_for_pipeline": "MusicGen is the renderer of record (license risk accepted). Every musicgen_prompt is explicit about instrumental + no vocals — do not relax this in any per-track override. Per-track durations sum to 3210 seconds (53.5 minutes) for the canonical 12 — slightly longer than Sunset Drive Vol. 1's 2940 seconds because Tron has more 270s tracks (5, 6, 7, 9, 10, 11) reflecting the album's denser structural payload. Long tracks (5, 6, 7, 9, 10, 11, 12) sit at 270-300s; the rest at 240s. All BPMs are within the 80-118 validation range (album range 96-112). Cover prompts are SDXL-ready, all specify 1024x1024 and 'no text, no people' (or in the case of figure-containing tracks 5, 8, 11, 12: 'no faces visible' or 'figure mid-dissolution / mid-recompile / silhouetted' to keep SDXL from generating realistic human faces). The palette differentiation from Sunset Drive Vol. 1 should be enforced at the SDXL stage by the explicit 'no warm colors, no palm trees, no sunsets, cyan-on-deep-black' constraints in every cover prompt.",
+    "differentiation_from_sunset_drive_vol_1": "Sunset Drive Vol. 1 was an ABA arch over the time-of-day from late afternoon to full dark, using cycle-of-fifths ascending through minor-major alternation for the climb (Am -> C -> G -> Em -> Bm) and chromatic-mediant slides for the descent (D -> F#m -> A -> F -> Dm -> Am), with a BPM range of 82-112 and a sonic palette built on DX7 pads and FM bells (warm analog). Tron Drive Vol. 1 is a Mobius-strip ring over 12 tracks (entry -> dissolution -> exit-on-opposite-face) using cycle-of-fifths ascending strictly inside the minor mode for the entry (Am -> Em -> Bm -> F#m Phrygian), modal interchange for the dissolution (C#m Dorian -> G#m Locrian-shaded -> Dm Aeolian -> Am Phrygian-shaded), and a retrace of the entry-arc ladder for the exit (Em -> Bm -> Am). NO MAJOR KEYS appear on the album — Tron never resolves to comfort. BPM range is the tighter 96-112 instead of the wider 82-112 — the mechanical pulse never relaxes. Sonic palette is PWM saws, triple-stacked aggressive saw leads, hard-square sub bass, vocoder-textured pads with no actual phonemes, and FM bell as the cold-bright accent voice (no warm DX7 pads anywhere). Sidechain is harder and more pumping (Daft Punk's Tron Legacy / Justice's Cross influence). The two motifs each appear four times instead of three, reflecting the stricter machine-tightening structural logic. The closing A minor is the same pitch as the opener but voiced one octave higher on FM bell with a derez tail to silence, where Sunset's closing A minor was voiced one octave LOWER half-tempo on FM bell as a memory-of-thesis statement. The two albums sit on the same shelf — same composer, same audience (late-night programmers), same channel — but they read as different works: Sunset is a drive home through golden hour into night; Tron is a descent into a closed digital system and the listener's partial emergence from it. The albums share an A-minor tonic frame but no other architectural overlap."
+  }
+}

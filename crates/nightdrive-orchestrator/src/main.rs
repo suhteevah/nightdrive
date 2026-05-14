@@ -35,6 +35,34 @@ enum Command {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Render every track of a pre-composed album. Reads
+    /// `docs/albums/<slug>.json` for the per-track specs and uses pre-rendered
+    /// covers from `assets/covers/albums/<slug>/track-NN.png`. Skips stage 1
+    /// (LLM) and stage 3 (art) since both are pre-baked; runs audio + master +
+    /// encode + upload per track.
+    RunAlbum {
+        /// Album slug, matches docs/albums/<slug>.json.
+        #[arg(long)]
+        slug: String,
+        /// Only render tracks at or after this number (1-indexed). For resume.
+        #[arg(long, default_value_t = 1)]
+        from_track: u32,
+        /// Stop after this track number (inclusive). 0 = render through end.
+        #[arg(long, default_value_t = 0)]
+        to_track: u32,
+        /// Synchronized 1-shot album drop — every track's scheduled_publish_at
+        /// is this exact RFC3339 timestamp (e.g. `2026-05-15T18:00:00Z`),
+        /// regardless of when individual uploads complete. When unset, each
+        /// track falls back to `now + [youtube].schedule_offset_hours` per-
+        /// upload (the trickle release pattern). For album conventions and
+        /// coordinated press moments, set this. Per
+        /// `memory/feedback_sync_drop_for_future_albums.md`.
+        #[arg(long)]
+        publish_at: Option<String>,
+        /// Skip the YouTube upload step.
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// Long-running 24/7 livestream supervisor.
     Livestream,
     /// Retry any tracks left in a non-terminal state.
@@ -60,6 +88,23 @@ async fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Command::RunBatch { count, dry_run } => run_batch(&cfg, count, dry_run).await,
+        Command::RunAlbum { slug, from_track, to_track, publish_at, dry_run } => {
+            let parsed_publish_at = publish_at
+                .as_deref()
+                .map(|s| chrono::DateTime::parse_from_rfc3339(s)
+                    .map(|d| d.with_timezone(&chrono::Utc)))
+                .transpose()
+                .context("--publish-at must be RFC3339 (e.g. 2026-05-15T18:00:00Z)")?;
+            if let Some(t) = parsed_publish_at {
+                let min_future = chrono::Utc::now() + chrono::Duration::hours(1);
+                if t < min_future {
+                    anyhow::bail!(
+                        "--publish-at {t} must be at least 1h in the future to avoid races with MG audio gen wall time"
+                    );
+                }
+            }
+            run_album(&cfg, &slug, from_track, to_track, parsed_publish_at, dry_run).await
+        }
         Command::Livestream => livestream(&cfg).await,
         Command::Resume => resume(&cfg).await,
         Command::Status => status(&cfg).await,
@@ -199,21 +244,44 @@ async fn pipeline_one(
     // 403 youtube.thumbnail.forbidden. The video itself uploads fine and
     // YouTube auto-generates a thumbnail from frame samples — that's good
     // enough for MVP, so we log + continue rather than fail the pipeline.
-    if let Err(e) = yt.set_thumbnail(&result.video_id, &paths.thumbnail_jpg()).await {
+    set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
+
+    Tracks::update_state(db, track_id, TrackState::Published).await?;
+    info!(video_id = %result.video_id, "track published");
+    Ok(())
+}
+
+/// Set the YouTube thumbnail with best-effort semantics: the video upload
+/// itself has already succeeded by the time we call this, so two known
+/// failure modes — channel-not-verified (403) and rate-limit (429) — are
+/// downgraded to a warn rather than failing the whole pipeline. YouTube
+/// auto-generates a thumbnail from frame samples when we don't set one,
+/// so the video is still presentable. Any other thumbnail error (auth
+/// expired, malformed JPEG, etc.) still bubbles.
+async fn set_thumbnail_best_effort(
+    yt: &nightdrive_youtube::YoutubeClient,
+    video_id: &str,
+    thumb_path: &std::path::Path,
+) -> anyhow::Result<()> {
+    use nightdrive_youtube::YoutubeUploader;
+    if let Err(e) = yt.set_thumbnail(video_id, thumb_path).await {
         let msg = e.to_string();
-        if msg.contains("403") && msg.contains("thumbnail") {
-            tracing::warn!(
-                video_id = %result.video_id,
-                "thumbnail set 403 — channel needs phone verification at \
-                 youtube.com/verify; using YouTube's auto-generated thumbnail"
+        let is_403_unverified = msg.contains("403") && msg.contains("thumbnail");
+        let is_429_ratelimit = msg.contains("429") && msg.contains("thumbnail");
+        if is_403_unverified {
+            warn!(
+                video_id,
+                "thumbnail 403 — channel needs phone verification at youtube.com/verify; YT auto-generated thumbnail will be used"
+            );
+        } else if is_429_ratelimit {
+            warn!(
+                video_id,
+                "thumbnail 429 — YT per-channel thumbnail upload rate limit hit (~100/day); auto-generated thumbnail will be used. Retry later via a `nightdrive-cli thumbnails retry-failed` pass."
             );
         } else {
             return Err(e.into());
         }
     }
-
-    Tracks::update_state(db, track_id, TrackState::Published).await?;
-    info!(video_id = %result.video_id, "track published");
     Ok(())
 }
 
@@ -299,6 +367,263 @@ async fn run_audio_and_cover(
     let (audio_res, art_res) = tokio::join!(audio_task, art_task);
     audio_res??;
     art_res??;
+    Ok(())
+}
+
+/// Render every track of a pre-composed album. Reads
+/// `docs/albums/<slug>.json` for specs + uses pre-rendered covers from
+/// `assets/covers/albums/<slug>/track-NN.png`. Stages 1 (LLM) and 3 (art)
+/// are skipped; everything else runs identical to the normal pipeline.
+#[instrument(skip(cfg), fields(slug, from_track, to_track, dry_run))]
+async fn run_album(
+    cfg: &AppConfig,
+    slug: &str,
+    from_track: u32,
+    to_track: u32,
+    publish_at: Option<chrono::DateTime<chrono::Utc>>,
+    dry_run: bool,
+) -> anyhow::Result<()> {
+    let album_json_path = std::path::PathBuf::from("docs/albums").join(format!("{slug}.json"));
+    let album_json = tokio::fs::read_to_string(&album_json_path).await
+        .with_context(|| format!("read {}", album_json_path.display()))?;
+    let album: serde_json::Value = serde_json::from_str(&album_json)
+        .with_context(|| format!("parse {}", album_json_path.display()))?;
+    let album_title = album["title"].as_str().unwrap_or(slug).to_string();
+    let tracks = album["tracks"].as_array()
+        .ok_or_else(|| anyhow::anyhow!("album.tracks must be an array"))?;
+    info!(
+        slug = %slug,
+        album_title = %album_title,
+        track_count = tracks.len(),
+        "album loaded"
+    );
+
+    let db = Db::connect_and_migrate(&cfg.paths.sqlite_db).await
+        .context("open sqlite + run migrations")?;
+
+    let cover_dir = std::path::PathBuf::from("assets/covers/albums").join(slug);
+
+    for track_value in tracks {
+        let track_num = track_value["track_number"].as_u64()
+            .ok_or_else(|| anyhow::anyhow!("track_number missing"))? as u32;
+        if track_num < from_track { continue; }
+        if to_track > 0 && track_num > to_track { continue; }
+
+        let track_id = nightdrive_core::TrackId(format!("nd-{slug}-{track_num:03}"));
+        let cover_src = cover_dir.join(format!("track-{track_num:02}.png"));
+
+        let span = tracing::info_span!(
+            "album_track",
+            id = %track_id,
+            num = track_num,
+            title = %track_value["title"].as_str().unwrap_or("?"),
+        );
+        let _enter = span.enter();
+
+        let spec = match spec_from_album_track(track_value, track_id.clone(), slug, &album_title) {
+            Ok(s) => s,
+            Err(e) => {
+                error!(error = %e, "couldn't build spec from album track");
+                continue;
+            }
+        };
+
+        if let Err(e) = pipeline_one_album(cfg, &db, &track_id, &spec, &cover_src, publish_at, dry_run).await {
+            error!(error = %e, error.chain = ?e, "album track pipeline failed");
+            if let Err(mark_err) =
+                Tracks::update_state(&db, &track_id, TrackState::Failed).await
+            {
+                warn!(error = %mark_err, "couldn't mark album track failed");
+            }
+        }
+    }
+
+    info!("album complete");
+    Ok(())
+}
+
+/// Build a [`CompositionSpec`] from one entry in `docs/albums/<slug>.json`.
+/// Maps the album JSON's loose schema (which has extras like `composer_notes`,
+/// `key_relationship_to_prior`, etc) into the strict CompositionSpec the
+/// pipeline crates consume. Constructs YT metadata from album-level info.
+fn spec_from_album_track(
+    track_value: &serde_json::Value,
+    track_id: nightdrive_core::TrackId,
+    slug: &str,
+    album_title: &str,
+) -> anyhow::Result<nightdrive_core::CompositionSpec> {
+    use nightdrive_core::{CompositionSpec, Section, YoutubeMetadata};
+    let title = track_value["title"].as_str()
+        .ok_or_else(|| anyhow::anyhow!("title"))?.to_string();
+    let bpm = track_value["bpm"].as_u64()
+        .ok_or_else(|| anyhow::anyhow!("bpm"))? as u32;
+    // Album JSON uses "key"; CompositionSpec uses "musical_key".
+    let musical_key = track_value["key"].as_str()
+        .ok_or_else(|| anyhow::anyhow!("key"))?.to_string();
+    let duration_seconds = track_value["duration_seconds"].as_u64()
+        .ok_or_else(|| anyhow::anyhow!("duration_seconds"))? as u32;
+    let track_number = track_value["track_number"].as_u64().unwrap_or(0) as u32;
+    let mood_tags: Vec<String> = track_value["mood_tags"].as_array()
+        .ok_or_else(|| anyhow::anyhow!("mood_tags"))?
+        .iter()
+        .filter_map(|v| v.as_str().map(String::from))
+        .collect();
+    let musicgen_prompt = track_value["musicgen_prompt"].as_str()
+        .ok_or_else(|| anyhow::anyhow!("musicgen_prompt"))?.to_string();
+    let cover_prompt = track_value["cover_prompt"].as_str()
+        .ok_or_else(|| anyhow::anyhow!("cover_prompt"))?.to_string();
+    let sections: Vec<Section> = track_value["sections"].as_array()
+        .ok_or_else(|| anyhow::anyhow!("sections"))?
+        .iter()
+        .map(|s| -> anyhow::Result<Section> {
+            Ok(Section {
+                name: s["name"].as_str()
+                    .ok_or_else(|| anyhow::anyhow!("section.name"))?.to_string(),
+                bars: s["bars"].as_u64()
+                    .ok_or_else(|| anyhow::anyhow!("section.bars"))? as u32,
+                instrumentation: s["instrumentation"].as_str()
+                    .ok_or_else(|| anyhow::anyhow!("section.instrumentation"))?.to_string(),
+            })
+        })
+        .collect::<anyhow::Result<Vec<_>>>()?;
+
+    // YouTube metadata: build a presentable title + description from album
+    // context. Title format mirrors the manual tracks already on the channel.
+    let yt_title = format!(
+        "{title} — {album_title} (Track {track_number:02}) [Synthwave for Coding]"
+    );
+    let yt_description = format!(
+        "Track {track_number:02} of {album_title}.\n\n\
+         Key: {musical_key} · {bpm} BPM · {duration_seconds}s\n\n\
+         Part of nightdrive's autonomous synthwave album series. \
+         Best listened to in order — playlist link in pinned comment.\n\n\
+         #synthwave #codingmusic #lofi #study #{slug}",
+        slug = slug.replace('-', "")
+    );
+
+    Ok(CompositionSpec {
+        track_id,
+        title,
+        subgenre: "synthwave".to_string(),
+        mood_tags,
+        bpm,
+        musical_key,
+        duration_seconds,
+        sections,
+        musicgen_prompt,
+        cover_prompt,
+        youtube: YoutubeMetadata {
+            title: yt_title,
+            description: yt_description,
+            tags: vec![
+                "synthwave".to_string(),
+                "coding music".to_string(),
+                "lofi".to_string(),
+                "study".to_string(),
+                "retrowave".to_string(),
+                album_title.to_string(),
+                slug.to_string(),
+            ],
+            category_id: "10".to_string(),
+        },
+    })
+}
+
+/// Album-mode pipeline for one track. Identical to `pipeline_one` minus
+/// stage 1 (LLM — spec is pre-baked) and stage 3 (art — cover is pre-rendered
+/// on disk). Audio, master, encode, upload all run; state transitions are
+/// the same so `resume` works on partially-rendered albums.
+#[instrument(skip(cfg, db, spec), fields(track_id = %track_id))]
+async fn pipeline_one_album(
+    cfg: &AppConfig,
+    db: &Db,
+    track_id: &nightdrive_core::TrackId,
+    spec: &nightdrive_core::CompositionSpec,
+    cover_src: &std::path::Path,
+    publish_at: Option<chrono::DateTime<chrono::Utc>>,
+    dry_run: bool,
+) -> anyhow::Result<()> {
+    let paths = nightdrive_core::TrackPaths::new(&cfg.paths.work_dir, track_id);
+    tokio::fs::create_dir_all(&paths.root).await
+        .with_context(|| format!("mkdir {}", paths.root.display()))?;
+
+    // Stage 1 SKIPPED. Spec is pre-baked from the album JSON. Write spec.json
+    // for downstream tooling visibility.
+    info!("stage=1 SKIPPED (album mode — spec pre-baked)");
+    tokio::fs::write(paths.spec_json(), serde_json::to_vec_pretty(spec)?).await?;
+    let seed = djb2_hash(track_id.as_str()) as i64;
+    Tracks::insert(db, spec, seed).await?;
+    Tracks::update_state(db, track_id, TrackState::SpecGenerated).await?;
+
+    // Stage 3 SKIPPED. Copy pre-rendered album cover into the per-track dir.
+    info!("stage=3 cover (copying pre-rendered: {})", cover_src.display());
+    if !tokio::fs::try_exists(cover_src).await.unwrap_or(false) {
+        anyhow::bail!(
+            "album cover missing at {} — generate it first via `python sidecar/generate_cover_library.py --album <slug>`",
+            cover_src.display()
+        );
+    }
+    tokio::fs::copy(cover_src, paths.cover_png()).await
+        .with_context(|| format!("copy {} -> {}", cover_src.display(), paths.cover_png().display()))?;
+
+    // Stage 2: audio. Same code path as `pipeline_one`; the music is the
+    // expensive bit (10-15 min per track on kokonoe MG).
+    info!("stage=2 audio_gen");
+    {
+        let client = nightdrive_audio_gen::client_for(cfg.audio_gen.clone())?;
+        client.render(spec, &paths).await?;
+    }
+    Tracks::update_state(db, track_id, TrackState::CoverRendered).await?;
+
+    // Stage 4: master
+    info!("stage=4 master");
+    {
+        use nightdrive_audio_master::AudioMaster;
+        let master = nightdrive_audio_master::FfmpegMaster::new(cfg.mastering.clone());
+        master.run(&paths).await?;
+    }
+    Tracks::update_state(db, track_id, TrackState::AudioMastered).await?;
+
+    info!("stage=5 visualizer (placeholder: showwaves overlay baked into stage 6)");
+
+    // Stage 6: encode
+    info!("stage=6 final encode");
+    {
+        use nightdrive_encoder::FinalEncoder;
+        let encoder = nightdrive_encoder::FfmpegEncoder::new(cfg.encoder.clone());
+        encoder.compose(&paths, spec).await?;
+        nightdrive_encoder::make_thumbnail(&paths).await?;
+    }
+    Tracks::update_state(db, track_id, TrackState::VideoEncoded).await?;
+
+    // Stage 7: upload
+    if dry_run {
+        info!("dry_run=true, skipping upload — state stays VideoEncoded");
+        return Ok(());
+    }
+    info!("stage=7 upload");
+    let upload_id = Uploads::insert(db, track_id).await?;
+    let creds = nightdrive_youtube::YoutubeCredentials::from_env()?;
+    let yt = nightdrive_youtube::YoutubeClient::new(creds)?;
+    use nightdrive_youtube::YoutubeUploader;
+    let req = nightdrive_youtube::UploadRequest {
+        spec,
+        paths: &paths,
+        privacy: match cfg.youtube.default_privacy.as_str() {
+            "public" => nightdrive_youtube::Privacy::Public,
+            "unlisted" => nightdrive_youtube::Privacy::Unlisted,
+            _ => nightdrive_youtube::Privacy::Private,
+        },
+        scheduled_publish_at: Some(publish_at.unwrap_or_else(||
+            chrono::Utc::now() + chrono::Duration::hours(cfg.youtube.schedule_offset_hours)
+        )),
+        declare_synthetic_content: cfg.youtube.declare_synthetic_content,
+    };
+    let result = yt.upload_video(req).await?;
+    Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
+    set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
+    Tracks::update_state(db, track_id, TrackState::Published).await?;
+    info!(video_id = %result.video_id, "album track published");
     Ok(())
 }
 
@@ -591,17 +916,7 @@ async fn resume_one(
         };
         let result = yt.upload_video(req).await?;
         Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
-        if let Err(e) = yt.set_thumbnail(&result.video_id, &paths.thumbnail_jpg()).await {
-            let msg = e.to_string();
-            if msg.contains("403") && msg.contains("thumbnail") {
-                warn!(
-                    video_id = %result.video_id,
-                    "thumbnail set 403 — channel needs phone verification"
-                );
-            } else {
-                return Err(e.into());
-            }
-        }
+        set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
         Tracks::update_state(db, &track_id, TrackState::Published).await?;
         info!(video_id = %result.video_id, "resumed track published");
     }

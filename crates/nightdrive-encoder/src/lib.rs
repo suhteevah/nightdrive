@@ -186,11 +186,20 @@ impl FinalEncoder for FfmpegEncoder {
         let mut city_fc_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
         let mut city_hi_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
         let mut city_lo_paths: Vec<Vec<PathBuf>> = Vec::with_capacity(forecast_data.cities.len());
+        let fetched_hhmm_utc = forecast_data.fetched_at.format("%H:%M");
         for (city_idx, city) in forecast_data.cities.iter().enumerate() {
+            // Header on the right panel: "5-DAY FORECAST · <CITY> · 14:30 UTC".
+            // The trailing UTC timestamp is the time we pulled the NWS data
+            // (not the time the forecast was issued — close enough). At
+            // fontsize 36 the longest city ("FORT LAUDERDALE") + timestamp
+            // measures ~880px which fits in the 920px right-panel space.
             let hdr = write_text(
                 &text_dir,
                 &format!("fc_header_c{city_idx}.txt"),
-                &format!("5-DAY FORECAST · {}", city.display_name),
+                &format!(
+                    "5-DAY FORECAST · {} · {} UTC",
+                    city.display_name, fetched_hhmm_utc
+                ),
             )
             .await?;
             city_headers.push(hdr);
@@ -359,12 +368,23 @@ fn build_filter_graph(
          [bg_seam]drawbox=x=40:y=300:w=880:h=480:color=0x0e2a4d@0.85:t=fill[bg_radar]",
     );
 
-    // Radar gif overlay onto the inner inset. `negate` inverts colors so the
-    // NWS white basemap → dark navy + precip blobs → glowing magenta.
-    // `scale=-1:480` preserves aspect, pillarbox-centers at x=218 (=(880-524)/2+40).
+    // Radar gif overlay onto the inner inset. The chain:
+    //   1. format=rgba — ensure an alpha channel before chromakey writes to it
+    //   2. chromakey color=0xC2EAF0 — kill the NWS basemap's pale-cyan WATER
+    //      fill (#C2EAF0 measured = 59% of pixels in the source GIF). This
+    //      becomes a peach-orange after `negate` and clashes with the dark
+    //      navy synthwave inset; chromakey-then-overlay shows the inset
+    //      underneath instead. similarity=0.12 is tight enough that the
+    //      cyan precip blobs (different saturation/hue) are not keyed.
+    //   3. negate — inverts the remaining RGB (white land → dark, dark
+    //      outlines → bright, precip oranges/reds → magentas/cyans).
+    //      Alpha is preserved (the keyed water stays transparent).
+    //   4. scale=-1:480 — preserves aspect, pillarbox-centers at x=218
+    //      (=(880-524)/2+40).
     if radar_present {
         graph.push_str(
-            ";[2:v]negate,scale=-1:480[radar_scaled];\
+            ";[2:v]format=rgba,chromakey=color=0xC2EAF0:similarity=0.12:blend=0.04,\
+                  negate,scale=-1:480[radar_scaled];\
              [bg_radar][radar_scaled]overlay=x=218:y=300:shortest=0[bg_with_radar];\
              [bg_with_radar][wave]overlay=x=0:y=820:format=yuv420[v_base]",
         );

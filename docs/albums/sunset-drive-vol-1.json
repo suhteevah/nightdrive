@@ -1,0 +1,326 @@
+{
+  "album_slug": "sunset-drive-vol-1",
+  "title": "Sunset Drive, Vol. 1",
+  "theme": "sunset_drive",
+  "track_count": 12,
+  "tonic_progression": "Am -> C -> G -> Em -> Bm -> D -> D -> F#m -> A -> F -> Dm -> Am",
+  "bpm_arc": [84, 88, 92, 96, 102, 108, 112, 106, 100, 94, 88, 82],
+  "narrative_arc": "Twelve tracks read like a single coastal drive from late afternoon to full dark. Tracks 1-2 ease away from the pier with the sun still warm overhead; 3-5 settle into a steady coast-road cruise as the sky shifts magenta and the palms cast long shadows across the lane markers. 6-7 are the dual peak: the highway opens, the speedometer climbs, the sun bisects the horizon and the chrome on the hood goes molten orange (6 is full-throttle exhilaration; 7 is the same moment held a beat longer, vanishing-point stillness inside the speed). 8-9 step the energy down as the sun drops below the waterline and afterglow stains the underside of the clouds lavender. 10-11 are the embers — last orange sliver, taillights ahead becoming the only color left in the frame. Track 12 closes the loop: dashboard glow, ocean gone black, the opening motif played one last time, slower, an octave down. The listener should feel they have driven somewhere and arrived.",
+  "recurring_motifs": [
+    {
+      "motif": "Sunset arp — ascending major-7 arpeggio voiced on DX7-style FM electric piano / glassy bell pad (1-3-5-7-9, two octaves)",
+      "introduced_in": 1,
+      "returns_in": [5, 8, 12],
+      "transformation": "Track 1 plays it whole and unhurried (the album's thesis statement). Track 5 inverts it descending (the sun is now lower than the arp's starting pitch). Track 8 fragments it — only the top three notes remain, with longer rests between, as if the listener can no longer remember the full shape. Track 12 plays it whole again, one octave lower, half tempo, FM bell instead of pad: the same idea remembered at the end of the night."
+    },
+    {
+      "motif": "Highway pulse — four-note descending pad figure landing on the and-of-4 (offbeat anchor that pulls each bar forward into the next)",
+      "introduced_in": 3,
+      "returns_in": [6, 11],
+      "transformation": "Track 3 introduces it under the verse as harmonic support. Track 6 brings it forward into the lead position at the peak — extended to a full 8-bar refrain, sidechained hard to the kick, the structural backbone of the apex. Track 11 returns it ghosted: same notes, same rhythm, but played on a filtered pad with the high end rolled off and the sustain bled out, as if heard through a closed car window."
+    }
+  ],
+  "tracks": [
+    {
+      "track_number": 1,
+      "title": "First Light Off the Pier",
+      "role": "opener",
+      "key": "A minor",
+      "bpm": 84,
+      "duration_seconds": 240,
+      "mood_tags": ["nocturnal", "anticipatory", "warm", "open"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "hazy DX7 pad alone, no rhythm, slow filter sweep opening"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ filtered ascending arp (sunset motif, whole), soft sub bass on root"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ gated reverb snare on 2 and 4, soft kick on 1, mellow analog bass walking root-fifth"},
+        {"name": "bridge", "bars": 8, "instrumentation": "drop to pad + arp only, breathe"},
+        {"name": "outro", "bars": 8, "instrumentation": "fade pad sustaining the A, drums drop out, arp once more then silence"}
+      ],
+      "musicgen_prompt": "synthwave 84 BPM A minor, hazy DX7 pad, slow ascending major-7 arpeggio, gated reverb drums entering at 1:00, mellow analog sub bass, warm twilight nocturnal feel, late afternoon golden light off the water, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, sun still high but lowering toward the horizon, view from a wooden pier extending into a calm Pacific ocean, palm tree silhouettes on the left, magenta-orange gradient sky just beginning, chrome car parked at the pier head reflecting the sky, anticipatory mood, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "—",
+      "tempo_relationship_to_prior": "—",
+      "composer_notes": "Sets the tonic (A minor) and the album's pad palette. Sunset motif played whole, unhurried — this is the thesis. No drums until bar 32. Outro ends on Em (V of A minor) which is the relative minor of G major — but the next track moves to C major (rel maj of Am) so the listener feels the brightening lift. Don't let MusicGen sneak in a hi-hat shuffle: keep the kit minimal and gated."
+    },
+    {
+      "track_number": 2,
+      "title": "Coast Road",
+      "role": "cruiser",
+      "key": "C major",
+      "bpm": 88,
+      "duration_seconds": 240,
+      "mood_tags": ["unfolding", "warm", "steady"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "filtered pad in C, sidechain hint"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ chugging muted-pluck arp on root-third-fifth, soft kick"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ saw lead melody, gated snare, sub bass"},
+        {"name": "verse2", "bars": 16, "instrumentation": "drop lead, layer second pad an octave up"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full kit + lead doubled in octaves"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter sweep down, pad sustains C"}
+      ],
+      "musicgen_prompt": "synthwave 88 BPM C major, warm analog pad, sidechained muted-pluck arpeggio, soft kick on every beat, gated reverb snare on 2 and 4, mellow saw lead melody, steady coastal-highway cruising feel, late afternoon golden hour, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, two-lane coast highway curving along a cliff edge, palm trees in silhouette on the right, calm ocean below, sky transitioning from gold to peach, chrome sports car mid-frame from behind driving away into the distance, neon lane markers glowing faintly, no people visible, no text, 1024x1024",
+      "key_relationship_to_prior": "Relative major of A minor — the brightening lift the listener feels after track 1's Em outro chord resolves up a major third.",
+      "tempo_relationship_to_prior": "+4 BPM. First step of the linear ascent.",
+      "composer_notes": "First true cruiser. Sidechain on the pad must be obvious but tasteful — this is where the listener locks in. Keep the lead melody short (4-bar phrase repeated). Outro ends on G (V of C) which is also the tonic of track 3 — earned pivot."
+    },
+    {
+      "track_number": 3,
+      "title": "Palm Shadows",
+      "role": "cruiser",
+      "key": "G major",
+      "bpm": 92,
+      "duration_seconds": 240,
+      "mood_tags": ["focused", "rolling", "amber"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "sub bass on G, kick"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ highway pulse motif (4-note descending pad on and-of-4), gated snare"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ saw lead, layered pads, sidechain"},
+        {"name": "breakdown", "bars": 8, "instrumentation": "kick drops, just pulse motif + pad + reverb tail"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full kit returns, lead doubled"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close, pad on D (V of G)"}
+      ],
+      "musicgen_prompt": "synthwave 92 BPM G major, four-note descending pad figure on the offbeat, sidechained warm pad, saw lead melody, gated reverb drums, kick on every beat, analog sub bass, focused coastal cruise feel, long palm tree shadows across the road, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, low sun behind palm trees casting long horizontal shadows across an empty highway, sky deepening from peach to magenta, chrome 80s coupe parked askew in foreground reflecting the palms, deep amber light, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from C — continuing the cycle-of-fifths-ascending ladder that pulls the album brighter and sharper.",
+      "tempo_relationship_to_prior": "+4 BPM. Maintaining linear ascent.",
+      "composer_notes": "FIRST APPEARANCE of the highway pulse motif — under the verse as harmonic support, not yet in the lead position. The breakdown at bar 41 is where the listener should first hear the motif unobstructed. Outro V chord (D) pivots cleanly to Em next (D is also bVII of Em — common rotation)."
+    },
+    {
+      "track_number": 4,
+      "title": "Magenta Mile",
+      "role": "cruiser",
+      "key": "E minor",
+      "bpm": 96,
+      "duration_seconds": 240,
+      "mood_tags": ["urgent", "saturated", "rolling"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "filtered arp in Em, building"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ kick on every beat, sub bass, gated snare"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ aggressive saw lead, layered pads, FM bell counter-melody"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead drops, arp returns to foreground"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full mix, sidechain harder"},
+        {"name": "outro", "bars": 8, "instrumentation": "lead holds B (V of Em), filter close"}
+      ],
+      "musicgen_prompt": "synthwave 96 BPM E minor, driving filtered arpeggio, hard kick on every beat, gated reverb snare, aggressive saw lead, FM bell counter-melody, sidechained layered pads, urgent coastal highway feel, deep magenta sky overhead, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, highway at dusk fully saturated magenta and violet, chrome car in motion blur from the side, neon lane markers streaking past, palm silhouettes blurred in passing on the right, last horizontal band of orange at the horizon, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Relative minor of G — pivots the brightness back into a darker shade without losing the sharp-key feel. The Em is the album's first minor since the opener; the listener should feel a slight cool-edge return.",
+      "tempo_relationship_to_prior": "+4 BPM.",
+      "composer_notes": "Energy ramps. Em is the gravity well between the bright G of track 3 and the climbing Bm of track 5. The FM bell counter-melody is a foreshadow of the sunset motif's bell-voice return in track 12."
+    },
+    {
+      "track_number": 5,
+      "title": "Half Sun",
+      "role": "bridge-into-peak",
+      "key": "B minor",
+      "bpm": 102,
+      "duration_seconds": 270,
+      "mood_tags": ["lifted", "spacious", "edge-of-peak"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad swell + reverse cymbal up to bar 1"},
+        {"name": "verse", "bars": 16, "instrumentation": "kick, sub bass, INVERTED sunset arp (descending major-7) on FM bell"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "build: snare rolls, riser, filter open"},
+        {"name": "chorus", "bars": 16, "instrumentation": "wide lead in Bm, layered pads, gated snare, full kit"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, just inverted arp and pad — listener takes a breath"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full return, double-octave lead"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on F# (V of Bm) holding into silence"}
+      ],
+      "musicgen_prompt": "synthwave 102 BPM B minor, descending major-7 arpeggio on FM bell, wide saw lead, layered atmospheric pads, gated reverb drums, hard kick, sub bass, reverse cymbal swells, sense of cresting a hill, half sun visible on the horizon, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, sun exactly half-set, bisected by a perfectly flat ocean horizon, sky a vertical gradient deep magenta at top to molten orange at the cut, palm silhouettes flanking the frame, chrome 80s sports car on a wireframe-grid road heading directly toward the sun, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Em — completes the cycle-of-fifths-ascending ladder (Am-C-G-Em-Bm). This is the highest, sharpest minor key on the record; the next track jumps to the relative major D for the peak.",
+      "tempo_relationship_to_prior": "+6 BPM (a slightly larger jump than the prior +4 step pattern — the road opens up here).",
+      "composer_notes": "SUNSET MOTIF RETURNS, INVERTED. The arp now descends — the literal sun is now lower than the arp's starting pitch. This is the album's first major structural callback. 270s (45s long) — the bridge into peak deserves the extra room. Outro F# pivots into D major (F# is the major third of D) for the peak."
+    },
+    {
+      "track_number": 6,
+      "title": "Apex",
+      "role": "peak",
+      "key": "D major",
+      "bpm": 108,
+      "duration_seconds": 300,
+      "mood_tags": ["exhilarated", "wide-open", "molten"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "kick + sub bass + sidechain pad, no melody yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ chugging arp, gated snare, layered pads"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "build: white-noise riser, snare roll"},
+        {"name": "chorus", "bars": 16, "instrumentation": "HIGHWAY PULSE MOTIF in lead position, extended 8-bar refrain, hard sidechain, double saw lead"},
+        {"name": "verse2", "bars": 16, "instrumentation": "drop lead, arp + pulse motif under pad"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full mix, lead doubled in octaves, layered pads"},
+        {"name": "bridge", "bars": 8, "instrumentation": "drums drop, pulse motif on solo pad, listener takes a breath at altitude"},
+        {"name": "chorus3", "bars": 16, "instrumentation": "full return, biggest version of the mix"},
+        {"name": "outro", "bars": 8, "instrumentation": "lead sustains A (V of D), filter close, drums fade"}
+      ],
+      "musicgen_prompt": "synthwave 108 BPM D major, hard kick on every beat, sidechained layered pads, chugging arpeggio, four-note descending offbeat pulse motif in lead voice, double saw lead, gated reverb drums, white-noise risers, full-throttle coastal highway at peak speed, molten orange sun bisecting the windshield, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, view from behind a chrome sports car at full speed on a wireframe-grid highway, sun bisected on the horizon directly ahead, sky molten orange below the horizon line and deep magenta above, palm silhouettes in motion blur on either side, neon lane markers streaking past at high speed, chrome surfaces glowing, no people, no text, 1024x1024",
+      "cover_notes_internal": "This is the album's hero cover — should read as the iconic image on the playlist thumbnail grid.",
+      "key_relationship_to_prior": "Relative major of Bm. The album lifts from its sharpest minor into its brightest major — this is the structural sunrise-at-sunset moment.",
+      "tempo_relationship_to_prior": "+6 BPM. The album's biggest BPM jump from track 1; the road has fully opened.",
+      "composer_notes": "PEAK TRACK 1 of 2. HIGHWAY PULSE MOTIF MOVES INTO LEAD POSITION — this is its structural payoff after the foreshadow in track 3. 300s is intentional: the listener should feel they could stay here forever. The bridge at bar 65 (pulse motif solo on pad) is the album's emotional center — give it air. Don't let MusicGen pile on; restraint at the peak is what separates synthwave from EDM."
+    },
+    {
+      "track_number": 7,
+      "title": "Vanishing Point",
+      "role": "peak",
+      "key": "D major",
+      "bpm": 112,
+      "duration_seconds": 270,
+      "mood_tags": ["suspended", "weightless", "still-inside-speed"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "continuation feel — pad sustains D from track 6, light kick"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ shimmering arp, sub bass, brushed snare on 2 and 4"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ ethereal lead floating above the rhythm, sidechain softer than track 6"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, just pad + arp + reverb wash — vanishing point feel"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "drums return, lead doubled with a higher-octave FM bell"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close, pad sustains D into silence, no V chord — track ends on tonic for the first time"}
+      ],
+      "musicgen_prompt": "synthwave 112 BPM D major, shimmering arpeggio, ethereal floating saw lead, brushed gated snare, soft sidechained pads, sub bass, sense of weightless stillness at high speed, vanishing point on the horizon, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, view straight down the centerline of a wireframe-grid highway converging at a single vanishing point on the horizon, sun exactly at the vanishing point as a glowing orange disc one-third below the horizon line, sky deep magenta and violet, palm silhouettes far back on either side, chrome car nowhere visible — the listener is now driving, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Same key (D major) — the only repeated tonic on the album. Tracks 6 and 7 form a dual-peak plateau; same key, different energy. Track 6 is the surge, track 7 is the same moment held a beat longer.",
+      "tempo_relationship_to_prior": "+4 BPM. Highest BPM on the record.",
+      "composer_notes": "PEAK TRACK 2 of 2. Stays in D major intentionally — this is the only place on the album where two consecutive tracks share a tonic. The effect is held-breath: the listener is still at altitude but the surge has settled into glide. Ending on tonic (not the dominant) is also intentional — it lets the next track (F# minor) feel like a chromatic-mediant slide downward, the first comedown step. Don't add a key change mid-track; the suspension IS the composition."
+    },
+    {
+      "track_number": 8,
+      "title": "Disclosure Day",
+      "role": "comedown",
+      "key": "F# minor",
+      "bpm": 106,
+      "duration_seconds": 240,
+      "mood_tags": ["uncanny", "revelatory", "suspended", "lavender"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad in F#m on a long-held note, soft kick, no melody yet — listener notices something is different before they know what"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ FRAGMENTED sunset motif (top 3 notes only, longer rests), sub bass, gated snare — the album's familiar tune cracking under the weight of the moment"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ suspended saw lead held on long sustained notes (not sweeping), layered atmospheric pads with slow filter open"},
+        {"name": "verse2", "bars": 16, "instrumentation": "fragmented motif returns, lead drops out, the whole texture leans back to make room for the silence"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full but reverent — sidechain pulled way back, drums spacious, awe rather than impact"},
+        {"name": "outro", "bars": 8, "instrumentation": "fragmented motif one last time, filter close, pad sustains C# (V of F#m) — pivots to A major next as the world resumes"}
+      ],
+      "musicgen_prompt": "synthwave 106 BPM F# minor, fragmented ascending three-note bell motif with long rests between phrases, suspended saw lead held on long sustained notes, layered atmospheric pads with slow filter sweeps, spacious gated reverb drums, lavender afterglow on the underside of clouds with something unexpected held above the horizon, awed and still and quiet, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, sun fully below horizon but the sky still glowing, undersides of stratocumulus clouds lit lavender and salmon from below, coastal highway curving to the left, palm silhouettes against a darkening sky, chrome car parked on a shoulder overlook, ocean a deep purple, no people, no text, 1024x1024",
+      "cover_notes_internal": "An unidentified craft emerged from this prompt in the generated cover (track-08.png) — the SDXL run interpreted the lavender afterglow as the backdrop for a hovering object, which becomes the visual + lyrical anchor for the renamed track. Cover is the artifact; the music was retuned to match the cover, not the other way around.",
+      "key_relationship_to_prior": "Chromatic-mediant slide down from D — F#m shares two pitches with D major (F# and A) so the descent feels related but cooler. This is the album's first comedown move.",
+      "tempo_relationship_to_prior": "-6 BPM. First downward step. Symmetric mirror of the track 5 +6 ascent.",
+      "composer_notes": "SUNSET MOTIF RETURNS, FRAGMENTED — recontextualized. In the original arc this was 'Afterglow Lane,' a melancholy comedown. The generated cover's emergent unidentified-object reframes the track entirely: the fragmented motif now reads as the album's familiar tune CRACKING under the weight of the moment of disclosure. Not melancholy — quieter awe. Suspended saw lead instead of wistful sweeping. Drums spacious and reverent. C# outro still pivots up a major third to A major — the world resumes in track 9, lavender-hour normalcy returning. Original 'Afterglow Lane' composition preserved as bonus track 13."
+    },
+    {
+      "track_number": 9,
+      "title": "Lavender Hour",
+      "role": "comedown",
+      "key": "A major",
+      "bpm": 100,
+      "duration_seconds": 240,
+      "mood_tags": ["warm-cool", "settling", "soft"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "soft pad in A, light kick"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ pluck arp, sub bass, gated snare"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ mellow lead, layered pads, soft sidechain"},
+        {"name": "verse2", "bars": 16, "instrumentation": "lead steps aside, arp + counter-pad foreground"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "lead returns, octave-up doubling"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on E (V of A), pad fade"}
+      ],
+      "musicgen_prompt": "synthwave 100 BPM A major, soft warm pad, mellow plucked arpeggio, gentle saw lead, gated reverb drums with soft kick, sub bass, settling-into-evening feel, lavender and salmon sky, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, coastal highway at full dusk, sky a soft gradient lavender to salmon to deep violet, palm silhouettes now nearly black against the sky, chrome 80s coupe with headlights just turned on, glowing yellow beams on the road ahead, ocean barely visible behind, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Chromatic-mediant up from F#m — A major shares two pitches with F#m (A and E). The lift here is subtle, almost reluctant; the album is still descending overall but the listener gets a moment of warmth before the embers.",
+      "tempo_relationship_to_prior": "-6 BPM.",
+      "composer_notes": "Brief return to a major key on the way down. Headlights just came on — narratively this is the moment of acceptance that the day is over. Don't make it sad; make it settled. Outro E (V of A) pivots cleanly to F major next (chromatic-mediant down, a semitone-cluster move)."
+    },
+    {
+      "track_number": 10,
+      "title": "Embers on Chrome",
+      "role": "comedown",
+      "key": "F major",
+      "bpm": 94,
+      "duration_seconds": 240,
+      "mood_tags": ["amber", "lingering", "low-light"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "warm pad in F, no rhythm"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ soft kick, sub bass, gated snare on 2/4, plucked counter-melody"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ FM bell lead, layered pads, sidechain pulled way back"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, FM bell alone with pad reverb tail"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "drums return softly, lead doubled with saw an octave down"},
+        {"name": "outro", "bars": 8, "instrumentation": "filter close on C (V of F), pad fade"}
+      ],
+      "musicgen_prompt": "synthwave 94 BPM F major, warm analog pad, FM bell lead, plucked counter-melody, soft kick, gated reverb snare brushed light, sub bass, sense of last embers of sunlight on chrome surfaces, low warm light, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, close-up of a chrome 80s car hood and windshield reflecting the last embers of orange light across an otherwise dark landscape, palm silhouettes nearly indistinguishable from the deep purple sky, a single horizontal sliver of orange at the far horizon, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a major third from A — F is the chromatic-mediant of A. Cooling tones; F major's softer pitch palette suits the dimming light.",
+      "tempo_relationship_to_prior": "-6 BPM.",
+      "composer_notes": "FM bell as lead voice is a deliberate prep for track 12's full-motif return on FM bell. Keep the mix soft — the listener should feel the album winding down without it dragging. C outro pivots to Dm (C is the bVII of Dm — natural minor relation)."
+    },
+    {
+      "track_number": 11,
+      "title": "Last Orange Sliver",
+      "role": "comedown",
+      "key": "D minor",
+      "bpm": 88,
+      "duration_seconds": 240,
+      "mood_tags": ["dimming", "tender", "almost-night"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad in Dm, no rhythm, deep reverb"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ GHOSTED highway pulse motif (high end rolled off, sustain bled out), soft kick, sub bass"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ tender saw lead, layered pads, very soft sidechain"},
+        {"name": "verse2", "bars": 16, "instrumentation": "ghosted pulse foreground, lead drops out"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "lead returns, FM bell whisper-doubling"},
+        {"name": "outro", "bars": 8, "instrumentation": "ghosted pulse one final time, filter close, pad sustains A (V of Dm)"}
+      ],
+      "musicgen_prompt": "synthwave 88 BPM D minor, four-note descending offbeat pulse motif heavily filtered with high end rolled off and short sustain, tender saw lead, layered pads with deep reverb, soft kick, sub bass, FM bell whispers, sense of last sliver of orange light vanishing below horizon, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, near-total darkness over the ocean, a single thin horizontal sliver of orange at the horizon line, sky deep violet to near-black above, palm silhouettes barely visible, chrome car taillights — two red dots — receding into the dark, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a minor third from F major to D minor — F's relative minor. The album is now in its darkest tonal space since the opening Am.",
+      "tempo_relationship_to_prior": "-6 BPM.",
+      "composer_notes": "HIGHWAY PULSE MOTIF RETURNS, GHOSTED. Same notes, same rhythm as track 6's peak, but heavily filtered and decayed — as if heard through a closed car window from a passing vehicle. This is the motif's farewell. Outro A (V of Dm) pivots into Am next — the album closes the ring."
+    },
+    {
+      "track_number": 12,
+      "title": "Lights Out, Dashboard Glow",
+      "role": "closer",
+      "key": "A minor",
+      "bpm": 82,
+      "duration_seconds": 300,
+      "mood_tags": ["nocturnal", "resolved", "interior", "alone"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "deep pad in Am alone, no rhythm, slow filter open over 30s"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ SUNSET MOTIF on FM bell, one octave below original, half-tempo phrasing, sub bass on root"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ soft kick, gated snare brushed very soft, mellow lead, layered pads"},
+        {"name": "break", "bars": 8, "instrumentation": "drums drop, FM bell sunset motif alone with deep reverb"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "drums return softly, lead octave-doubled, full but quiet mix"},
+        {"name": "coda", "bars": 16, "instrumentation": "lead drops out, FM bell sunset motif one final time whole, pad fades, drums fade, silence"}
+      ],
+      "musicgen_prompt": "synthwave 82 BPM A minor, deep warm analog pad, FM bell ascending major-7 arpeggio played slow and full, soft kick on 1, brushed gated reverb snare, mellow saw lead, sub bass on root, sense of driving alone at night with only the dashboard glowing, nocturnal interior resolved feel, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, interior view from inside a chrome 80s sports car at night, dashboard instruments glowing soft cyan and amber, windshield showing a dark coastal highway lit only by headlights and faint stars over the ocean, palm silhouettes barely visible against a deep violet near-black sky, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fifth from Dm to Am — closes the cycle. The album begins and ends in A minor. The full descent has been traversed.",
+      "tempo_relationship_to_prior": "-6 BPM. Lowest BPM on the record, slightly below track 1's 84 BPM — the listener arrives more tired than they started, which is honest.",
+      "composer_notes": "CLOSER. SUNSET MOTIF RETURNS WHOLE, ONE OCTAVE DOWN, HALF TEMPO, ON FM BELL — the same idea remembered at the end of the night. 300s long to give the coda the air it needs. The final 16-bar coda is the motif alone, then silence; do not let MusicGen add a fade-up tail or any kind of stinger. The album ends in A minor where it began — the listener should feel the ring closed."
+    },
+    {
+      "track_number": 13,
+      "title": "Afterglow Lane",
+      "role": "bonus",
+      "key": "F# minor",
+      "bpm": 106,
+      "duration_seconds": 240,
+      "mood_tags": ["lavender", "wistful", "cooling"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "pad in F#m, soft kick, no melody yet"},
+        {"name": "verse", "bars": 16, "instrumentation": "+ FRAGMENTED sunset motif (top 3 notes only, longer rests), sub bass, gated snare"},
+        {"name": "chorus", "bars": 16, "instrumentation": "+ wistful saw lead, layered pads"},
+        {"name": "verse2", "bars": 16, "instrumentation": "fragmented motif returns, lead drops out"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "full but softer — sidechain pulled back"},
+        {"name": "outro", "bars": 8, "instrumentation": "fragmented motif one last time, filter close, pad sustains C#"}
+      ],
+      "musicgen_prompt": "synthwave 106 BPM F# minor, fragmented ascending three-note bell motif with long rests between phrases, wistful saw lead, layered atmospheric pads, gated reverb drums, sense of glowing sky after the sun has dropped, lavender afterglow on the underside of clouds, instrumental, no vocals",
+      "cover_prompt": "synthwave 1985 album cover, sun fully below horizon but the sky still glowing, undersides of stratocumulus clouds lit lavender and salmon from below, coastal highway curving to the left, palm silhouettes against a darkening sky, chrome car parked on a shoulder overlook, ocean a deep purple, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Bonus track — sits outside the album's 12-track arc; not part of the cycle-of-fifths/chromatic-mediant chain.",
+      "tempo_relationship_to_prior": "—",
+      "composer_notes": "BONUS TRACK. This was the originally designed track 8: a melancholy comedown with the SUNSET MOTIF returning fragmented as the listener's memory of the album's familiar tune dimming with the light. When the SDXL cover for track 8 surfaced an unidentified object in the sky, that slot was renamed 'Disclosure Day' and given a quieter, awed reading of the same music; this bonus preserves the original melancholic intent (wistful saw lead instead of suspended, normal-tight drums instead of spacious). Same musical bones, different psychic weather. Different cover seed will produce a different lavender-sky image without the UFO."
+    }
+  ],
+  "album_notes": {
+    "overall_form": "ABA arch over 12 tracks. A (tracks 1-5): ascent — sun lowering, road opening, tempo climbing from 84 to 102 BPM. B (tracks 6-7): dual peak in D major — track 6 is the surge (108 BPM), track 7 is the suspension (112 BPM, same key, glide instead of surge). A' (tracks 8-12): symmetric descent — chromatic-mediant slides cooling the harmony, tempo retreating 106 -> 100 -> 94 -> 88 -> 82, ending in A minor exactly where the album began. Dual peak (6+7) is intentionally off-center: the comedown gets one more track than the ascent, because the comedown is where this audience actually lives.",
+    "key_strategy": "Ascent uses cycle-of-fifths ascending through minor/major alternation: Am -> C (rel maj) -> G (P5) -> Em (rel min) -> Bm (P5). This climbs into sharper keys, brightening and tightening the harmonic palette. Peak pivots to D major (rel maj of Bm) for tracks 6 and 7 — the only repeated tonic on the album, a held-breath plateau. Descent uses chromatic-mediant slides: D -> F#m (shared F# and A) -> A major (shared A and E with F#m) -> F major (chromatic-mediant down from A) -> Dm (rel min of F) -> Am (P5 down from Dm). The descent feels related-but-cooling rather than mechanical. The ring closes: Am opens and closes the record.",
+    "tempo_strategy": "Ascent: 84 -> 88 -> 92 -> 96 -> 102 -> 108 (steps of +4 until the +6 jump at track 5 where the highway opens, then +6 again into the peak). Plateau: 108 -> 112 (+4 at the dual peak; track 7 is the album's BPM ceiling). Descent: 112 -> 106 -> 100 -> 94 -> 88 -> 82 (symmetric -6 steps mirroring the ascent's later +6 steps). Ends one tick below the opener's 84 — the listener arrives more tired than they started, which is the truth of a long drive home. Never crosses below 80 or above 118 (validation safe).",
+    "motif_strategy": "Two motifs, each with three structural appearances across the album. (1) Sunset motif — ascending major-7 arpeggio on DX7/FM bell, introduced WHOLE in track 1 (thesis), returns INVERTED in track 5 (sun lower), FRAGMENTED in track 8 (afterglow, memory dimming), and WHOLE AGAIN one octave down half-tempo on FM bell in track 12 (the same idea remembered at the end of the night). (2) Highway pulse motif — four-note descending offbeat pad figure landing on the and-of-4, introduced as harmonic support in track 3, moved into LEAD POSITION at track 6's peak as an extended 8-bar refrain, returns GHOSTED in track 11 as the listener's last view of the road. The two motifs alternate appearance points so neither overstays.",
+    "tracklist_continuity": "Each track ends on either the dominant (V) of the next track's tonic, or on a pitch that lives in the next track's tonic chord (for chromatic-mediant moves). Specifically: 1 ends on Em (the iv of A minor, but also the relative minor of G — primes track 2's C major lift). 2 ends on G (V of C, also tonic of track 3). 3 ends on D (V of G, also major-third upper-leading-tone into Em of track 4). 4 ends on B (V of Em, also tonic of track 5). 5 ends on F# (V of Bm, also major-third in D major of track 6). 6 ends on A (V of D, prepares track 7's same tonic with the held-breath plateau effect). 7 ends on D (tonic — the only tonic-ending on the album — pivoting via chromatic-mediant slide into F#m of track 8). 8 ends on C# (V of F#m, also major-third in A major of track 9). 9 ends on E (V of A, semitone-cluster pivot into F major of track 10). 10 ends on C (V of F, bVII pivot into Dm of track 11). 11 ends on A (V of Dm, also tonic of track 12 — closes the ring). The listener won't consciously hear most of these — they will only feel that each transition is inevitable rather than abrupt.",
+    "visual_continuity_notes": "Twelve covers follow the album's narrative arc as a single sunset-to-dark progression. Track 1: pier, sun still high, anticipatory. Tracks 2-3: coast road, long shadows, deepening amber. Track 4: full magenta saturation, motion blur. Track 5: half sun bisected by horizon (the album's hero structural image after track 6). Track 6: peak speed, sun bisecting windshield, molten chrome — this is the album's hero playlist-thumbnail cover. Track 7: down the centerline, vanishing point, listener now driving. Track 8: sun gone but afterglow lit clouds. Track 9: headlights just turned on. Track 10: last embers on chrome. Track 11: thin orange sliver, taillights receding. Track 12: interior view, dashboard glow, full night. The aesthetic vocabulary (palm silhouettes, magenta-to-violet skies, chrome reflections, wireframe-grid highways, neon lane markers, no people, no text) is held across all 12 — the listener scrolling the playlist thumbnails sees one cohesive record, not 12 unrelated images.",
+    "execution_notes_for_pipeline": "MusicGen is the renderer of record (license risk accepted). Every musicgen_prompt is explicit about instrumental + no vocals — do not relax this in any per-track override. Per-track durations sum to 2940s (49 minutes) for the canonical 12, +240s if track 13 is included. All BPMs are within the 80-118 validation range. Long tracks (5, 6, 7, 12) sit at 270-300s; the rest at 240s. Cover prompts are SDXL-ready, all specify 1024x1024 and 'no text, no people' to keep the SDXL pipeline from inserting either.",
+    "bonus_track_genesis": "Tracks 1-12 are the canonical album. Track 13 ('Afterglow Lane') is a bonus that preserves the originally-designed track-8 composition before the cover generation surfaced an unidentified object in the sky. That cover (track-08.png) became the visual anchor for renaming the slot 'Disclosure Day' and retuning the same musical material — fragmented motif intact, but suspended/awed instead of wistful/melancholic. Both readings of the F#m fragmented-motif idea are valid; the bonus track exists so the original creative direction isn't lost to the cover-driven retitling. Playlist convention: canonical release = tracks 1-12. Track 13 published as a standalone single on the channel, linked from the album playlist description as 'bonus / alt take of Disclosure Day.'"
+  }
+}

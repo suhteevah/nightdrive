@@ -836,6 +836,119 @@ Still open:
   NWS branding visible as a color guide, deliberately not cropped).
 - **cnc P100s arrival ~2026-05-17** still gates N1.5, N1.7, N1.13.
 
+## 20. Session 2026-05-13 — First full album shipped + Tron Vol. 1 staged
+
+### Last Updated
+2026-05-13
+
+### Project Status
+🟢 **Sunset Drive, Vol. 1 — 12 tracks live on NightDrive channel, scheduled trickle-public Wed 2026-05-14 05:52→08:50 UTC.** YouTube playlist + cover library + bonus cut + Tron Vol. 1 cover library all queued behind.
+
+### What Was Done This Session (the big arc)
+
+This session went from "manual single tracks running on autonomous-VOD scaffolding" to **first full coherent music-theory-architected album published as a YouTube playlist**, plus end-to-end automation that scales the same workflow to subsequent albums.
+
+1. **Discipline stack tasks 1-3 + 5 (from §18 punch list).**
+   - Item 5 — candle backend exploration: `docs/candle-backend-exploration.md`. Defer. Upstream candle's MusicGen example is text-encoder-only; PR #2145 sat unmerged 13 months; EnCodec at 24kHz not 32kHz; 3-6 weeks of from-scratch port for likely worse perf. Keep audiocraft.
+   - Item 1 — bench ledger: 10 real rows appended to `docs/BENCH_LEDGER.md` from live YouTube wall times. Track #2 MG 1072s flagged as 79% over the 10-min ROADMAP gate (honest, not massaged).
+   - Item 2 — storage wired into `pipeline_one`: `Db::connect_and_migrate` once per batch, `Tracks::insert` at stage 1, `update_state` per stage boundary, `Uploads::insert/set_youtube_id` around upload, catch-and-continue marks `Failed` in `run_batch`.
+   - Item 3 — N2.1 resume subcommand: `resume_with_db` + `resume_one` + extracted `run_audio_and_cover` helper. Monotonic `needs_*` dispatch chain. Witness `tests/witnesses/resume_skips_terminal_tracks.rs` (#8) passes in 4s.
+
+2. **SDXL cover library expanded.** 2 → 11 random library covers (slots 1-11 from the hand-tuned synthwave prompt list). Established that **low-vram mode (sequential CPU offload + slicing) is the right call on kokonoe** — confirmed with timing data: low-vram at 42-50s/cover beats no-low-vram at 215-312s/cover (latter saturates VRAM at 8/8 GB and spills to shared system memory). Memory: this is permanent on kokonoe.
+
+3. **Album-composer subagent.** `.claude/agents/album-composer.md` — PhD-level studio musician + producer persona. Reads visual theme + track count + audience, designs a coherent album as honest music theory (cycle-of-fifths, modal interchange, motifs that recur at structural pivots, BPM arcs that mean something). Output is a single JSON consumed directly by the orchestrator. Tested across two album genres.
+
+4. **Sunset Drive Vol. 1 — full 12-track album.** Composer-designed: ABA arch over time-of-day, cycle-of-fifths ascent (Am→C→G→Em→Bm), pivot to D major at dual peak (tracks 6-7), chromatic-mediant descent (D→F#m→A→F→Dm→Am) closing the ring. BPM arc 84→112→82. Two motifs threaded across the album: ascending major-7 sunset arp (t1 whole → t5 inverted → t8 fragmented → t12 whole-octave-down-half-tempo) and four-note descending highway-pulse offbeat figure (t3 harmonic support → t6 lead 8-bar refrain → t11 ghosted/filtered).
+
+5. **The Disclosure Day pivot.** Original track 8 was "Afterglow Lane" — melancholy F#m comedown. SDXL cover gen produced an unidentified hovering craft in the sky from the "lavender afterglow" prompt. **Matt: "track 8 must be named disclosure day, this is non-negotiable."** Title flipped + composer notes rewritten (fragmented motif now reads as "the world's familiar tune cracking on the moment of revelation, quieter awe instead of melancholy"). Original Afterglow Lane preserved as **bonus track 13** outside the canonical 12-track album.
+
+6. **Album-batch mode in orchestrator.** New `run-album --slug <slug> [--from-track N] [--to-track N] [--publish-at <RFC3339>] [--dry-run]` subcommand. Reads `docs/albums/<slug>.json`, skips stage 1 (LLM — spec pre-baked) and stage 3 (art — cover pre-rendered to disk, copied into per-track dir). Audio + master + encode + upload run identical to normal pipeline. Spec-from-JSON map handles the lossy JSON-vs-CompositionSpec schema difference (album JSON uses `key`/`key_relationship_to_prior`/`composer_notes` etc; pipeline wants `musical_key`/`youtube`/etc).
+
+7. **Sync-drop publish-at flag** for synchronized 1-shot album drops. Vol. 1 used trickle by Matt's explicit call (`trickle is fine for this`); future albums target a single anchor timestamp via `--publish-at 2026-05-15T18:00:00Z`. Memory locked.
+
+8. **Sunset Vol. 1 audio gen executed.** 12 tracks rendered sequentially via MG-stereo-medium continuation on the existing :8082 sidecar, ~14-18 min wall each, total ~2h 51m. 10 of 12 succeeded clean end-to-end. **Tracks 11 + 12 failed at YT stage 7** in different ways: 11 = chunked PUT transport-layer failure mid-upload (video never accepted); 12 = post-upload `thumbnails.set` returned 429 ("user uploaded too many thumbnails recently") which the old code bubbled as Err → marked the track Failed even though the video was already on YT.
+
+9. **Thumbnail-429 bug fix** — `set_thumbnail_best_effort` helper in `main.rs`. Both 403 (channel unverified) and 429 (rate limit) are now downgraded to warn-and-continue; the video upload itself has succeeded by that point and YT's auto-generated thumbnail is acceptable. Applied at all three call sites (pipeline_one, pipeline_one_album, resume_one). Recovery for tracks 11 + 12 was hand-rolled SQL: track 12 → state=published (video was up), track 11 → state=video_encoded + delete orphan queued upload row, then `resume` re-attempted just stage 7 and landed `oxdlesFx-cI`.
+
+10. **YouTube playlist live.** `https://youtube.com/playlist?list=PLc304hwLOBm_-REZSBQvRlhwTpq0bFiLA`. `scratch/create_album_playlist.py` reads `.env` for OAuth, refreshes access token, calls `playlists.insert` then `playlistItems.insert` 12× in canonical order. Description trimmed to title + narrative_arc + hashtags — the structured `overall_form` content triggered YT's anti-spam playlist heuristic with HTTP 400 "Invalid playlist snippet" (bisected against the live API; documented in the script). Per-minute quota also hit during bisect — defer further playlist work by a few min.
+
+11. **Wallpaper pipeline shipped, then deprecated, then replaced.** `sidecar/wallpaper_pack.py` implemented the reflect-pad img2img outpaint approach (~40 min on all 24 covers). Output was **bad** — reflect-pad seeded the edges with mirrored content (cloned cars, double suns, cloned UFOs at low denoise strength). Matt: "some of the outpaints look meh, we should def avoid outpaint and just generate the covers at the correct ratio and crop to our needs." **Memory locked**: future albums gen at all 3 SDXL training-bucket resolutions natively (1024² + 1344×768 + 768×1344). `sidecar/generate_album_covers_native.py` implements this. Re-ran for Sunset Vol. 1 — 26 fresh native-aspect wallpapers replace the bad outpaints.
+
+12. **Tron Drive, Vol. 1 plan + covers.** Spawned album-composer for the second album. 12 tracks, **all minor keys**, Möbius-strip ring form (entry → dissolution → exit on opposite face, ends in A minor like opener but FM-bell octave-up with derez tail). Modal logic instead of fifths (Phrygian, Locrian, Aeolian, Dorian rotation through the dissolution arc). BPM 96-112 (tight mechanical range vs Sunset's wide 82-112). Two motifs: PWM grid-pulse arp (filtered → unfiltered → glitch-stuttered → FM bell derez) and Phrygian bII derez-chord bracketing the dissolution arc. 36 covers rendered at all 3 native aspects (~26 min wall).
+
+13. **Encoder TWC polish.** Two long-pending polish items shipped:
+    - **Blue filler behind radar killed.** Sampled the NWS GIF — pale-cyan water fill is exactly `#C2EAF0` (59% of pixels). New filter chain: `format=rgba, chromakey=color=0xC2EAF0:similarity=0.12:blend=0.04, negate, scale=-1:480`. Surgical: water → alpha=0 → dark navy inset shows through; precip cyans untouched (different saturation/hue).
+    - **Timestamp next to city name.** City header now: `5-DAY FORECAST · MIAMI · 14:30 UTC` using `forecast_data.fetched_at`. Width math: longest case "FORT LAUDERDALE" + timestamp = ~880px which fits the 920px right-panel space at fontsize 36.
+
+### Tracks shipped this session (NightDrive channel)
+
+```
+01. First Light Off the Pier       SCpD4doyaWY   Am  84   opener
+02. Coast Road                     u-SfzJUi460   C   88
+03. Palm Shadows                   iQGHBqPyPpw   G   92
+04. Magenta Mile                   ZFsC-IVkWHQ   Em  96
+05. Half Sun                       CHqZyIq__xo   Bm 102   bridge-into-peak
+06. Apex                           WulWSjAfAm0   D  108   peak 1
+07. Vanishing Point                I0rJt6a0nbM   D  112   peak 2 (BPM ceiling)
+08. Disclosure Day                 KXnZZ7hqrvg   F#m 106   ← UFO emerged from cover gen
+09. Lavender Hour                  _xcjwu8938A   A  100
+10. Embers on Chrome               -VHYwyPVi6I   F   94
+11. Last Orange Sliver             oxdlesFx-cI   Dm  88
+12. Lights Out, Dashboard Glow     d6Lq1psbFY8   Am  82   closer (ring close)
+
+Playlist: PLc304hwLOBm_-REZSBQvRlhwTpq0bFiLA
+```
+
+### Current State
+
+**Working:**
+- Album-batch mode: `run-album --slug <slug>` end-to-end works (audio + master + encode + upload + state transitions + catch-and-continue).
+- Sync-drop publish-at flag ready for Tron + future albums (`--publish-at 2026-05-15T18:00:00Z`).
+- Thumbnail set is best-effort: 403 (unverified) and 429 (rate-limited) downgraded to warn, video upload succeeds either way.
+- Native-aspect cover gen (`generate_album_covers_native.py --slug <slug>`) produces 3 covers per track in ~150s/track total.
+- YouTube playlist creator works against the v3 API; description must stay narrative-only (the structured `overall_form` content trips YT's anti-spam heuristic).
+- Encoder filter graph: water-blue chromakey + city header timestamp applied. Release binary rebuilt 2026-05-13.
+
+**Pre-existing tracks + content:**
+- Sunset Drive Vol. 1: 12 published, scheduled trickle-public Wed 05:52→08:50 UTC. (These rendered with the OLD encoder filter graph — no chromakey, no city timestamp. If you want them re-encoded retroactively, see "What's Next.")
+- Tron Drive Vol. 1: covers ready, audio gen NOT started.
+- Bonus track 13 (Afterglow Lane): cover exists, audio gen never run. Standalone single, no priority.
+
+**Broken / known issues:**
+- The bad outpainted wallpapers in `assets/wallpapers/sunset-drive-vol-1/` are still on disk. The fresh native-aspect versions live under `assets/covers/albums/sunset-drive-vol-1/track-NN-{desktop,phone}.png`. A small "publish_wallpapers" cleanup step needs to copy the good ones to the public `assets/wallpapers/` location and delete the outpaints. Not done.
+- Track 8 wallpaper variants (desktop + phone) **don't have the UFO** — the 1024² album cover does. Different seeds per aspect → SDXL produced different scenes from the same `cover_prompt`. Either accept the duality (canonical Disclosure Day cover has craft; wallpapers are "broader establishing shots") or update track 8's `cover_prompt` to explicitly name the hovering craft and re-gen the two non-1024² variants.
+- The audit gate (`scripts/audit.ps1`) hasn't been run since the album-batch + encoder polish landed. Should be re-run.
+- The `wallpaper_pack.py` script is deprecated but still on disk. Per memory it should not be used; consider deleting.
+
+### Blocking Issues
+
+None immediate. Pending decisions:
+1. **Auto-chain Tron audio gen, or hold for explicit go?** ~3-3.5h MG sequential commit; the MG sidecar was killed for the SDXL work and needs to be restarted first.
+2. **UFO-in-wallpaper retrofit for track 8?** Optional; the duality argument is solid.
+3. **Re-render the 12 Sunset Vol. 1 tracks** to apply the new encoder filter (chromakey + timestamp) before they flip public? Tomorrow 05:52 UTC. Cost: re-encode + re-upload ~20 min for 12 tracks, plus YT video replacement logistics (delete old + re-upload as new + replace in playlist). Probably not worth it — first album ships with the old look, Tron is the first to show the polish.
+
+### What's Next (prioritized)
+
+1. **Matt's call on Tron audio gen.** When given, restart MG sidecar (`uvicorn sidecar.musicgen_server:app --host 127.0.0.1 --port 8082 --workers 1`), kick off `run-album --slug tron-drive-vol-1` (with `--publish-at` if synchronized drop wanted). ~3-3.5h wall.
+2. **Publish-wallpapers cleanup step** — small script to copy `assets/covers/albums/<slug>/track-NN-{desktop,phone}.png` → `assets/wallpapers/<slug>/` and delete the bad outpaints. ~20 lines of Python.
+3. **`status` subcommand** — last of the N1.12 stubs. Print: last successful batch timestamp, last failed track + reason, count per TrackState, livestream service status. Pure presentation layer; the data is in storage.
+4. **Tokyo Cyberpunk Vol. 1** — third planned album. Album-composer can run any time (no GPU); generates the JSON plan ready for cover gen + audio.
+5. **N2.2 Track dedup** — orphan `uploads` rows in `queued` state (the pattern that bit tracks 11 + 12) aren't currently re-processed by resume. Either extend resume to scan `uploads.status='queued'` or document the operator cleanup recipe.
+6. **Bonus track 13 audio gen** — standalone single, low priority. ~17 min for one track when there's a slot.
+
+### Notes for Next Session
+
+- The release binary at `target/release/nightdrive-orchestrator.exe` has the new chromakey + city timestamp. Sunset Vol. 1's already-uploaded 12 videos used the OLD binary.
+- MG sidecar is currently DOWN. Restart with: `& "J:\pledgeandcrowns\tools\synthwave-gen\.venv\Scripts\python.exe" -m uvicorn sidecar.musicgen_server:app --host 127.0.0.1 --port 8082 --workers 1` — ~16s model load, ~3.4 GB VRAM idle.
+- **Don't run wallpaper_pack.py.** Deprecated. Use `generate_album_covers_native.py --slug <slug> --low-vram` for any wallpaper retrofit OR generate at all 3 aspects in the first album cover pass.
+- **kokonoe's GPU is more efficient in low-vram mode than no-low-vram.** Counter-intuitive but documented with timing: low-vram CPU-offload at ~42-50s/cover beats no-low-vram at ~215-312s/cover because the latter saturates 8/8 GB and spills to shared system memory. Always pass `--low-vram` on kokonoe SDXL gens.
+- **YT playlist API anti-spam heuristic**: descriptions with structured "Form: <text>" content + tracklist with key signatures trip HTTP 400 "Invalid playlist snippet." Keep playlist descriptions narrative-only.
+- **Sunset Vol. 1's bonus track 13** has a cover at `assets/covers/albums/sunset-drive-vol-1/track-13.png` (fresh native-aspect, no UFO) and `track-13-{desktop,phone}.png`. Its audio_gen has never run; the orchestrator's `run-album` would render it if `--to-track 13` is passed. Not in the playlist by design.
+- **`docs/albums/<slug>.json` is canonical** — both `sunset-drive-vol-1.json` and `tron-drive-vol-1.json` carry the full music-theory rationale, key relationships, BPM logic, motif tracking, narrative arc, per-track composer notes. Read these before designing any follow-up volume to maintain stylistic differentiation.
+- **`.claude/agents/album-composer.md`** is the persona. For Tokyo Cyberpunk, dispatch with similar setup as the Tron run (read persona, read prior album JSONs for differentiation, design, write JSON, summarize under 300 words).
+- **Spring (Teespring) is the picked merch platform** when monetization unlocks. YouTube Merch Shelf integration is the deciding factor; Amazon-owned for trust. Pair with Printful + Gumroad for higher-quality direct-to-fan sales. Wallpaper-pack work IS the print-file prep — same upscaled covers.
+- **audit gate** (`powershell -ExecutionPolicy Bypass -File scripts/audit.ps1`) hasn't been run since the album-batch + encoder polish changes landed. Run it before claiming "clean" externally.
+
 ---
 
 **Single-source-of-truth:** this file. Update it when decisions change.
