@@ -155,7 +155,7 @@
     },
     {
       "track_number": 7,
-      "title": "Recognizer",
+      "title": "Scan Subroutine",
       "role": "dissolution-peak",
       "key": "D minor (Aeolian)",
       "bpm": 98,
@@ -271,7 +271,7 @@
     },
     {
       "track_number": 12,
-      "title": "Derez (User Exits)",
+      "title": "User Exits",
       "role": "closer",
       "key": "A minor",
       "bpm": 100,
