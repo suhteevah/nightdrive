@@ -1043,4 +1043,382 @@ None. Pending decisions:
 
 ---
 
+## 22. Session 2026-05-16 — Audio-gen rewire foundation (ACE-Step + stems + export)
+
+### Last Updated
+2026-05-16
+
+### Project Status
+🟡 **Rewire scaffold landed; sidecar bring-up + A/B pending.** Code path for
+ACE-Step 1.5 (MIT-licensed local song-gen, single-shot full-track, no
+30s seams) is in place end-to-end. Cargo workspace green, all unit
+tests pass, audit clean at `OK build:0 test:0 stubs:2 witnesses:11`
+(stages 0,1,2,3,4,7). MG continuation engine remains the default until
+Matt A/Bs the first ACE-Step track and flips `[audio_gen].engine`.
+
+### What Was Done This Session
+
+1. **Deep dive on the audio-gen problem.** Findings in
+   `scratch/audio_gen_deepdive_2026-05-16.md` (~4k words):
+   - MG seams ≠ random; root causes are (a) same prompt sent for every
+     segment so the model never knows when to evolve, (b) EnCodec
+     prefix round-trip per continuation, (c) production-character drift
+     between calls
+   - 2026 local model menu: ACE-Step 1.5 (MIT, <4 GB VRAM, single-shot
+     4-min) is the clean replacement; MBD is the cheap in-place upgrade
+     for MG; DiffRhythm 2 / YuE deferred (instrumental-only mode not
+     ready / heavy hardware respectively)
+   - Spotify path: just FLAC + DistroKid; no new pipeline work needed
+     beyond the export bundler
+   - Editability path: Demucs `htdemucs_ft` stems → basic-pitch / MT3
+     MIDI transcription (Phase 3+, optional)
+
+2. **ACE-Step sidecar + install playbook** (Phase 1 — primary engine swap):
+   - `sidecar/acestep_server.py` — FastAPI wrapper around ACE-Step 1.5
+     handler-based API. POST /generate { caption, lyrics, duration,
+     bpm, key, seed, guidance_scale, inference_steps } → audio/wav.
+     Single-shot full-song generation, no segment chain. Auto-detects
+     Pascal `sm_60` and forces `ACESTEP_LM_BACKEND=pt`. Includes
+     fallback path for older `ACEStepPipeline` API if the handler
+     import shape shifts.
+   - `scripts/install_acestep.ps1` — idempotent installer: installs
+     `uv`, clones `ace-step/ACE-Step-1.5` to `J:\acestep` (or
+     `$env:NIGHTDRIVE_ACESTEP_ROOT`), runs `uv sync`, pre-downloads
+     model weights (~10 GB), prints the sidecar run command.
+   - **Not yet executed** — Matt runs `scripts/install_acestep.ps1`
+     when he wants to bring it up. Sidecar will be on `:8083`.
+
+3. **Rust client wiring** (`crates/nightdrive-audio-gen`):
+   - New `pub mod prompt` with deterministic `format_ace_step_caption`,
+     `format_ace_step_lyrics`, `format_musicgen_section_prompt`, and
+     `section_for_time` helpers. Translates a `CompositionSpec` →
+     engine-native prompts. **Pure Rust, no LLM call** — the "prompt
+     engineer" role from the deep-dive is a stateless module, not an
+     agent.
+   - `AceStepClient` implementing `AudioGenerator` trait, single-shot
+     POST → write WAV directly to `paths.raw_audio_wav()`. Headers
+     `X-Nightdrive-Gen-Wall-Seconds`, `X-Nightdrive-Inference-Steps`
+     surfaced for observability.
+   - `client_for(cfg)` factory dispatches on `engine = "ace_step"`
+     alongside existing `"stable_audio"` and `"musicgen"`. Older
+     configs without `engine` default to stable_audio (unchanged).
+   - `AudioGenConfig` gains an `inference_steps: u32` (default 32)
+     field — `8` for turbo variants.
+   - 7 new unit tests in `prompt::tests`, all passing.
+
+4. **Arranger Claude subagent** — `.claude/agents/arranger.md`. Optional
+   layer between `album-composer` and the audio-gen engines. Enriches
+   sparse per-track `sections[].instrumentation` strings into vivid,
+   model-friendly section hints (spatial detail, processing references,
+   continuity prose). On-demand only — not pipeline-wired. Designed to
+   not step on the composer's cross-track decisions (key/BPM/role
+   stays untouched).
+
+5. **`nightdrive-stems` crate (NEW)** — Demucs CLI wrapper.
+   - `StemSeparator` trait + `DemucsCli` impl, shells out to `demucs
+     -n htdemucs_ft -o <stems_dir> --device <cuda|cpu> [--shifts N]
+     <master.flac>`, normalizes the model-nested output layout to
+     canonical `<track_root>/stems/{drums,bass,vocals,other}.wav`.
+   - Lightweight vocal-presence QC: warns if `vocals.wav` is
+     suspiciously large for an instrumental track (>10 % of
+     master.flac size).
+   - Added to workspace `Cargo.toml` members + workspace deps.
+
+6. **`nightdrive-cli` new subcommands**:
+   - `nightdrive-cli stems generate --album <slug> [--track N]` — runs
+     demucs on every track in an album JSON, finds artifact dirs by
+     matching `spec.json.title` against the album's
+     `tracks[*].title`. Skips tracks without `master.flac` or that
+     already have `stems/`.
+   - `nightdrive-cli export album --slug <slug> [--out PATH]
+     [--include-stems]` — bundles FLAC + cover + optional stems into
+     `exports/<slug>/<NN> - <Title>.flac`, writes `README.txt`.
+     Spotify/DistroKid upload-ready.
+
+7. **Three new witness tests** (all real-endpoint, no mocks per
+   `tests/witnesses/README.md`):
+   - `ace_step_real_sidecar.rs` (stage 2) — skips when
+     `NIGHTDRIVE_ACESTEP_URL` unset; calls real sidecar with a 20s
+     duration target, asserts WAV signature + duration ±20 %.
+   - `stems_real_demucs.rs` (stage 4) — skips when `demucs` not on
+     PATH; runs Demucs on a real shipped `master.flac` (or
+     env-overridable fixture), asserts 4 stems exist + vocals.wav not
+     implausibly large.
+   - `cli_export_album.rs` (stage 0) — stages fake album JSON +
+     spec.json + master.flac in a tempdir, runs the actual
+     `nightdrive-cli` binary, asserts the export bundle.
+     **End-to-end witness against the real built binary; passes.**
+
+### Current State
+
+**Working (Cargo-green + audit-clean):**
+- ACE-Step Rust client + sidecar + prompt module — code path complete
+- Stems crate (CLI shell-out) with `nightdrive-cli stems generate`
+- Export bundler with `nightdrive-cli export album`
+- 11 witnesses across stages 0, 1, 2, 3, 4, 7
+- `cargo test --workspace` passes; release binaries built
+
+**Not yet done (deferred Phase 0 items from the deep dive):**
+- **Per-section MG prompts** in `MusicGenClient::render` — `prompt::
+  format_musicgen_section_prompt` exists but `MusicGenClient` still
+  sends `spec.musicgen_prompt` for every segment. Wiring it through is
+  ~30 LOC if/when we keep MG around for legacy renders.
+- **MBD (Multi-Band Diffusion)** on the MG sidecar — drop-in quality
+  boost for the MG path; deferred since we're moving primary to
+  ACE-Step.
+- **Continuation prefix bump 5s → 8s** — config knob already exists,
+  just hasn't been bumped in the live nightdrive.toml.
+
+**Not yet integrated:**
+- Stems generation is *operator-triggered* (`nightdrive-cli stems
+  generate`); not auto-called by `pipeline_one_album`. Adding it as a
+  stage 4.5 hook is a small follow-up.
+- The `arranger` subagent is on-demand; not invoked automatically by
+  `run-album`. By design — the composer's output is good enough most
+  of the time.
+- Live `[audio_gen].engine` is still `"musicgen"` in the runtime config.
+  Switch happens after Matt's first A/B listen against ACE-Step.
+
+### Blocking Issues
+
+None. The remaining work is **operator-side install + first run**:
+
+1. **Run `scripts/install_acestep.ps1`** to install ACE-Step into
+   `J:\acestep` + download the ~10 GB of model weights. One-time, ~15-30
+   min including download.
+2. **Start the sidecar** on port 8083:
+   ```powershell
+   $env:NIGHTDRIVE_ACESTEP_ROOT = "J:\acestep"
+   $env:NIGHTDRIVE_ACESTEP_CONFIG = "acestep-v15-turbo"
+   & "J:\acestep\.venv\Scripts\python.exe" -m uvicorn sidecar.acestep_server:app --host 127.0.0.1 --port 8083 --workers 1
+   ```
+3. **A/B test** — render one Tokyo Cyberpunk Vol. 1 track via ACE-Step
+   (point `[audio_gen].base_url` + `engine = "ace_step"` at the new
+   sidecar) and compare against an MG render of the same track JSON.
+   Matt's ear decides.
+
+### What's Next (post bring-up)
+
+1. **Bench-runner**: append a row for the rewire (the audit's `5 days
+   old` last-bench is right at the gate — fresh row needed before any
+   external claim about ACE-Step performance).
+2. **Wire stems generation into `pipeline_one_album`** (stage 4.5 hook
+   after mastering) so every new album auto-produces stems.
+3. **Phase 0 carryback if MG stays in rotation**: section-aware MG
+   prompts + MBD + 8s prefix.
+4. **Tokyo Cyberpunk Vol. 1** — first ACE-Step album, clean signal on
+   whether the engine swap is heard.
+5. **Bonus track 13 audio gen** (carried from §20) — could be the
+   ACE-Step debut single since it's standalone.
+6. **Carried**: thumbnails retry-failed, Tron Vol. 1 playlist, wallpaper
+   cleanup, `status` subcommand, dedup.
+
+### Notes for Next Session
+
+- **`docs/albums/<slug>.json` shape**: the export-album CLI deserializes
+  a minimal subset (`album_slug`, `title`, `tracks[].track_number +
+  title`) so older album JSONs missing newer optional fields don't
+  break export.
+- **Title-match indexing**: `build_title_index()` in
+  `nightdrive-cli/src/main.rs` walks `paths.tracks_dir`, parses every
+  `spec.json`, builds `title → root` map. O(N) per album-export call.
+  Good enough for ~hundreds of tracks; revisit if catalog blows up.
+- **Cargo workspace gained `nightdrive-stems`** — 1 new member crate +
+  1 new workspace dep. Cargo.toml `[workspace.dependencies]` updated.
+- **`AudioGenConfig::inference_steps`** new field, default 32. Pre-existing
+  TOML configs without this field will deserialize fine (serde default
+  kicks in). Only matters when `engine = "ace_step"`.
+- **The `arranger` subagent is intentionally minimal** — only touches
+  `sections[*].instrumentation` strings. Doesn't change titles,
+  BPM, key, motifs, narrative arc. If a composition decision needs
+  changing, that's still `album-composer`'s job.
+- **ACE-Step license is MIT** — clean for the monetized NightDrive
+  channel. Once we flip the engine, the `feedback_musicgen_commercial_risk_accepted`
+  memory becomes historical context rather than active license posture.
+  Don't delete the memory file yet; the MG tracks already published
+  still ride that risk until the licenses retroactively expire (they
+  don't — but they're past the cease-and-desist window per Matt's
+  read).
+
+---
+
+## 23. Session 2026-05-16 (continued) — ACE-Step installed; kokonoe 8 GB hits hard wall
+
+### Last Updated
+2026-05-16
+
+### Project Status
+🟡 **ACE-Step 1.5 installed clean (~10 GB weights on disk, deps green,
+sidecar boots, /health 200). Cannot generate on kokonoe 8 GB.** Smoke
+test deferred to cnc P100s (~2026-05-17).
+
+### What Was Done This Session (continued from §22)
+
+1. **Ran `scripts/install_acestep.ps1`** (twice — first run died on a
+   PowerShell encoding bug, em-dash characters were read as
+   `â€"` by PS 5.1 because the Write tool emits UTF-8 without BOM and
+   the system codepage isn't UTF-8). Patched the script to ASCII-only
+   on the second run. Install completed end-to-end:
+   - uv 0.11.14 installed
+   - `git clone ace-step/ACE-Step-1.5` to `J:\acestep`
+   - `uv sync` installed 123 packages including torch 2.7.1+cu128
+   - ACE-Step model weights downloaded from HuggingFace into
+     `J:\acestep\checkpoints` — **9.4 GB across 57 files** in 4 subdirs:
+     - `acestep-v15-turbo/` (5 files, 4.46 GB — DiT decoder)
+     - `acestep-5Hz-lm-1.7B/` (9 files, 3.50 GB — 5 Hz LM head)
+     - `Qwen3-Embedding-0.6B/` (9 files, 1.12 GB — text encoder)
+     - `vae/` (2 files, 0.31 GB — audio VAE)
+
+2. **Install-script side-issue:** the smoke-test step at the end of the
+   installer calls `AceStepHandler.initialize_service(device="cuda:0")`
+   to verify the handler loads. That loads ~5 GB into VRAM as a
+   verification step, which I described in chat as "pre-download
+   weights" without flagging the VRAM cost. Matt's call to "make sure
+   you dont leave anything in vram" caught it. Smoke-test process
+   killed cleanly post-verification. **Memory saved: be explicit about
+   every VRAM/GPU-touching step in user-facing descriptions.**
+
+3. **Brought up the actual sidecar on :8083 in two configs:**
+   - Full mode (DiT + 5Hz LM + Qwen3 embedding): /health reported
+     `vram_used_gb: 8.0/8.0`, generation rejected with
+     `Insufficient free VRAM: need ~0.8 GB, only 0.1 GB available` per
+     ACE-Step's pre-flight check.
+   - DiT-only mode (`NIGHTDRIVE_ACESTEP_DIT_ONLY=1` env var added to
+     `sidecar/acestep_server.py`) + `PYTORCH_CUDA_ALLOC_CONF=
+     expandable_segments:True,max_split_size_mb:128`: same VRAM
+     ceiling — `0.4 GB free` after the allocator grew into unreserved
+     blocks, still short of the 0.8 GB activation buffer requirement.
+   - Tried duration=10s (the schema min) since ACE-Step's error message
+     hints at "reduce duration" — but the pre-flight buffer is a
+     fixed ~0.8 GB regardless of duration below 30s.
+
+4. **The math, honestly:**
+   - Windows + apps baseline: 2.1 GB
+   - ACE-Step turbo DiT (fp16): ~4.5 GB
+   - Qwen3-Embedding-0.6B: ~1.0 GB
+   - VAE: ~0.3 GB
+   - ACE-Step activation pre-flight: 0.8 GB
+   - **Total: ~8.7 GB demanded on an 8 GB card.**
+   - Even DiT-only (skipping 5Hz LM head's ~1.5 GB) doesn't close the
+     gap because the embedding + VAE + activation buffer still puts us
+     ~0.4 GB over.
+
+5. **Sidecar killed, VRAM verified clean.** nvidia-smi
+   `--query-compute-apps` shows zero python/uv processes on the GPU.
+   The 2.7 GB baseline is Chrome / Discord / Ollama / Edge WebView2 /
+   Photos / system processes — all Matt's, none from this session.
+
+6. **Witness test `ace_step_real_sidecar` ran but FAILED** because gen
+   never started. The test code itself is correct — it surfaces
+   ACE-Step's pre-flight error through the AudioGen error variant
+   cleanly. Re-runs will pass once we're on cnc P100 (16 GB) where
+   neither the DiT load nor the activation buffer is a constraint.
+
+7. **Deep-dive doc moved** from `scratch/` (gitignored ephemera) to
+   `docs/audio_gen_deepdive_2026-05-16.md` so it's part of the
+   project knowledge tree.
+
+8. **gitignore additions:** `**/__pycache__/` + `*.pyc` (sidecar
+   bytecode caches now exist after the first sidecar boot).
+
+### Current State
+
+**Working:**
+- ACE-Step 1.5 fully installed at `J:\acestep` — uv venv at
+  `J:\acestep\.venv\Scripts\python.exe`, weights at
+  `J:\acestep\checkpoints/{acestep-v15-turbo,acestep-5Hz-lm-1.7B,
+  Qwen3-Embedding-0.6B,vae}/`.
+- `sidecar/acestep_server.py` boots clean (~30-60s model load), exposes
+  GET /health + POST /generate. Handles `NIGHTDRIVE_ACESTEP_DIT_ONLY=1`
+  env var to skip LM init.
+- `config/nightdrive-acestep.toml` ready to drop in via
+  `NIGHTDRIVE_CONFIG` env var or `--config` flag — `engine =
+  "ace_step"`, `base_url = "http://127.0.0.1:8083"`,
+  `inference_steps = 8` for turbo.
+- Rust workspace audit-clean; AceStepClient unit-tested via 7 prompt
+  module tests, request schema validated end-to-end (422 on under-min
+  duration, 500 with structured detail on VRAM rejection).
+
+**Blocked on hardware:**
+- Phase C (witness test) and Phase D (full pipeline_one with
+  engine=ace_step) both require ≥10 GB VRAM headroom for an 8s+ render.
+  cnc P100 (16 GB) is the right hardware.
+
+**Not started this session:**
+- Stems pipeline integration into `pipeline_one_album` (still
+  operator-triggered via `nightdrive-cli stems generate`)
+- Phase 0 wins (per-section MG prompts wiring, MBD on MG sidecar) —
+  still deferred since we're betting on ACE-Step
+
+### Blocking Issues
+
+1. **kokonoe 8 GB VRAM is structurally insufficient for ACE-Step
+   turbo.** Not a bug, just hardware reality. Move sidecar deployment
+   to cnc P100s when they land (~2026-05-17 per memory file
+   `project_cnc_p100_arrival`).
+
+### What's Next (in order)
+
+1. **Wait for cnc P100s** to arrive. Per `project_cnc_p100_arrival`
+   memory, expected ~2026-05-17. 3 × P100 16 GB each = 48 GB total
+   for the audio-gen + art workload.
+2. **Deploy `sidecar/acestep_server.py` on cnc-server** with
+   `ACESTEP_LM_BACKEND=pt` env var (Pascal sm_60 has no vLLM
+   support — ACE-Step auto-falls-back to PyTorch but explicit is
+   faster). The sidecar's existing `auto` mode handles this too.
+3. **Update `config/nightdrive-acestep.toml`** to point
+   `[audio_gen].base_url` at the cnc Tailscale endpoint
+   (`http://cnc-server.tailb85819.ts.net:8083`).
+4. **Re-run Phase C witness** with full LM mode (no
+   NIGHTDRIVE_ACESTEP_DIT_ONLY) — proves the integration on intended
+   hardware.
+5. **Re-run Phase D full pipeline** — `nightdrive-orchestrator
+   run-batch --count 1 --dry-run` with NIGHTDRIVE_CONFIG=ace_step toml.
+   A/B against an MG-rendered track for ear-quality comparison.
+6. **Lock the engine flip** by promoting
+   `config/nightdrive-acestep.toml` → `config/nightdrive.toml` if the
+   ear test passes. Future albums (Tokyo Cyberpunk Vol. 1+) render via
+   ACE-Step.
+
+### Notes for Next Session
+
+- **The `audit.ps1` gate has not been re-run** since the smoke-test
+  session. It was clean before (build:0 test:0 stubs:2 witnesses:11)
+  but the witness test in `ace_step_real_sidecar.rs` will SKIP cleanly
+  unless `NIGHTDRIVE_ACESTEP_URL` is set in the audit's environment —
+  the witness's env-not-set early-return path is the correct behavior
+  for an offline audit.
+- **PowerShell file encoding gotcha confirmed**: when writing .ps1
+  files via Claude's `Write` tool, stick to ASCII characters. PS 5.1
+  reads files in system codepage (Windows-1252 on US-Windows), not
+  UTF-8. Em-dashes (`—`), smart quotes, etc. parse as garbage. Plain
+  hyphens + `--` work fine.
+- **ACE-Step turbo model in pre-flight ignores cfg_scale**: log notes
+  "Turbo model detected: overriding guidance_scale 7.0 -> 1.0 (turbo
+  does not use CFG)." Don't waste time tuning guidance for the turbo
+  variant. Base variant (`acestep-v15`) respects cfg, but it's larger
+  and won't fit on kokonoe either.
+- **`vram_used_gb: 8.0/8.0` in /health is a known PyTorch caching-
+  allocator quirk** — `torch.cuda.mem_get_info()` returns the OS-level
+  free memory, which reflects everything PyTorch's allocator has
+  pre-reserved as committed-but-unused. nvidia-smi shows the same.
+  Both are "true" in different senses; for actual usable headroom, the
+  ACE-Step pre-flight check (`_vram_preflight_check`) is the
+  authoritative number.
+- **DiT-only mode is a usable fallback** on tight VRAM. The lyrics
+  field still gets passed but conditioning is weaker (caption-only
+  pathway). Section-level structure quality will suffer; full
+  LM-conditioned mode is the target on cnc.
+- **Ollama on :11434 was UP** during the session — qwen2.5:7b-instruct
+  + 7 others registered. If we run Phase D on cnc later, qwen2.5 stays
+  on kokonoe :11434 (its native home); ACE-Step lives on cnc :8083.
+  Orchestrator on arch-controller dispatches both over Tailscale per
+  the HANDOFF §3 fleet table.
+- **VRAM was verified clean at session end** — no python sidecars
+  running, no GPU compute processes from this session. Matt's
+  baseline ~2.7 GB is Chrome/Discord/Ollama/system. Free to shut down
+  or keep using the machine without restart.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.

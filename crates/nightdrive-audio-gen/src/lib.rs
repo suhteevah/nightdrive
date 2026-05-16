@@ -25,6 +25,8 @@ use std::path::PathBuf;
 use std::time::Duration;
 use tracing::{debug, info, instrument, warn};
 
+pub mod prompt;
+
 #[async_trait]
 pub trait AudioGenerator: Send + Sync {
     /// Generate the raw stitched audio for `spec` and write it to
@@ -43,8 +45,10 @@ pub fn client_for(cfg: AudioGenConfig) -> NightdriveResult<Box<dyn AudioGenerato
     match cfg.engine.as_str() {
         "stable_audio" | "" => Ok(Box::new(StableAudioClient::new(cfg)?)),
         "musicgen" => Ok(Box::new(MusicGenClient::new(cfg)?)),
+        "ace_step" => Ok(Box::new(AceStepClient::new(cfg)?)),
         other => Err(NightdriveError::AudioGen(format!(
-            "unknown [audio_gen].engine = {other:?} (expected 'stable_audio' or 'musicgen')"
+            "unknown [audio_gen].engine = {other:?} \
+             (expected 'stable_audio', 'musicgen', or 'ace_step')"
         ))),
     }
 }
@@ -631,6 +635,203 @@ pub fn probe_wav(path: &std::path::Path) -> NightdriveResult<(u32, u16, f32)> {
     let duration_seconds =
         reader.duration() as f32 / spec.sample_rate as f32;
     Ok((spec.sample_rate, spec.channels, duration_seconds))
+}
+
+// =============================================================================
+// AceStepClient — single-shot full-song generation via ACE-Step 1.5 sidecar
+// =============================================================================
+//
+// Where StableAudioClient stitches and MusicGenClient continuation-chains,
+// ACE-Step does the whole song in ONE POST /generate call. The Rust client
+// sends caption + structured lyrics + bpm + key + duration; the sidecar
+// returns the complete WAV body. No segment loop, no crossfade, no
+// continuation-prefix re-encode.
+//
+// The two structured inputs come from `prompt::format_ace_step_caption(spec)`
+// (caption, ≤512 chars) and `prompt::format_ace_step_lyrics(spec)`
+// (per-section `[Section - notes]` block lines derived from spec.sections[]).
+// This is the layer the MG/SAO engines were throwing away.
+//
+// **License:** ACE-Step 1.5 weights are MIT. The CC-BY-NC strike risk we
+// accepted for MusicGen does not apply to tracks rendered via this engine.
+
+#[derive(Debug, Clone)]
+pub struct AceStepClient {
+    http: reqwest::Client,
+    cfg: AudioGenConfig,
+}
+
+impl AceStepClient {
+    pub fn new(cfg: AudioGenConfig) -> NightdriveResult<Self> {
+        // ACE-Step base SFT generates a 4-min song in ~30-90s on a 3070 Ti
+        // and ~60-180s on a P100 (no fp16 accel). 600s timeout fits the
+        // worst-case "loading model from cold + first-call diffusion warm-up"
+        // — same shape as the other sidecars.
+        let http = reqwest::Client::builder()
+            .timeout(Duration::from_secs(600))
+            .build()
+            .map_err(|e| NightdriveError::AudioGen(format!("http client: {e}")))?;
+        Ok(Self { http, cfg })
+    }
+
+    pub async fn health(&self) -> NightdriveResult<AceStepHealthResponse> {
+        let url = format!("{}/health", self.cfg.base_url.trim_end_matches('/'));
+        let resp = self
+            .http
+            .get(&url)
+            .timeout(Duration::from_secs(5))
+            .send()
+            .await
+            .map_err(|e| NightdriveError::AudioGen(format!("health: {e}")))?;
+        resp.json()
+            .await
+            .map_err(|e| NightdriveError::AudioGen(format!("health decode: {e}")))
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct AceStepHealthResponse {
+    pub ok: bool,
+    pub model: String,
+    pub device: String,
+    pub sample_rate: u32,
+    pub channels: u32,
+    #[serde(default)]
+    pub supports_structured_lyrics: bool,
+    #[serde(default)]
+    pub vram_used_gb: f32,
+    #[serde(default)]
+    pub vram_total_gb: f32,
+}
+
+#[async_trait]
+impl AudioGenerator for AceStepClient {
+    #[instrument(
+        skip_all,
+        fields(
+            track_id = %spec.track_id,
+            base_url = %self.cfg.base_url,
+            target_duration_s = spec.duration_seconds,
+            engine = "ace_step",
+        )
+    )]
+    async fn render(
+        &self,
+        spec: &CompositionSpec,
+        paths: &TrackPaths,
+    ) -> NightdriveResult<PathBuf> {
+        #[derive(Serialize)]
+        struct Req<'a> {
+            caption: &'a str,
+            lyrics: &'a str,
+            duration_seconds: f32,
+            bpm: u32,
+            musical_key: &'a str,
+            seed: i64,
+            guidance_scale: f32,
+            inference_steps: u32,
+        }
+
+        let caption = prompt::format_ace_step_caption(spec);
+        let lyrics = prompt::format_ace_step_lyrics(spec);
+        let seed = djb2_hash(spec.track_id.as_str()) as i64;
+        let duration_seconds = spec.duration_seconds as f32;
+
+        info!(
+            caption_len = caption.chars().count(),
+            lyrics_lines = lyrics.lines().count(),
+            inference_steps = self.cfg.inference_steps,
+            seed,
+            "ACE-Step single-shot generation"
+        );
+
+        let url = format!("{}/generate", self.cfg.base_url.trim_end_matches('/'));
+        let body = Req {
+            caption: &caption,
+            lyrics: &lyrics,
+            duration_seconds,
+            bpm: spec.bpm,
+            musical_key: &spec.musical_key,
+            seed,
+            guidance_scale: self.cfg.guidance_scale,
+            inference_steps: self.cfg.inference_steps,
+        };
+        debug!(%url, "POST /generate (ace_step)");
+
+        let resp = self
+            .http
+            .post(&url)
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| NightdriveError::AudioGen(format!("POST /generate: {e}")))?;
+
+        let status = resp.status();
+        if !status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(NightdriveError::AudioGen(format!(
+                "ace_step {status}: {text}"
+            )));
+        }
+
+        let gen_wall = resp
+            .headers()
+            .get("x-nightdrive-gen-wall-seconds")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|s| s.parse::<f32>().ok())
+            .unwrap_or(0.0);
+        let sr_header = resp
+            .headers()
+            .get("x-nightdrive-sample-rate")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|s| s.parse::<u32>().ok());
+
+        let bytes = resp
+            .bytes()
+            .await
+            .map_err(|e| NightdriveError::AudioGen(format!("read wav body: {e}")))?
+            .to_vec();
+        info!(
+            wav_bytes = bytes.len(),
+            gen_wall_s = gen_wall,
+            sample_rate_header = ?sr_header,
+            "ACE-Step returned full-song WAV"
+        );
+
+        let out_path = paths.raw_audio_wav();
+        if let Some(parent) = out_path.parent() {
+            tokio::fs::create_dir_all(parent).await.map_err(|e| NightdriveError::Io {
+                path: parent.display().to_string(),
+                source: e,
+            })?;
+        }
+        tokio::fs::write(&out_path, &bytes).await.map_err(|e| NightdriveError::Io {
+            path: out_path.display().to_string(),
+            source: e,
+        })?;
+
+        // Sanity-check the file roundtrips through hound's WAV reader — guards
+        // against the sidecar accidentally returning JSON-as-WAV or a partial
+        // body on a transport hiccup.
+        let (sr, channels, duration) = probe_wav(&out_path)?;
+        info!(
+            sample_rate = sr,
+            channels,
+            duration_s = duration,
+            target_s = duration_seconds,
+            path = %out_path.display(),
+            "raw audio written (ACE-Step single-shot)"
+        );
+        if duration < duration_seconds * 0.5 {
+            warn!(
+                actual_s = duration,
+                target_s = duration_seconds,
+                "ACE-Step output shorter than 50% of target — model may have truncated; investigate prompt"
+            );
+        }
+
+        Ok(out_path)
+    }
 }
 
 #[cfg(test)]

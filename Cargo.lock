@@ -1208,11 +1208,15 @@ name = "nightdrive-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "clap",
  "dotenvy",
  "nightdrive-core",
+ "nightdrive-stems",
  "nightdrive-storage",
  "nightdrive-youtube",
+ "serde",
+ "serde_json",
  "tokio",
  "tracing",
 ]
@@ -1286,6 +1290,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "nightdrive-stems"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "nightdrive-core",
+ "serde",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "nightdrive-storage"
 version = "0.1.0"
 dependencies = [
@@ -1316,8 +1333,10 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "nightdrive-art",
+ "nightdrive-audio-gen",
  "nightdrive-core",
  "nightdrive-llm",
+ "nightdrive-stems",
  "nightdrive-storage",
  "nightdrive-youtube",
  "reqwest",

@@ -36,12 +36,26 @@ path = "retry_recovers_transient_500.rs"
 name = "resume_skips_terminal_tracks"
 path = "resume_skips_terminal_tracks.rs"
 
+[[test]]
+name = "ace_step_real_sidecar"
+path = "ace_step_real_sidecar.rs"
+
+[[test]]
+name = "stems_real_demucs"
+path = "stems_real_demucs.rs"
+
+[[test]]
+name = "cli_export_album"
+path = "cli_export_album.rs"
+
 [dev-dependencies]
 nightdrive-core.workspace = true
 nightdrive-llm.workspace = true
 nightdrive-storage.workspace = true
 nightdrive-youtube.workspace = true
 nightdrive-art.workspace = true
+nightdrive-audio-gen.workspace = true
+nightdrive-stems.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "process", "fs"] }
 reqwest.workspace = true
 chrono.workspace = true

@@ -10,6 +10,7 @@ members = [
     "crates/nightdrive-encoder",
     "crates/nightdrive-youtube",
     "crates/nightdrive-storage",
+    "crates/nightdrive-stems",
     "crates/nightdrive-orchestrator",
     "crates/nightdrive-cli",
     "tests/witnesses",
@@ -84,6 +85,7 @@ nightdrive-visuals = { path = "crates/nightdrive-visuals" }
 nightdrive-encoder = { path = "crates/nightdrive-encoder" }
 nightdrive-youtube = { path = "crates/nightdrive-youtube" }
 nightdrive-storage = { path = "crates/nightdrive-storage" }
+nightdrive-stems = { path = "crates/nightdrive-stems" }
 
 [profile.release]
 opt-level = 3

@@ -54,21 +54,29 @@ pub struct AudioGenConfig {
     pub guidance_scale: f32,
     /// Which audio-gen engine the sidecar at `base_url` implements. Drives
     /// which AudioGenerator impl the orchestrator picks. Allowed values:
-    ///   - `"stable_audio"` (default; commercial-license-safe, blind crossfade)
-    ///   - `"musicgen"` (CC-BY-NC, native audio continuation, seamless chain)
+    ///   - `"stable_audio"`  (Stable Audio Community License, blind crossfade, 47s segments)
+    ///   - `"musicgen"`      (CC-BY-NC, native audio continuation, seamless 30s-chain)
+    ///   - `"ace_step"`      (MIT, single-shot full-song generation, no chunking)
     /// Older configs without this field default to `"stable_audio"`.
     #[serde(default = "default_engine")]
     pub engine: String,
-    /// Continuation-only: how many seconds of accumulated audio to send back
-    /// to the MusicGen sidecar as `prev_audio_b64` prefix. 5s is the audiocraft
-    /// default + reasonable balance between context (helps continuity) and
-    /// throughput (sending more makes each call slower). Ignored by SAO.
+    /// MusicGen-only: how many seconds of accumulated audio to send back to the
+    /// sidecar as `prev_audio_b64` prefix. 5s is audiocraft default; bumping to
+    /// 8s helps the model lock its production-character across segment joins.
+    /// Ignored by SAO + ACE-Step.
     #[serde(default = "default_continuation_prefix")]
     pub continuation_prefix_seconds: f32,
+    /// ACE-Step-only: diffusion step count. 8 for the `-turbo` distilled variant,
+    /// 32-64 for the base. Higher = more quality at linear cost. Ignored by other
+    /// engines (which have their own sample-step / num-inference-steps configs
+    /// pinned in their sidecars).
+    #[serde(default = "default_inference_steps")]
+    pub inference_steps: u32,
 }
 fn default_guidance_scale() -> f32 { 3.0 }
 fn default_engine() -> String { "stable_audio".to_string() }
 fn default_continuation_prefix() -> f32 { 5.0 }
+fn default_inference_steps() -> u32 { 32 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ArtConfig {
