@@ -951,4 +951,96 @@ None immediate. Pending decisions:
 
 ---
 
+## 21. Session 2026-05-16 — Tron Drive Vol. 1 shipped (sync drop set)
+
+### Last Updated
+2026-05-16
+
+### Project Status
+🟢 Second full album rendered + uploaded clean. Sync-drop public flip armed for Fri 2026-05-15 15:00 UTC (8 AM PT). Channel now carries two albums (Sunset Drive Vol. 1 + Tron Drive Vol. 1).
+
+### What Was Done This Session
+
+1. **Two track-title renames on `docs/albums/tron-drive-vol-1.json`** to dodge double-collision risk:
+   - Track 7 `"Recognizer"` → `"Scan Subroutine"`
+   - Track 12 `"Derez (User Exits)"` → `"User Exits"`
+   - Both originals were simultaneously (a) named dialogue/objects in Tron 1982 AND (b) literal Daft Punk track titles on the Tron Legacy soundtrack. Single-hit is fine (unavoidable in a tribute album); double-hit is takedown territory on a monetized channel. Rule saved as `feedback_album_title_danger_zone.md` + linked in `MEMORY.md`. Composer-internal motif names (`derez chord`, `recognizer subroutine` in the prose) left in place — those never reach the public.
+
+2. **MG sidecar bring-up.** Started `sidecar/musicgen_server.py` on `127.0.0.1:8082` via the synthwave-gen venv python, ~16s model load, idle VRAM 5.58 GB on the 3070 Ti. Logs: `scratch/mg-sidecar-tron.log`, `scratch/mg-sidecar-tron.err.log`.
+
+3. **`run-album --slug tron-drive-vol-1 --publish-at 2026-05-15T15:00:00Z`** kicked off. Sync drop chosen per `feedback_sync_drop_for_future_albums.md` (Vol. 1 trickle was the one-time exception). Anchor = Fri 8 AM PT (UTC-7 PDT). The orchestrator validated `--publish-at` was ≥1h in the future and stamped that exact RFC3339 timestamp on every track's `scheduled_publish_at`.
+
+4. **Wall time:** start 13:18:21Z, finish 16:09:43Z = **~2h 51m** for all 12 tracks (matches Sunset Vol. 1's ~2h 51m exactly — MG-stereo-medium continuation pacing is stable). 0 ERROR lines in the log. stderr empty.
+
+5. **Result:** 12/12 tracks rendered + mastered + encoded + uploaded to the NightDrive channel, all scheduled `private → public` at the anchor timestamp. Auto-publish at the anchor still rides YT's scheduler — the videos are uploaded `private` with `publishAt` set, YT flips them at the moment.
+
+6. **Thumbnail 429s on tracks 11 + 12.** Same YT per-channel `~100/day` thumbnail-upload ceiling that bit Sunset Vol. 1. Both tracks fell back to YT's auto-generated thumbnail per the `set_thumbnail_best_effort` helper (downgrade 429 to warn-and-continue). Video upload itself succeeded for both — only the custom thumbnail upload was suppressed. **Retry recipe:** `nightdrive-cli thumbnails retry-failed` once the 24h window clears (~tomorrow). Both tracks will get their custom Tron covers swapped in then.
+
+7. **MG sidecar killed post-run.** Was camping the full 8/8 GB VRAM (the model + activation cache ceilings into the headroom once gen completes). PID 6180 stopped, port 8082 free.
+
+### Tracks shipped this session (NightDrive channel — Tron Drive Vol. 1)
+
+```
+01. On The Grid (From Outside)              Am(104)
+02. Perimeter Trace                         Em(108)
+03. Light Trail                             Bm(110)
+04. Enter The Lattice                       F#m Phrygian (112)
+05. Disassembly                             C#m Dorian (100)
+06. Memory Cache                            G#m Locrian-shaded (96)   ← BPM floor
+07. Scan Subroutine                         Dm Aeolian (98)            ← renamed from "Recognizer"
+08. Recompile (Colder Shape)                Am Phrygian-shaded (102)   ← structural midpoint
+09. Light-Cycle Sprint                      Em (108)
+10. I/O Tower                               Bm (110)
+11. Breach                                  Am (112)                   ← thumbnail 429
+12. User Exits                              Am (100)                   ← renamed from "Derez (User Exits)"; thumbnail 429
+```
+
+Sync drop: **2026-05-15T15:00:00Z** (Fri 8 AM PT). YouTube IDs available in `var/nightdrive/nightdrive.sqlite` (table `uploads`) — query when needed.
+
+### Current State
+
+**Working:**
+- Tron Drive Vol. 1 fully on YT, sync-flip armed.
+- MG sidecar lifecycle (start → render album → kill) clean.
+- `--publish-at` flag end-to-end validated against the live YT API.
+- Title-collision rule documented + memory'd so album-composer doesn't re-suggest movie-quote+DP-track double-hits on future albums.
+
+**Pending (non-blocking):**
+- Tracks 11 + 12 custom thumbnails not yet on YT (auto-thumb fallback active). Retry with `nightdrive-cli thumbnails retry-failed` once the 24h thumbnail quota clears.
+- Sunset Vol. 1 → Tron Vol. 1 differentiation now mostly visual + textual (cool palette, tighter BPM, no major keys, Möbius-strip form). Worth a chat in the YT description templates if we want the listener to feel the contrast deliberately.
+
+**Broken / known issues:**
+- Carried forward from §20: the bad outpainted wallpapers in `assets/wallpapers/sunset-drive-vol-1/` still on disk, publish-wallpapers cleanup script not written.
+- Carried forward: `scripts/audit.ps1` not run since §20's encoder polish + this session's tron drop. Run it before the next external claim.
+
+### Blocking Issues
+
+None. Pending decisions:
+1. **Playlist creation for Tron Vol. 1.** Same `scratch/create_album_playlist.py` pattern works; needs a slug arg added (or duplicate + s/sunset-drive-vol-1/tron-drive-vol-1/g). Description must stay narrative-only per §20 #10 (structured `Form:`/key-signature content trips YT's playlist anti-spam heuristic). 5 min of work.
+2. **Wallpaper retrofit + publish.** Same as §20's carry-forward. Tron's 36 covers at 3 aspects are in `assets/covers/albums/tron-drive-vol-1/`; the `assets/wallpapers/tron-drive-vol-1/` public bucket doesn't exist yet.
+
+### What's Next (prioritized)
+
+1. **`nightdrive-cli thumbnails retry-failed`** for tracks 11 + 12 once the 24h YT thumbnail window clears (~2026-05-17 13:00Z). Two API calls.
+2. **Playlist for Tron Vol. 1** — copy `create_album_playlist.py` → parameterise on slug, run it. URL goes into the channel's playlist tab.
+3. **Publish-wallpapers cleanup script** (deferred from §20). ~20 LOC Python, hits both Sunset + Tron buckets.
+4. **`status` subcommand** (deferred from §20). Last successful batch + last failure + per-state counts + livestream service status.
+5. **Tokyo Cyberpunk Vol. 1** — third planned album. Album-composer can run any time; CLAUDE.md's "240min catalog before livestream" memory says we want ≥60 tracks before flipping on the livestream channel + real NWS data. Two albums = 24 tracks ≈ ~106 min. Three more albums ≈ 60 tracks ≈ 4 hours.
+6. **N2.2 dedup of orphan `uploads.status='queued'` rows** (deferred from §20).
+7. **Bonus track 13 (Afterglow Lane)** audio gen (deferred from §20).
+
+### Notes for Next Session
+
+- **Album title hygiene** (new rule): cross-reference any tribute-album track title against (a) the source film's dialogue/named objects AND (b) the canonical soundtrack album. Reject double-hits. Saved as `feedback_album_title_danger_zone.md`. The Tron run caught two — `Derez`/`Recognizer` — both Daft Punk track titles AND film terms. Future Vol. 2+ runs need a sweep step before the JSON is finalized.
+- **MG sidecar VRAM ceiling**: the audiocraft model on a 3070 Ti starts at ~3.4 GB idle, climbs to 5.58 GB once a render starts, and post-album can sit at 8/8 GB until the process is killed. Always kill it after `run-album` finishes (it doesn't release on idle).
+- **Sync drop validated end-to-end.** The orchestrator stamped `publishAt = 2026-05-15T15:00:00Z` on all 12 tracks; YT accepted it (videos uploaded `private` with `publishAt` field). The "≥1h in future" guard caught nothing here (anchor was ~46h out) but the path is exercised.
+- **MG sidecar restart command** unchanged from §20 notes:
+  ```
+  & "J:\pledgeandcrowns\tools\synthwave-gen\.venv\Scripts\python.exe" -m uvicorn sidecar.musicgen_server:app --host 127.0.0.1 --port 8082 --workers 1
+  ```
+- **PDT conversion for sync drop**: PT in May = UTC-7 (PDT). 8 AM PT = 15:00 UTC. The orchestrator wants RFC3339 with `Z` (or explicit offset).
+- **Title-rename safety**: the title field in `docs/albums/<slug>.json` is the only user-visible source. The composer notes / motif names elsewhere in the JSON are internal-only and never surface to YT or the playlist. Safe to keep "derez chord" / "recognizer subroutine" in the prose for music-theory continuity.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
