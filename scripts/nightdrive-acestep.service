@@ -1,0 +1,75 @@
+[Unit]
+Description=nightdrive ACE-Step 1.5 audio-gen sidecar (FastAPI on :8083)
+Documentation=https://github.com/ace-step/ACE-Step-1.5
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Run as root for now -- ACE-Step's checkpoint dir + uv venv at /opt/acestep
+# are root-owned by default. Tighten with a dedicated `acestep` user later if
+# we want hardening parity with nightdrive-nightly.service.
+User=root
+Group=root
+
+WorkingDirectory=/opt/nightdrive
+
+# ACE-Step paths + config
+Environment="NIGHTDRIVE_ACESTEP_ROOT=/opt/acestep"
+Environment="NIGHTDRIVE_ACESTEP_CONFIG=acestep-v15-turbo"
+
+# Pascal P100 (sm_60) cannot use vLLM. Force the PyTorch LM backend up front
+# instead of waiting for ACE-Step's auto-detect fallback path.
+Environment="ACESTEP_LM_BACKEND=pt"
+
+# Split-GPU placement (validated 2026-05-19, ~20% wall-time win on 360 s
+# render vs single-card). Expose BOTH P100s to the process; in this order
+# the inside-process numbering is:
+#   cuda:0 -> host GPU 1 (P100 PCIe 16 GB, bus 02:00.0) -- DiT + 5 Hz LM
+#   cuda:1 -> host GPU 0 (P100 PCIe 12 GB, bus 01:00.0) -- VAE alone
+# The VAE on its own card frees ~3.5 GB on the 16 GB card during decode
+# (headroom unlock for XL DiT / longer renders), and a larger VAE chunk
+# size (1024 latents/chunk vs the default 128 ACE-Step would pick from
+# the DiT card's 4 GB-free signal) cuts the VAE decode step from ~24 s
+# to ~14 s on a 360 s render.
+Environment="CUDA_VISIBLE_DEVICES=1,0"
+Environment="NIGHTDRIVE_ACESTEP_DEVICE=cuda:0"
+Environment="NIGHTDRIVE_ACESTEP_VAE_DEVICE=cuda:1"
+Environment="ACESTEP_VAE_DECODE_CHUNK_SIZE=1024"
+
+# To revert to single-card behavior, comment the four lines above and
+# uncomment:
+# Environment="CUDA_VISIBLE_DEVICES=1"
+
+# Optional: drop the 5 Hz LM head if the 16 GB card is shared. With CUDA
+# isolation to one card and only ACE-Step on it, full-LM fits fine -- leave
+# DIT_ONLY unset (0).
+# Environment="NIGHTDRIVE_ACESTEP_DIT_ONLY=1"
+
+ExecStart=/opt/acestep/.venv/bin/python -m uvicorn sidecar.acestep_server:app \
+    --host 0.0.0.0 --port 8083 --workers 1
+
+StandardOutput=journal
+StandardError=journal
+
+# Model load + first /generate can take 60-120s on Pascal. Don't let systemd
+# kill the warm-up.
+TimeoutStartSec=5min
+TimeoutStopSec=30s
+
+Restart=on-failure
+RestartSec=10s
+# Don't loop a hard import failure forever -- 5 restarts per hour ceiling.
+StartLimitIntervalSec=3600
+StartLimitBurst=5
+
+# Hardening -- relaxed vs nightdrive-nightly because we need /dev/nvidia*.
+# Do not set PrivateDevices=true here.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/acestep /tmp
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

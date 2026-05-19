@@ -1,0 +1,34 @@
+# nightdrive patch: route VAE-decode latents to the VAE's actual device.
+#
+# Validated against ACE-Step 1.5 commit (vendored at /opt/acestep on cnc).
+# Apply on the deployed sidecar host with:
+#
+#   cd /opt/acestep && \
+#   patch -p1 < /opt/nightdrive/scripts/patches/acestep-vae-device-aware-decode.patch
+#
+# Idempotent: on single-card deployments (VAE on same device as DiT), the
+# `.to(device=...)` is a no-op. Only matters when NIGHTDRIVE_ACESTEP_VAE_DEVICE
+# moves the VAE to a different GPU than the DiT (split-GPU mode, used on cnc
+# P100 pair).
+#
+# Original 2026-05-18 attribute path: ACE-Step's tiled-decode code path already
+# tolerates an `ACESTEP_VAE_ON_CPU=1` env that bounces the VAE module to CPU at
+# decode time. That existing machinery proved the VAE-on-different-device idea
+# was safe; this patch is the small extension that lets us put the VAE on a
+# different GPU instead of on CPU. Without it the call site does only a dtype
+# cast on the latents and the cross-device VAE forward fails with a device
+# mismatch error.
+
+--- a/acestep/core/generation/handler/generate_music_decode.py
++++ b/acestep/core/generation/handler/generate_music_decode.py
+@@ -129,7 +129,10 @@
+         with torch.inference_mode():
+             with self._load_model_context("vae"):
+                 pred_latents_cpu = pred_latents.detach().cpu()
+-                pred_latents_for_decode = pred_latents.transpose(1, 2).contiguous().to(self.vae.dtype)
++                # nightdrive patch 2026-05-19: send latents to VAE device, not just dtype,
++                # so VAE-on-different-device deployment works (NIGHTDRIVE_ACESTEP_VAE_DEVICE).
++                _vae_param_device = next(self.vae.parameters()).device
++                pred_latents_for_decode = pred_latents.transpose(1, 2).contiguous().to(device=_vae_param_device, dtype=self.vae.dtype)
+                 del pred_latents
+                 self._empty_cache()

@@ -528,6 +528,40 @@ VOD batch + livestream, with monitoring + alerting + auto-recovery.
 - **Done criterion:** Grafana shows ≥ 7 days since the last `failed`
   state in `tracks` AND livestream uptime gauge ≥ 604_800.
 
+## N4.11 Pipeline-parallel ACE-Step across mixed-capacity P100 pair (L, deferred)
+
+- **Trigger:** ACE-Step XL (4B DiT) variant adopted, OR a single render
+  routinely exceeds one card's free VRAM, OR concurrent ACE-Step +
+  SDXL on the same card becomes the bottleneck. Until then this
+  stays dormant — turbo + full-LM fits the 16 GB card with 3.87 GB
+  free per the 2026-05-18 smoke.
+- Patch ACE-Step's handler `_load_*` methods to accept an explicit
+  device map (e.g. `{"vae": "cuda:0", "lm": "cuda:1", "dit": "cuda:1",
+  "embedding": "cuda:0"}`) instead of the implicit single-device
+  default. cnc layout: 12 GB card (GPU 0) holds VAE + Qwen embed; 16 GB
+  card (GPU 1) holds DiT + 5Hz LM.
+- Enable GPUDirect P2P over PCIe between the two cards to make the
+  cross-stage tensor transit cheap. P100 PCIe (no NVLink) supports
+  P2P but at ~3-5 GB/s vs ~80 GB/s NVLink — acceptable since the
+  cross-stage tensors are small (latent buffers, not weights).
+- **Witness:** `tests/witnesses/acestep_pipeline_parallel_xl.rs` —
+  `// stage: 2`. Drive a render that exceeds 16 GB VRAM with the
+  device-map override; assert both cards show non-trivial VRAM use
+  during inference (>8 GB on each at peak) and the WAV is bit-exact
+  to a single-card baseline (when both runs fit).
+- **NOT:** llama.cpp / vLLM tensor-parallel. Those frameworks shard
+  transformer LLMs; ACE-Step is a custom DiT + LM + VAE pipeline,
+  not a transformer LM. Wrong tool.
+- **NOT:** PyTorch FSDP / DeepSpeed ZeRO. Those require model authors
+  to expose sharded layer wrappers — ACE-Step's DiT isn't FSDP-wrapped
+  upstream. Forking that is weeks of work for capability we don't
+  currently need.
+- **Cheap fallback if XL is wanted before this lands:** diffusers
+  `enable_model_cpu_offload()` lets a single card host a model bigger
+  than its VRAM by swapping components CPU↔GPU per forward pass.
+  ~3-5× slower but a 1-line patch. Pipeline-parallel is the proper
+  solution; CPU offload is the duct tape.
+
 **Phase N4 done:** the system runs itself. Matt's only intervention is
 content review (private → public flip per N5.1).
 

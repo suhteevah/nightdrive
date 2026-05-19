@@ -112,6 +112,13 @@ ACESTEP_LM_MODEL = os.environ.get(
 
 DEVICE = os.environ.get("NIGHTDRIVE_ACESTEP_DEVICE", "cuda:0")
 
+# Optional: place the VAE on a different GPU than DiT/LM to take pressure off
+# the hot card. Companion to ACE-Step's patch in
+# generate_music_decode.py that routes latents to the VAE's device pre-decode.
+# Cnc layout (when CUDA_VISIBLE_DEVICES=1,0): cuda:0 = 16 GB P100 (DiT + LM),
+# cuda:1 = 12 GB P100 (VAE). Unset = legacy single-device behavior.
+ACESTEP_VAE_DEVICE = os.environ.get("NIGHTDRIVE_ACESTEP_VAE_DEVICE")
+
 # DiT-only mode skips the 5 Hz LM head load (saves ~1.5 GB VRAM). The lyrics
 # field still gets sent but acts as a weaker structural anchor — diffusion
 # attends to it via the caption pathway only. Set this on the kokonoe 3070
@@ -270,13 +277,47 @@ if llm_handler is not None:
 
 log.info("model + handlers loaded in %.1fs", time.time() - _t0)
 
-free, total = torch.cuda.mem_get_info(DEVICE)
-log.info(
-    "VRAM total=%.2f GiB · free=%.2f GiB · used=%.2f GiB",
-    total / 2**30,
-    free / 2**30,
-    (total - free) / 2**30,
-)
+# Optional cross-GPU VAE placement. Done AFTER initialize_service so the loader
+# behaves normally; the VAE is then re-homed and ACE-Step's decode-time patch
+# routes latents to its new device.
+if ACESTEP_VAE_DEVICE and ACESTEP_VAE_DEVICE != DEVICE:
+    if not hasattr(dit_handler, "vae") or dit_handler.vae is None:
+        log.warning(
+            "NIGHTDRIVE_ACESTEP_VAE_DEVICE=%s set, but handler has no .vae attribute; ignoring",
+            ACESTEP_VAE_DEVICE,
+        )
+    else:
+        _t_vae = time.time()
+        log.info(
+            "moving VAE: cuda(%s) -> %s (DiT+LM stay on %s)",
+            next(dit_handler.vae.parameters()).device,
+            ACESTEP_VAE_DEVICE,
+            DEVICE,
+        )
+        dit_handler.vae = dit_handler.vae.to(ACESTEP_VAE_DEVICE)
+        torch.cuda.synchronize()
+        log.info("VAE moved in %.2fs", time.time() - _t_vae)
+
+# VRAM snapshot per visible device.
+for _di in sorted({DEVICE, ACESTEP_VAE_DEVICE} - {None}):
+    free, total = torch.cuda.mem_get_info(_di)
+    log.info(
+        "VRAM[%s] total=%.2f GiB · free=%.2f GiB · used=%.2f GiB",
+        _di,
+        total / 2**30,
+        free / 2**30,
+        (total - free) / 2**30,
+    )
+
+# Note: an earlier attempt monkey-patched dit_handler.generate_music to
+# default use_tiled_decode=False under split-GPU mode -- the single-chunk
+# VAE decode for a 360 s render needs ~8 GiB of conv_transpose activation,
+# which OOM'd the 12 GiB VAE card. The tiled-decode path with a LARGER
+# chunk_size (set via ACESTEP_VAE_DECODE_CHUNK_SIZE env var) is the
+# correct win; ACE-Step's auto-tuner picks chunk_size=128 based on
+# self.device's free VRAM, which sees only ~4 GiB on the DiT card even
+# when the VAE card has 11 GiB free. Set ACESTEP_VAE_DECODE_CHUNK_SIZE
+# at boot to override.
 
 # -----------------------------------------------------------------------------
 # FastAPI surface

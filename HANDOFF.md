@@ -1421,4 +1421,251 @@ test deferred to cnc P100s (~2026-05-17).
 
 ---
 
+## 24. Session 2026-05-18 — ACE-Step alive on cnc P100 (sm_60 wall solved)
+
+### Outcome
+
+🟢 **ACE-Step 1.5 turbo runs in full-LM mode on cnc-server's Tesla P100
+16 GB (Pascal sm_60), 8.00× realtime on the GPU.** First end-to-end
+generation outside kokonoe.
+
+### Hardware reality (vs prior session memory)
+
+Memory file said "3 × P100 16 GB = 48 GB total" — stale. Actual:
+
+| Slot | Card | Bus | PCI ID | VRAM |
+|---|---|---|---|---|
+| GPU 0 | P100-PCIE-12GB | 01:00.0 | `10de:15f7` | 12 GB |
+| GPU 1 | P100-PCIE-16GB | 02:00.0 | `10de:15f8` | 16 GB |
+| GPU 2 | — | — | — | **waiting on a PCIe riser** |
+
+Drivers: 580.126.09 / CUDA 13.0. Both cards idle pre-test. cnc is
+openSUSE Leap Micro 6.2 — transactional/read-only root; host package
+install via `transactional-update pkg install`, not `zypper`. `/opt` is
+writable.
+
+### The sm_60 wall + fix
+
+ACE-Step's `pyproject.toml` pins `torch==2.10.0+cu128` on Linux. That
+wheel has **no sm_60 binaries** — torch officially dropped Pascal from
+cu128 builds around 2.7-2.8. Smoke-time symptom: VAE load died with
+`CUDA error: no kernel image is available for execution on the device`
+even though the handler init returned "OK" (ACE-Step swallows the
+exception in its loader).
+
+`torch.cuda.get_arch_list()` proved it: pinned wheel only has
+`['sm_70','sm_75','sm_80','sm_86','sm_90','sm_100','sm_120']`. Torch
+itself prints the warning loud: *"Tesla P100 with CUDA capability sm_60
+is not compatible with the current PyTorch installation."*
+
+**Fix:** override the torch pin to `torch==2.7.1+cu118` (the version
+ACE-Step pins on its Windows path, plus cu118's wider arch list). One
+command in the existing venv:
+
+```
+ssh cnc-server "cd /opt/acestep && \
+  CUDA_VISIBLE_DEVICES=1 uv pip install --force-reinstall \
+    --index-url https://download.pytorch.org/whl/cu118 \
+    'torch==2.7.1+cu118' 'torchvision==0.22.1+cu118' \
+    'torchaudio==2.7.1+cu118'"
+```
+
+Resulting `get_arch_list()` includes `sm_60` (plus `sm_37`, `sm_50`,
+all the way to `sm_90`). ACE-Step source-level compat with 2.7.1 is
+already validated by upstream's own Windows pin — no API breakage.
+One non-fatal warning: `torchao: Skipping import of cpp extensions
+due to incompatible torch version 2.7.1+cu118 for torchao version
+0.16.0`. torchao falls back to pure-Python; doesn't affect inference.
+
+Candle was ruled out — candle can build on Pascal via wiki patches
+(`J:\llm-wiki\patterns\candle-p100-pascal-compat.md`), but candle has
+no ACE-Step implementation; ACE-Step's DiT + 5Hz LM + VAE would need
+weeks of porting work to land on candle. Not on the path.
+
+### Benchmark — full-LM ACE-Step on the 16 GB P100
+
+| Duration | Sidecar time | Wall (curl.exe client) | GPU realtime ratio | Pre-norm peak |
+|---|---|---|---|---|
+| 10 s | 3.7 s | ~4.0 s | 2.70× | 0.9141 |
+| 200 s | **25.0 s** | **25.67 s** | **8.00×** | 1.0000 (clipped → normalized to 0.8913) |
+
+Linear fit: `t_gpu ≈ 0.107 × duration_s + 2.6 s`. Tiled VAE
+auto-engaged at 3.7 GB free (chunk_size=128, latents [1, 64, 5000]).
+**Network transfer is noise** — 38 MB pulls in ~0.4 s over the LAN
+(Tailscale direct, not DERP-relayed); the wall is ~99% GPU compute.
+
+Projected per real song:
+- 180 s track: ~21 s GPU + ~0.4 s transfer = **~22 s wall**
+- 300 s track: ~35 s GPU + ~0.6 s transfer = **~36 s wall**
+- 360 s track: ~41 s GPU + ~0.7 s transfer = **~42 s wall**
+
+For comparison: Tron Vol. 1 ran ~14 min/track on MusicGen-on-kokonoe
+(chained 30 s segments). ACE-Step single-shot on cnc P100 ≈ **~20×
+faster** per track, plus license is MIT (no CC-BY-NC strike risk).
+
+**Client-side gotcha:** the first 200 s render in this session
+clocked 58.5 s wall. That was PowerShell `Invoke-WebRequest -OutFile`
+buffering the full 38 MB response in memory before flushing to disk
+(known PS 5.1 issue). Switching the client to `curl.exe` (built into
+Windows 10) cut wall time to 25.67 s — virtually all GPU. For the
+Rust client side (`AceStepClient` in `nightdrive-audio-gen`), reqwest
+streams `Response::bytes_stream()` directly to a file with no buffering
+overhead — already correct. Only the ad-hoc PS probes were affected.
+
+### Install layout on cnc
+
+Mirrors the kokonoe `J:\acestep\` layout at `/opt/acestep/`:
+
+| Path | What |
+|---|---|
+| `/opt/acestep/` | Cloned `ace-step/ACE-Step-1.5` |
+| `/opt/acestep/.venv/bin/python` | uv-managed venv (Python 3.12.12) |
+| `/opt/acestep/.venv/.../torch` | **2.7.1+cu118** (overridden from upstream 2.10.0+cu128) |
+| `/opt/acestep/checkpoints/{acestep-v15-turbo, acestep-5Hz-lm-1.7B, Qwen3-Embedding-0.6B, vae}/` | ~10 GB weights |
+| `/opt/nightdrive/sidecar/acestep_server.py` | nightdrive sidecar code, scp'd from `J:\nightdrive\sidecar\` |
+| `/var/log/nightdrive/sidecar.log` | runtime log |
+
+Helper artifacts staged in repo (not yet installed on cnc as systemd):
+
+- `scripts/install_acestep.sh` — Linux port of the PS1 installer
+  (idempotent, sets `UV_HTTP_TIMEOUT=300` to avoid the default-30s
+  fonttools timeout that hit on first attempt)
+- `scripts/nightdrive-acestep.service` — systemd unit, `Type=simple`,
+  pins `CUDA_VISIBLE_DEVICES=1`, restarts on failure
+- `config/nightdrive-acestep-cnc.toml` — orchestrator config variant
+  with `[audio_gen].base_url = http://cnc-server.tailb85819.ts.net:8083`
+
+### Sidecar boot (current, manual)
+
+```
+ssh cnc-server "cd /opt/nightdrive && \
+  CUDA_VISIBLE_DEVICES=1 \
+  NIGHTDRIVE_ACESTEP_ROOT=/opt/acestep \
+  NIGHTDRIVE_ACESTEP_CONFIG=acestep-v15-turbo \
+  ACESTEP_LM_BACKEND=pt \
+  nohup /opt/acestep/.venv/bin/python -m uvicorn \
+    sidecar.acestep_server:app --host 0.0.0.0 --port 8083 --workers 1 \
+    > /var/log/nightdrive/sidecar.log 2>&1 &"
+```
+
+`/health` output:
+```
+{
+  "ok": true, "model": "acestep-v15-turbo",
+  "lm_model": "acestep-5Hz-lm-0.6B", "lm_backend": "pt",
+  "device": "cuda:0", "sample_rate": 48000, "channels": 2,
+  "supports_structured_lyrics": true,
+  "vram_used_gb": 12.07, "vram_total_gb": 15.89
+}
+```
+
+### Split-GPU VAE follow-up (same session, ~1 h later)
+
+After the single-card baseline was validated, explored pipeline-parallel VAE
+placement across the 12 GB + 16 GB P100 pair to see how much the N4.11
+roadmap item is worth in practice. Outcome: **~20 % wall-time win on a
+360 s render, plus a constant ~3.5 GB headroom unlock on the DiT card.**
+The N4.11 placeholder is partly redeemed by this work — full tensor-
+parallel sharding is still a future item, but the VAE-on-different-GPU
+piece is now production.
+
+**The patch stack** (three changes, all in this repo):
+
+1. `scripts/patches/acestep-vae-device-aware-decode.patch` —
+   one-line `.to(self.vae.dtype)` → `.to(device=<vae_device>, dtype=<...>)`
+   in ACE-Step's `generate_music_decode.py`. Idempotent on single-card
+   (cast is a no-op when VAE shares the latent's device). Apply once on
+   any cnc redeploy.
+2. `sidecar/acestep_server.py` — reads `NIGHTDRIVE_ACESTEP_VAE_DEVICE`
+   env. After `dit_handler.initialize_service`, moves
+   `dit_handler.vae` to that device + logs per-device VRAM. Unset =
+   legacy single-device path.
+3. `scripts/nightdrive-acestep.service` — split-GPU env is the default:
+   `CUDA_VISIBLE_DEVICES=1,0`, `NIGHTDRIVE_ACESTEP_DEVICE=cuda:0`,
+   `NIGHTDRIVE_ACESTEP_VAE_DEVICE=cuda:1`,
+   `ACESTEP_VAE_DECODE_CHUNK_SIZE=1024`.
+
+**Chunk-size A/B grid (360 s render, seed=137, full LM, 8 turbo steps):**
+
+| Config | Wall | Server | VAE decode | RT | # chunks |
+|---|---|---|---|---|---|
+| Single-card (chunk=128 auto) | 52.5 s | 51.7 s | ~24 s | 6.96× | 70 |
+| Split (chunk=128) | 54.7 s | 54.0 s | ~23 s | 6.67× | 70 |
+| Split (chunk=512) | 45.3 s | 44.5 s | 16.2 s | 8.09× | 18 |
+| **Split (chunk=1024) [prod]** | **42.8 s** | **42.0 s** | **13.8 s** | **8.57×** | **9** |
+| Split (chunk=2048) | 42.1 s | 41.4 s | 12.9 s | 8.69× | 5 |
+
+The auto-tuner picks `chunk_size=128` based on `self.device`'s free
+VRAM (~4 GB on the DiT card) — wrong card. Manually setting
+`ACESTEP_VAE_DECODE_CHUNK_SIZE=1024` lets the VAE on its dedicated
+12 GB card use chunks 8× bigger, amortizing per-chunk overhead.
+`2048` plateaus the win (~0.7 s further) but eats more activation
+buffer — `1024` is the robust production setting.
+
+**Things that didn't work, with why:**
+
+- **Single-chunk (`use_tiled_decode=False`)** — OOM at 360 s. The VAE's
+  `conv_t1` ConvTranspose1d needs an 8.24 GiB activation buffer for the
+  full 9000-latent input. Even on a 12 GB card with 11 GB free at
+  decode start, the upsampling stage doesn't fit single-pass.
+- **`use_tiled_decode=False` via direct kwarg to
+  `acestep.inference.generate_music`** — the top-level function
+  doesn't take it; the kwarg lives on the handler-method one layer
+  deeper. Worked around with a `functools.wraps`'d monkey-patch on
+  `dit_handler.generate_music`, then reverted once we confirmed the
+  bigger-chunk path was the actual win.
+- **Calling the threshold helper with the VAE's device** would let
+  `_get_auto_decode_chunk_size` auto-pick the right tier, but the helper
+  is a method on the handler that queries `self.device` directly.
+  Patching it would mean a second source edit; the env-var override
+  (which ACE-Step already supports) was cleaner.
+
+### What's next (in order)
+
+1. **Land the systemd unit on cnc** — `transactional-update` not
+   needed for the unit file (it goes in `/etc/systemd/system/` which
+   is on the writable subvolume on Leap Micro). `daemon-reload` +
+   `enable --now`. Sidecar auto-restarts on failure, survives reboot.
+2. **A/B listen** — Matt evaluates the 200 s smoke
+   (`scratch/cnc-smoke-200s.wav`) vs a prior MusicGen-rendered track.
+   If quality is acceptable, flip the engine.
+3. **Promote `config/nightdrive-acestep-cnc.toml` → `config/nightdrive.toml`**
+   only after the A/B verdict.
+4. **Phase D witness re-run** — Phase C had skipped on kokonoe (env
+   var not set in audit env). With cnc up, re-run
+   `cargo test --test ace_step_real_sidecar`, point
+   `NIGHTDRIVE_ACESTEP_URL=http://cnc-server.tailb85819.ts.net:8083`,
+   confirm it passes end-to-end.
+5. **Phase E full pipeline** — `nightdrive-orchestrator run-batch
+   --count 1 --dry-run` with the cnc config, confirm `pipeline_one`
+   no longer warns on Stage 2 audio_gen.
+6. **N4.11 (deferred)** — pipeline-parallel ACE-Step across the
+   12+16 GB pair, only if XL variant or larger renders become
+   interesting. Today's turbo workload fits the 16 GB card.
+
+### Notes for next session
+
+- **3rd P100 still pending a PCIe riser.** When it lands, re-run the
+  fleet table in `cnc-p100-arrival` memory and decide whether to
+  fanout (parallel renders per card) or pool (N4.11).
+- **`torch==2.7.1+cu118` is the magic pin** — do NOT let any later
+  `uv sync` or `pip install -U` revert it to ACE-Step's 2.10 default.
+  If we ever build a Dockerfile or a fresh provisioner for the
+  sidecar, the torch override has to be the LAST install step.
+- **Pre-stage from fleet before upstream** (lesson burned in today,
+  see `feedback_prestage_from_fleet_before_upstream` memory). The
+  ~10 GB ACE-Step checkpoints already existed on kokonoe; I should
+  have rsync'd them over Tailscale during the driver-install hold
+  instead of letting cnc re-pull from HuggingFace.
+- **Default 30s `UV_HTTP_TIMEOUT` will burn you** on slow HF/PyPI
+  bursts when several large wheels race concurrently. Set
+  `UV_HTTP_TIMEOUT=300` for any uv sync on cnc.
+- **bash + lean-ctx wrapper conflict observed** — `curl ... | python
+  -m json.tool` came back with `C:UsersMatt.cargobinlean-ctx.exe:
+  command not found` (the wrapper stripped path slashes). PowerShell
+  pipeline worked clean. Use PowerShell for HTTP probes from kokonoe
+  side; bash on cnc-side is fine.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.

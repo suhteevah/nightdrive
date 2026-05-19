@@ -1,0 +1,95 @@
+# nightdrive runtime config -- ACE-Step 1.5 on cnc-server (Tailscale).
+#
+# Diff from config/nightdrive-acestep.toml (kokonoe-local variant):
+#   [audio_gen].base_url swapped to the cnc Tailscale endpoint.
+#   inference_steps + guidance_scale + sample_rate unchanged.
+#
+# Use via:
+#   $env:NIGHTDRIVE_CONFIG = "config/nightdrive-acestep-cnc.toml"
+# Or:
+#   nightdrive-orchestrator --config config/nightdrive-acestep-cnc.toml run-batch ...
+#
+# Pre-req: the sidecar must be running on cnc:
+#   sudo systemctl status nightdrive-acestep
+# and Tailscale must be up on both ends.
+
+[paths]
+work_dir = "J:/nightdrive/var/nightdrive"
+sqlite_db = "J:/nightdrive/var/nightdrive/nightdrive.sqlite"
+tracks_dir = "J:/nightdrive/var/nightdrive/tracks"
+
+[openclaw]
+base_url = "http://localhost:11434"
+model = "qwen2.5:7b-instruct"
+temperature = 0.85
+max_tokens = 2048
+timeout_seconds = 180
+
+[audio_gen]
+# ACE-Step 1.5 sidecar on cnc-server, GPU 1 (Tesla P100 16 GB), Tailscale.
+# Bus 02:00.0; the 12 GB card on bus 01:00.0 is GPU 0 and is reserved for
+# SDXL / fanout (see project_cnc_p100_arrival memory for the mixed-capacity
+# story).
+base_url = "http://cnc-server.tailb85819.ts.net:8083"
+engine = "ace_step"
+model = "acestep-v15-turbo"
+sample_rate = 48000
+channels = 2
+# Vestigial MG fields; ACE-Step ignores them but the struct still wants values.
+segment_seconds = 30
+overlap_seconds = 0
+continuation_prefix_seconds = 0.0
+guidance_scale = 7.0
+# 8 steps for turbo; bump to 32-64 if we ever swap to the base (non-turbo) variant.
+inference_steps = 8
+
+[art]
+base_url = "http://127.0.0.1:8081"
+model = "sdxl"
+width = 1024
+height = 1024
+steps = 20
+cfg_scale = 7.0
+negative_prompt = "text, watermark, signature, low quality, blurry, jpeg artifacts"
+
+[mastering]
+target_lufs = -14.0
+true_peak_db = -1.0
+loudness_range = 11.0
+fade_in_seconds = 2.0
+fade_out_seconds = 4.0
+
+[visualizer]
+width = 1920
+height = 1080
+fps = 30
+quality_preset = "high"
+seed_from_track_id = true
+include_code_scroll = false
+
+[encoder]
+ffmpeg_path = "ffmpeg"
+video_codec = "libx264"
+crf = 18
+preset = "medium"
+audio_codec = "aac"
+audio_bitrate = "320k"
+intro_seconds = 3
+outro_seconds = 3
+
+[youtube]
+default_privacy = "private"
+default_category_id = "10"
+schedule_offset_hours = 24
+publish_window_start_hour = 19
+publish_window_end_hour = 23
+declare_synthetic_content = true
+
+[livestream]
+visualizer_ws_port = 7373
+metadata_refresh_seconds = 1
+shuffle_buffer_size = 12
+min_replay_gap_hours = 24
+
+[metrics]
+prometheus_port = 9091
