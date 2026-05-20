@@ -62,11 +62,11 @@ pub async fn bootstrap_refresh_token(
 
     println!("\nOpen this URL in a browser to grant nightdrive YouTube upload access:\n");
     println!("    {auth_url}\n");
-    println!("Waiting for callback on {redirect_uri} (timeout: 5 minutes)...\n");
+    println!("Waiting for callback on {redirect_uri} (timeout: 30 minutes)...\n");
 
-    let code = tokio::time::timeout(Duration::from_secs(300), wait_for_callback(&listener))
+    let code = tokio::time::timeout(Duration::from_secs(1800), wait_for_callback(&listener))
         .await
-        .map_err(|_| NightdriveError::Youtube("oauth callback timeout (5 min)".into()))??;
+        .map_err(|_| NightdriveError::Youtube("oauth callback timeout (30 min)".into()))??;
 
     info!("auth code received, exchanging for refresh token");
 

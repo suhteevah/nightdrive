@@ -154,8 +154,12 @@ impl Tracks {
         let spec_json = serde_json::to_string(spec)
             .map_err(|e| NightdriveError::Storage(format!("serialize spec: {e}")))?;
 
+        // INSERT OR IGNORE so re-runs of pipeline_one_album (which call
+        // insert idempotently per track) don't blow up on the UNIQUE constraint
+        // for tracks.id. Existing rows keep their state + spec — updates flow
+        // through `update_state` instead.
         sqlx::query(
-            "INSERT INTO tracks (id, title, bpm, key, seed, spec_json, state, duration_secs) \
+            "INSERT OR IGNORE INTO tracks (id, title, bpm, key, seed, spec_json, state, duration_secs) \
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         )
         .bind(spec.track_id.as_str())

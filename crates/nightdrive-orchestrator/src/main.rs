@@ -566,18 +566,33 @@ async fn pipeline_one_album(
     tokio::fs::copy(cover_src, paths.cover_png()).await
         .with_context(|| format!("copy {} -> {}", cover_src.display(), paths.cover_png().display()))?;
 
+    // Skip-on-state: file-existence-based stage gating so a failed-late re-run
+    // (e.g. YT OAuth invalid_grant on stage 7) doesn't re-do the ~3 min/track
+    // of audio + master + encode. File-existence is more robust than DB state
+    // because it survives state drift / Failed-marker overwrites.
+    let raw_wav_exists =
+        tokio::fs::try_exists(paths.raw_audio_wav()).await.unwrap_or(false);
+    let master_flac_exists =
+        tokio::fs::try_exists(paths.master_flac()).await.unwrap_or(false);
+    let final_mp4_exists =
+        tokio::fs::try_exists(paths.final_mp4()).await.unwrap_or(false);
+
     // Stage 2: audio. Same code path as `pipeline_one`; the music is the
-    // expensive bit (10-15 min per track on kokonoe MG).
-    info!("stage=2 audio_gen");
-    {
+    // expensive bit (~42 s/track on cnc ACE-Step split-GPU).
+    if raw_wav_exists || master_flac_exists || final_mp4_exists {
+        info!("stage=2 audio_gen SKIPPED (raw.wav / downstream artifact present)");
+    } else {
+        info!("stage=2 audio_gen");
         let client = nightdrive_audio_gen::client_for(cfg.audio_gen.clone())?;
         client.render(spec, &paths).await?;
     }
     Tracks::update_state(db, track_id, TrackState::CoverRendered).await?;
 
     // Stage 4: master
-    info!("stage=4 master");
-    {
+    if master_flac_exists || final_mp4_exists {
+        info!("stage=4 master SKIPPED (master.flac / final.mp4 present)");
+    } else {
+        info!("stage=4 master");
         use nightdrive_audio_master::AudioMaster;
         let master = nightdrive_audio_master::FfmpegMaster::new(cfg.mastering.clone());
         master.run(&paths).await?;
@@ -587,8 +602,10 @@ async fn pipeline_one_album(
     info!("stage=5 visualizer (placeholder: showwaves overlay baked into stage 6)");
 
     // Stage 6: encode
-    info!("stage=6 final encode");
-    {
+    if final_mp4_exists {
+        info!("stage=6 final encode SKIPPED (final.mp4 present)");
+    } else {
+        info!("stage=6 final encode");
         use nightdrive_encoder::FinalEncoder;
         let encoder = nightdrive_encoder::FfmpegEncoder::new(cfg.encoder.clone());
         encoder.compose(&paths, spec).await?;

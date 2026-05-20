@@ -1668,4 +1668,254 @@ buffer — `1024` is the robust production setting.
 
 ---
 
+## 25. Session 2026-05-19 — Split-GPU VAE + Vol. 2 kickoff (Akira-coded)
+
+### Outcome (status: 🟡 in progress — album pipeline staged, composer rate-limited mid-run)
+
+ACE-Step on cnc P100 graduated from "smoke passes on one card" to a
+tuned split-GPU production config (~20% wall-time win on a 360 s render),
+plus the SDXL cache moved from kokonoe to cnc over LAN so the next
+album's covers can render without touching the kokonoe GPU (which is
+locked: matt-voice is training there). Started Vol. 2 album work
+(Akira-coded Neo-Tokyo, sync-drop ~2026-05-20 01:30 UTC) but the
+album-composer subagent hit a transient Anthropic rate-limit before
+emitting the JSON. Resume by either re-dispatching album-composer or
+using SendMessage on agentId `a42880847a9a3dc2b`.
+
+### What got done
+
+1. **Split-GPU VAE for ACE-Step on the P100 pair** (full A/B grid in §24,
+   in-place edits above). Production env baked into
+   `scripts/nightdrive-acestep.service`:
+   `CUDA_VISIBLE_DEVICES=1,0`, `NIGHTDRIVE_ACESTEP_DEVICE=cuda:0`,
+   `NIGHTDRIVE_ACESTEP_VAE_DEVICE=cuda:1`,
+   `ACESTEP_VAE_DECODE_CHUNK_SIZE=1024`. The recommended chunk_size is
+   1024 (2048 plateaus the win but eats more activation budget).
+2. **Upstream patch saved at**
+   `scripts/patches/acestep-vae-device-aware-decode.patch` — one-line
+   change to ACE-Step's `generate_music_decode.py` routing latents to
+   the VAE's device. Idempotent on single-card. Apply on any cnc
+   redeploy of ACE-Step.
+3. **Tailscale path confirmed direct-LAN** (`direct 192.168.168.100:...`,
+   not DERP relay). No reason to bypass — sub-ms RTT, gigabit
+   throughput for the WAV download phase.
+4. **PowerShell IWR speed trap exposed**: `Invoke-WebRequest -OutFile`
+   buffers the full response in PS 5.1 memory. The first 200 s
+   render's 58.5 s wall was ~33 s of buffering. Switched all HTTP
+   probes to `curl.exe` (built into Win 10). See
+   `feedback_powershell_iwr_buffers_large_downloads` memory.
+5. **SDXL cache prestaged on cnc** at
+   `/root/.cache/huggingface/hub/models--stabilityai--stable-diffusion-xl-base-1.0`
+   — 6.62 GB scp'd from kokonoe in 123.7 s over Tailscale's direct-LAN
+   path (54.8 MB/s effective). NOT a HF re-pull. Followed the
+   `prestage-from-fleet-before-upstream` rule Matt reinforced this
+   session.
+6. **N4.11 roadmap placeholder** added for the pipeline-parallel VAE
+   item (partly redeemed by this session's work; full tensor-parallel
+   sharding still a future item).
+7. **Memory updates**:
+   - new `project_split_gpu_vae_acestep.md`
+   - new `feedback_powershell_iwr_buffers_large_downloads.md`
+   - new `feedback_prestage_from_fleet_before_upstream.md`
+   - new `project_p100_torch_sm60_blocked.md` (then status-updated to
+     SOLVED once torch override worked)
+   - updated `cnc-p100-arrival.md` to flip the misleading "pin to
+     GPU 1" instruction (both cards now hold ACE-Step in prod)
+   - updated `MEMORY.md` index
+
+### Current state of the pipeline
+
+| Stage | Status | Notes |
+|---|---|---|
+| Audio gen | 🟢 Production | ACE-Step on cnc, split-GPU, ~42 s wall per 360 s track |
+| Mastering | 🟢 Working | ffmpeg loudnorm two-pass on orchestrator host |
+| Covers | 🟡 Staged | SDXL weights on cnc; no sidecar.py yet; existing `sidecar/generate_album_covers_native.py` could run against the cache via the ACE-Step venv (needs diffusers verify) |
+| Visualizer | 🟢 Working | Album mode uses ffmpeg `showwaves` overlay baked into stage 6 (CPU, no GPU) per `pipeline_one_album` |
+| Final encode | 🟢 Working | ffmpeg libx264 + AAC |
+| Upload | 🟢 Working | Single-shot YT Data API v3; chunked-resume still TODO but not blocking |
+
+Audit (last run this session): build:0 test:0 stubs:2 (livestream TODOs
+in main.rs, not album-mode blockers) witnesses:11 schema:clean
+**bench:STALE 8 d** — only failure, non-blocking for shipping. The
+bench-runner agent should be invoked at the start of the next session
+to refresh the ledger now that perf-relevant code changed (ACE-Step
+on cnc, split-GPU VAE).
+
+### Blocking issues
+
+- **Album-composer subagent rate-limited mid-dispatch.** Resume via
+  `SendMessage to: a42880847a9a3dc2b` or just re-dispatch the
+  album-composer with the same brief (theme: Akira-coded Neo-Tokyo,
+  12 tracks, BPM 104-120, sync-drop, 3-aspect cover prompts, ACE-Step
+  prompt format). Brief is in the prior turn of this session's
+  transcript.
+- **kokonoe GPU OFF LIMITS** until matt-voice finishes training. Affects:
+  any visualizer wgpu work, any SDXL-on-kokonoe path, any concurrent
+  cover gen on kokonoe. Workaround: covers go to cnc (SDXL cache ready);
+  album-mode visualizer is showwaves (CPU); wgpu visualizer waits.
+
+### What's next (in order, for resume)
+
+1. **Re-dispatch the album-composer subagent** with the Akira brief.
+   Expected output: `docs/albums/neo-tokyo-drive-vol-1.json` (matching
+   the Tron Vol. 1 schema exactly: 12 tracks, recurring motifs, full
+   per-track sections + musicgen_prompt + cover_prompt +
+   composer_notes).
+2. **Decide cover-gen path on cnc**: either (a) call the existing
+   `sidecar/generate_album_covers_native.py` directly via the ACE-Step
+   venv (likely works since ACE-Step bundles diffusers), or (b) write
+   a proper long-running `sidecar/sdxl_server.py` mirroring
+   `acestep_server.py` for repeat use. (a) is faster for one album;
+   (b) is the right architecture. Recommend (a) for Vol. 2, do (b)
+   alongside Vol. 3.
+3. **Pre-render 36 covers** (12 tracks × 3 aspects: 1024², 1344×768,
+   768×1344) into `assets/covers/albums/neo-tokyo-drive-vol-1/`.
+   Path convention is set by `generate_album_covers_native.py`.
+4. **Verify the sidecar is up with prod config** — currently running
+   with `ACESTEP_VAE_DECODE_CHUNK_SIZE=2048` from the A/B test. Either
+   restart it with the systemd unit (which now defaults to 1024) or
+   confirm 2048 is what we want shipped.
+5. **Run the album**:
+   ```
+   $env:NIGHTDRIVE_CONFIG = "config/nightdrive-acestep-cnc.toml"
+   .\target\release\nightdrive-orchestrator.exe run-album `
+       --slug neo-tokyo-drive-vol-1 `
+       --publish-at 2026-05-20T01:30:00Z
+   ```
+   Estimated wall: 12 × (~42 s audio + ~30 s master + ~20 s encode +
+   ~20 s upload) ≈ **~22-25 min** for the album, plus the cover
+   pre-step (~15-30 min depending on which SDXL path).
+
+### Notes for next session
+
+- **Sidecar state on cnc**: running PID 371531 with chunk_size=2048
+  (from the A/B test, not the prod chunk_size=1024). Same VAE timing
+  in practice (~0.7 s difference); the 1024 default in the systemd
+  unit is the prod recommendation but the running process is fine to
+  ship with as-is. `systemctl daemon-reload && systemctl restart
+  nightdrive-acestep` will roll it to the canonical config if/when the
+  unit lands on cnc.
+- **The systemd unit `scripts/nightdrive-acestep.service` is staged
+  but not installed on cnc.** Install with:
+  `sudo install -m 0644 scripts/nightdrive-acestep.service
+  /etc/systemd/system/ && sudo systemctl daemon-reload &&
+  sudo systemctl enable --now nightdrive-acestep.service`.
+  (Reminder: Leap Micro `/etc/systemd/system/` is on the writable
+  subvolume — no `transactional-update` needed.)
+- **bash via the Bash tool is mangling paths via lean-ctx wrapper**
+  for some operations (e.g. `git status` came back with
+  `C:UsersMatt.cargobinlean-ctx.exe: command not found`). PowerShell
+  works clean. Default to PowerShell for any client-side ops on
+  kokonoe; ssh-into-cnc bash is fine.
+- **The auto-uploader (`github-uploader-buildout`) auto-commits the
+  working tree.** Don't manually `git add/commit` — the tool handles
+  it. Each "Initial commit - uploaded via github-uploader-buildout"
+  in the log is a buildout snapshot.
+- **Album-composer agentId from this session**: `a42880847a9a3dc2b`.
+  If still resumable next session, use `SendMessage` instead of a
+  fresh `Agent` dispatch (preserves the brief context).
+
+---
+
+## 26. Session 2026-05-19 (continued) — Vol. 2 ship pass: 10/12 uploaded, 11+12 cron-deferred
+
+### Outcome (status: 🟡 awaiting Pacific quota reset for 11/12 retry)
+
+Neo-Tokyo Drive, Vol. 1 went private end-to-end on the NightDrive YouTube
+channel. Sync-drop anchor was pushed from 2026-05-20T01:30Z → **2026-05-20T12:00:00Z**
+because YouTube's per-channel daily upload cap clamped on tracks 11+12.
+
+### What got done
+
+1. **Album spec composed** by the album-composer subagent →
+   `docs/albums/neo-tokyo-drive-vol-1.json` (12 tracks, BPM 104-120,
+   home tonic D minor, FM bell + analog brass palette, vertical-descent
+   narrative arc through Neo-Tokyo).
+2. **Covers rendered on cnc** (NOT kokonoe — matt-voice was training
+   on that GPU). SDXL cache pre-staged from kokonoe via `scp` over the
+   LAN (6.62 GB / 124 s / ≈55 MB/s). 36 PNGs (12 × {1024², 1344×768,
+   768×1344}) at `assets/covers/albums/neo-tokyo-drive-vol-1/`. Wall
+   ~23 min on the 16 GB P100 (no `--low-vram` needed).
+3. **Pipeline ran end-to-end audio→master→encode** for all 12 tracks
+   (35.8 min wall). Stage 7 upload failed all 12 with `invalid_grant`
+   — refresh token expired.
+4. **OAuth re-bootstrapped via Chrome MCP** for
+   `mmichels88@gmail.com`. Trap: bootstrap.rs timeout was 5 min but
+   navigating Google's multi-step consent took longer than that on the
+   first try; bumped timeout to 30 min in source, rebuilt, retried.
+   See [[powershell-iwr-buffers-large-downloads]] companion lesson
+   (similar — assume client-side timing is the bottleneck, not the
+   API).
+5. **Patched `pipeline_one_album` to skip-on-state** via file-existence
+   checks: `raw_audio_wav` / `master_flac` / `final_mp4` presence
+   skips stages 2 / 4 / 6 respectively. Survives DB state drift /
+   Failed-marker overwrites.
+6. **Patched `Tracks::insert` to `INSERT OR IGNORE`** so re-runs don't
+   blow up on the `tracks.id` UNIQUE constraint when the row already
+   exists from a prior partial run.
+7. **Re-ran orchestrator**: 10/12 tracks uploaded clean in 257.1 s wall
+   (~25 s/track upload + thumbnail). Tracks 11 + 12 failed with
+   `uploadLimitExceeded` (`domain: youtube.video`) — YouTube's
+   per-channel daily upload cap, not API quota.
+8. **All 10 already-uploaded videos re-anchored** via `videos.update`
+   (PUT /youtube/v3/videos?part=status) from
+   `publishAt=2026-05-20T01:30Z` → `2026-05-20T12:00:00Z`. Privacy
+   stays Private until the new anchor.
+9. **Cron `455a6596` scheduled** one-shot at `27 0 20 5 *` local
+   (= 2026-05-20T07:27Z, 27 min after Pacific midnight quota reset)
+   to re-fire the orchestrator with `--from-track 11 --publish-at
+   2026-05-20T12:00:00Z`. Harness reports session-only despite
+   `durable: true`.
+10. **Telegram heads-up** sent to Matt with the 10 video_ids + manual
+    fallback command in case the session dies before 07:27Z fires.
+
+### Final video_id list (Neo-Tokyo Drive, Vol. 1)
+
+| # | Title | YT Video ID | publishAt |
+|---|---|---|---|
+| 01 | Ignition Deck | `YLmBMrYm6Hk` | 2026-05-20T12:00Z |
+| 02 | Onramp Above the City | `ZwSdlwaE47s` | 2026-05-20T12:00Z |
+| 03 | Vertical Signage | `ZilNGntSXGg` | 2026-05-20T12:00Z |
+| 04 | Cut-In | `0WsM78t7kqw` | 2026-05-20T12:00Z |
+| 05 | Arcade Strobe Wall | `EokwjZGFjMk` | 2026-05-20T12:00Z |
+| 06 | Night Market Run | `Ca6ZzmTVtRw` | 2026-05-20T12:00Z |
+| 07 | Under the Overpass | `f9JuXeRRmKs` | 2026-05-20T12:00Z |
+| 08 | Service Ramp Down | `1yLQY3VwGJc` | 2026-05-20T12:00Z |
+| 09 | Flooded Maintenance Line | `b2_v_1G6Zxg` | 2026-05-20T12:00Z |
+| 10 | Reactor Hall | `XtxiLuX6DTo` | 2026-05-20T12:00Z |
+| 11 | Freight Elevator | (pending 07:27Z retry) | — |
+| 12 | Ground Floor, Pre-Dawn | (pending 07:27Z retry) | — |
+
+### Blocking issues
+
+- **2 of 12 tracks still need upload** — cron `455a6596` scheduled to
+  retry at 07:27Z. Fallback: manual `nightdrive-orchestrator run-album
+  --slug neo-tokyo-drive-vol-1 --from-track 11 --publish-at
+  2026-05-20T12:00:00Z` if session dies first.
+- **YouTube channel daily upload cap is the binding constraint** on
+  album-mode batching. NightDrive channel hit it at ~10/day with all
+  10 uploads in a ~4-min window. Future albums of >10 tracks need to
+  span 2+ Pacific calendar days OR get the channel into a higher
+  verification tier.
+
+### Notes for next session
+
+- **The auto-uploader (`github-uploader-buildout`) auto-commits.** Don't
+  manually `git add/commit/push`. See `reference_github_uploader_auto_commits`.
+- **Refresh token in `.env` is fresh** as of 2026-05-19. Backup at
+  `.env.bak.20260519`. The new token is for `mmichels88@gmail.com` —
+  confirmed by Matt during the Chrome MCP flow.
+- **The `scratch/` dir on kokonoe** has the 4 smoke WAV files
+  (10s, 200s, 360s single-GPU, 360s split-GPU chunk=512) plus the
+  yt-auth.log + .err files. Safe to clean up; nothing depends on them.
+- **All 36 covers** are at `J:\nightdrive\assets\covers\albums\neo-tokyo-drive-vol-1\`
+  (the orchestrator-host copies) AND
+  `cnc:/opt/nightdrive/assets/covers/albums/neo-tokyo-drive-vol-1/`
+  (cnc copies, original render location). Either works as source-of-truth.
+- **Build numbers updated** (timeout 5→30 min on bootstrap.rs +
+  skip-on-state in pipeline_one_album + INSERT OR IGNORE in Tracks::insert).
+  Three discrete edits, one rebuild each — all clean.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
