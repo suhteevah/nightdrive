@@ -1918,4 +1918,121 @@ because YouTube's per-channel daily upload cap clamped on tracks 11+12.
 
 ---
 
+## 27. Session 2026-05-20 — Vol. 2 sync-drop pushed AGAIN + Vol. 3 in flight
+
+### Outcome (status: 🟡 holding for 16:03Z cap-clear retry; Vol. 3 audio pending)
+
+Two threads of work running in parallel today:
+
+1. **Vol. 2 (Neo-Tokyo) upload retry hit the SAME `uploadLimitExceeded`
+   at 07:27 UTC.** Diagnosis revised: the YouTube channel daily cap is
+   a **rolling 24h window from first cap-hit**, not a Pacific-midnight
+   calendar reset. First hit was 2026-05-19T15:36Z, so the window
+   clears ~2026-05-20T15:36Z.
+2. **Vol. 3 (Atompunk Cold War) cover gen kicked off on cnc** while
+   waiting on Vol. 2. Same SDXL pattern as Vol. 2 — 36 PNGs (12 × 3
+   aspects), ACE-Step sidecar killed first to free the 16 GB card.
+
+### Vol. 2 — third anchor push
+
+- **Sync-drop anchor**: 01:30Z → 12:00Z → **2026-05-21T00:00:00Z**.
+- All 10 already-uploaded videos re-anchored via
+  `videos.update?part=status` for the third time (~1 s wall for the
+  whole batch).
+- **Cron `f8816c1d`** scheduled at `3 9 20 5 *` (09:03 PDT today =
+  16:03 UTC, 27 min after rolling-24h window clears). Will fire
+  the orchestrator with `--from-track 11 --publish-at 2026-05-21T00:00:00Z`.
+- Matt picked the +24h conservative anchor over a tighter 17:00Z
+  retry because the cap reset model is opaque — no API to query when
+  it actually clears, so giving 8h+ buffer between retry attempt and
+  sync-drop avoids a possible 4th push.
+
+### Vol. 3 — composer + cover render
+
+- **Theme**: Atompunk Cold War (1958-1968). Tang-orange + steel-grey
+  + atomic-teal palette, Theremin + muted brass + vibraphone +
+  upright bass + brushed drums. BPM 84-98 (slowest album yet). Home
+  tonic **C minor** — new harmonic neighborhood vs the A/D minor
+  pattern.
+- **Album JSON**: `docs/albums/atompunk-drive-vol-1.json` — 12 tracks,
+  24-hour cycle narrative (dawn drill siren → bunker midday → near-
+  launch crisis → night sign-off), cycle-of-fifths-ascending ladder
+  Cm→G#m for morning/bunker arc, cycle-of-fifths-descending Ebm→Cm
+  for night descent. Drill siren motif bookends the album as Theremin
+  lullaby at half-tempo.
+- **Tracks**: 1. Drill Siren, 0600 / 2. Foil Curtain Morning /
+  3. Salt Flats Commute / 4. Stations, Console Six /
+  5. Telemetry, Range Window 2 / 6. Wall Clock, 1217 /
+  7. Contact on the Doppler / 8. Twenty-Second Holds /
+  9. All Stand Down / 10. Salt Flats After Sundown /
+  11. Sign-Off, Test Pattern Hum / 12. Porch Light, Midnight.
+- **Cover gen**: in flight on cnc as of 2026-05-20T07:24Z, ~23 min
+  wall expected for 36 PNGs.
+- **3 future-album themes banked** from the same picker:
+  VHS Bootleg Horror, Hong Kong Rooftop Noir, Arctic Ice Station.
+  See `project_future_album_theme_bank` memory.
+
+### Vol. 2 retry RESOLVED — 12/12 uploaded
+
+Cron `f8816c1d` fired at 16:03Z (~27 min after the rolling-24h cap
+cleared ~15:36Z). Both tracks uploaded in **54.3 s wall**:
+
+- Track 11 **Freight Elevator** → `mtEra-1Fdok`
+- Track 12 **Ground Floor, Pre-Dawn** → `7XptVg8BjVc`
+
+**All 12 of Vol. 2 are now uploaded private + anchored to
+2026-05-21T00:00:00Z.** Sync-drop will fire ~7.5 h from this writing.
+
+### Final video_id list — Neo-Tokyo Drive, Vol. 1
+
+| # | Title | YT Video ID | publishAt |
+|---|---|---|---|
+| 01 | Ignition Deck | `YLmBMrYm6Hk` | 2026-05-21T00:00Z |
+| 02 | Onramp Above the City | `ZwSdlwaE47s` | 2026-05-21T00:00Z |
+| 03 | Vertical Signage | `ZilNGntSXGg` | 2026-05-21T00:00Z |
+| 04 | Cut-In | `0WsM78t7kqw` | 2026-05-21T00:00Z |
+| 05 | Arcade Strobe Wall | `EokwjZGFjMk` | 2026-05-21T00:00Z |
+| 06 | Night Market Run | `Ca6ZzmTVtRw` | 2026-05-21T00:00Z |
+| 07 | Under the Overpass | `f9JuXeRRmKs` | 2026-05-21T00:00Z |
+| 08 | Service Ramp Down | `1yLQY3VwGJc` | 2026-05-21T00:00Z |
+| 09 | Flooded Maintenance Line | `b2_v_1G6Zxg` | 2026-05-21T00:00Z |
+| 10 | Reactor Hall | `XtxiLuX6DTo` | 2026-05-21T00:00Z |
+| 11 | Freight Elevator | `mtEra-1Fdok` | 2026-05-21T00:00Z |
+| 12 | Ground Floor, Pre-Dawn | `7XptVg8BjVc` | 2026-05-21T00:00Z |
+
+### What's next (in order)
+
+1. **Wait on Vol. 3 cover gen** to finish (still running in the
+   background as of 16:04Z). Pull track 1's 3 aspects back to kokonoe,
+   send to Matt to confirm the atompunk aesthetic landed before booting
+   ACE-Step for the audio pass.
+2. **Boot ACE-Step sidecar** on cnc (prod split-GPU config) once
+   covers are done.
+3. **Run orchestrator `run-album --slug atompunk-drive-vol-1
+   --dry-run`** — stops before stage 7 upload, leaves 12 final.mp4s
+   on disk. Audio + master + encode only.
+4. **Plan Vol. 3 upload**: cannot upload Vol. 3 today (Vol. 2 ate
+   today's cap window — 12 tracks in ~24 h). Earliest Vol. 3 first
+   upload is 2026-05-21T16:04Z + 24 h ≈ 2026-05-22T16:04Z (rolling
+   window from Vol. 2's LAST upload). Could schedule Vol. 3
+   sync-drop for Sun 2026-05-24T00:00Z or later, with cron-based
+   upload starting ~2026-05-22T18:00Z.
+
+### Notes for next session
+
+- **The YT channel daily upload cap is rolling 24h, NOT calendar-day.**
+  Burned this lesson [[yt-channel-daily-upload-cap]] — first version
+  of that memory said "resets at Pacific midnight" which was wrong.
+  The memory has been corrected.
+- **Vol. 3 upload should wait at least 24h after Vol. 2's last upload
+  succeeds.** With Vol. 2 retry hopefully landing at ~16:03Z today,
+  Vol. 3's first upload should be no earlier than 2026-05-21T16:03Z
+  to avoid stacking caps.
+- **Sidecar state on cnc**: dead, will be re-booted after covers finish.
+- **All Vol. 3 audio/master/encode artifacts will land at
+  `var/nightdrive/tracks/nd-atompunk-drive-vol-1-NNN/`** when the
+  orchestrator runs.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
