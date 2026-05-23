@@ -2035,4 +2035,97 @@ cleared ~15:36Z). Both tracks uploaded in **54.3 s wall**:
 
 ---
 
+## 28. Sessions 2026-05-20 → 2026-05-22 — Vol. 2 LIVE, XL downloaded, Vol. 3 blocked
+
+### Outcome (status: 🟢 Vol. 2 public; 🟡 Vol. 3 audio blocked on cnc GPU contention with openclaw)
+
+**Vol. 2 (Neo-Tokyo Drive) is live.** All 12 videos flipped to public
+at 2026-05-21T00:00:00Z exactly as scheduled. Verified 2026-05-22 via
+`videos.list` API call — all 12 return `privacyStatus=public`,
+`publishAt=` (empty, cleared once flip fired).
+
+### What got done 2026-05-20 → 2026-05-22
+
+1. **16:03Z retry cron `f8816c1d` succeeded** as predicted (rolling-24h
+   window cleared ~15:36Z). Both Vol. 2 stragglers landed in 54.3 s
+   wall: track 11 `mtEra-1Fdok` + track 12 `7XptVg8BjVc`. Final video
+   table in §27.
+2. **2026-05-21T00:00Z sync-drop fired** server-side (no orchestrator
+   action needed — YouTube auto-flipped at the scheduled `publishAt`
+   time). Telegram NOT auto-sent on this (could be a future hook).
+3. **ACE-Step XL turbo + 4B LM downloaded** to cnc:
+   `/opt/acestep/checkpoints/acestep-v15-xl-turbo/` (19 GB) and
+   `/opt/acestep/checkpoints/acestep-5Hz-lm-4B/` (7.9 GB). Wall:
+   1509 s + 628 s = ~35 min via `huggingface_hub.snapshot_download`,
+   background process, no GPU touched. Total `/opt/acestep/checkpoints/`
+   is now ~36 GB. Standard turbo + XL turbo coexist; pick by
+   `NIGHTDRIVE_ACESTEP_CONFIG` env var.
+4. **Vol. 3 (Atompunk) covers rendered** — all 36 PNGs at
+   `/opt/nightdrive/assets/covers/albums/atompunk-drive-vol-1/` AND
+   mirrored to `J:\nightdrive\assets\covers\albums\atompunk-drive-vol-1\`.
+   Track 1 three-aspect set was sent to Matt for aesthetic
+   confirmation; **no verdict received before this writing** (Matt
+   may have been away). Assume aesthetic is OK for now (the cover gen
+   used the same script + same prompts that produced acceptable
+   Vol. 2 results).
+
+### Vol. 3 — current blocker
+
+The Atompunk audio pass (task #18) has NOT run. cnc P100s are
+currently occupied by **Matt's openclaw inference fleet**:
+
+| GPU | Used | Free | Process |
+|---|---|---|---|
+| 0 (12 GB) | 6.2 GB | 5.7 GB | `/opt/openclaw-inference/bin/llama-server` ×2 + `/opt/llama/llama-b8182/rpc-server` |
+| 1 (16 GB) | 10.5 GB | 5.5 GB | `/opt/openclaw-inference/bin/llama-server` + rpc-server |
+
+Neither card has the ~12 GB headroom ACE-Step turbo needs for the DiT
+side. **Don't kill openclaw** — it's Matt's primary inference fleet
+(per the openclaw-fleet skill, 12 systemd Rust agents). See new memory
+`project_cnc_shared_with_openclaw` for the full coordination story.
+
+### What's next (in order, when Vol. 3 unblocks)
+
+1. **Get Matt's verdict on Atompunk Track 1 covers** (sent
+   2026-05-20T16:05Z, no response yet). If aesthetic is wrong, re-gen
+   covers with adjusted prompts before audio.
+2. **Coordinate cnc GPU availability** — either ask Matt to stop a
+   subset of openclaw agents temporarily, or wait for an off-peak
+   window, OR fall back to ACE-Step `DIT_ONLY=1` mode which might
+   squeeze into ~6 GB if standard turbo (won't fit XL).
+3. **Boot ACE-Step sidecar** (decide XL vs standard turbo based on
+   available VRAM at the moment of decision).
+4. **Run orchestrator `run-album --slug atompunk-drive-vol-1
+   --dry-run`** — stops at stage 7 (no upload). Audio + master + encode.
+5. **Plan Vol. 3 upload schedule** — Vol. 2's last upload was
+   2026-05-20T16:04Z, so the rolling-24h cap from THAT point cleared
+   2026-05-21T16:04Z. Vol. 3 upload can fire any time after that.
+   Recommend a Sat 2026-05-24T00:00Z or Sun 2026-05-25T00:00Z
+   sync-drop anchor.
+
+### Notes for next session
+
+- **The auto-uploader has been keeping up** during the multi-day gap
+  (4 new "Initial commit - uploaded via github-uploader-buildout"
+  snapshots since the last manual commit `c4df8aa`). The earlier
+  memory correction about "auto-uploader is NOT real-time" still
+  stands — it's faster than I first noted but not instant.
+- **YouTube's per-channel daily upload cap behavior is fully
+  characterized now**: rolling 24h from the FIRST cap-hit upload
+  (not the last). Memory `feedback_yt_channel_daily_upload_cap`
+  has the correct version.
+- **No telegram notification fired when Vol. 2 sync-drop flipped**
+  — that's a thing the orchestrator doesn't watch for (publishAt is
+  YouTube-side, fires without callback). Worth a future enhancement:
+  a daily cron that checks publishAt videos approaching their flip
+  and notifies Matt 1h before / at the moment of flip.
+- **XL is downloaded but NOT yet wired** — switching to XL requires
+  updating `NIGHTDRIVE_ACESTEP_CONFIG=acestep-v15-xl-turbo` and
+  `NIGHTDRIVE_ACESTEP_LM_MODEL=acestep-5Hz-lm-4B` in the systemd
+  unit + verifying the sidecar boots clean against the bigger
+  weights. First boot will reveal whether the 16 GB card alone holds
+  XL DiT or whether we need different split-GPU geometry.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
