@@ -1,6 +1,13 @@
-//! nightdrive-llm — talks to the local OpenClaw / Ollama instance to generate
-//! a `CompositionSpec` for one track. Uses Ollama's structured-output (JSON
-//! schema) mode when available, otherwise enforces JSON via prompt + parse.
+//! nightdrive-llm — talks to an OpenAI-compatible chat endpoint (LiteLLM,
+//! Ollama's /v1 layer, real OpenAI, etc.) to generate a `CompositionSpec`
+//! for one track. Uses `response_format: {"type":"json_object"}` for JSON
+//! enforcement.
+//!
+//! Historical note: this crate POSTed Ollama's native `/api/chat` until
+//! 2026-05-23 when nightdrive moved to a shared cnc box that runs LiteLLM
+//! (master-key-gated, OpenAI-format-only) in front of multiple LLM
+//! backends. The migration kept the same `OpenclawConfig` struct + added
+//! an optional `api_key` field for Bearer auth.
 
 use async_trait::async_trait;
 use nightdrive_core::{CompositionSpec, NightdriveError, NightdriveResult, TrackId};
@@ -75,34 +82,41 @@ impl OpenclawLlm {
     }
 }
 
+// OpenAI-format chat completion request. LiteLLM, Ollama's /v1 layer, and
+// real OpenAI all speak this shape.
 #[derive(Serialize)]
-struct OllamaChatRequest<'a> {
+struct ChatRequest<'a> {
     model: &'a str,
-    messages: Vec<OllamaMessage<'a>>,
-    stream: bool,
-    format: &'a str,                // "json" enforces JSON mode
-    options: OllamaOptions,
+    messages: Vec<ChatMessage<'a>>,
+    temperature: f32,
+    max_tokens: u32,
+    response_format: ResponseFormat<'a>,
 }
 
 #[derive(Serialize)]
-struct OllamaMessage<'a> {
+struct ChatMessage<'a> {
     role: &'a str,
     content: String,
 }
 
 #[derive(Serialize)]
-struct OllamaOptions {
-    temperature: f32,
-    num_predict: i32,
+struct ResponseFormat<'a> {
+    #[serde(rename = "type")]
+    kind: &'a str,
 }
 
 #[derive(Deserialize)]
-struct OllamaChatResponse {
-    message: OllamaResponseMessage,
+struct ChatResponse {
+    choices: Vec<ChatChoice>,
 }
 
 #[derive(Deserialize)]
-struct OllamaResponseMessage {
+struct ChatChoice {
+    message: ChatResponseMessage,
+}
+
+#[derive(Deserialize)]
+struct ChatResponseMessage {
     content: String,
 }
 
@@ -151,30 +165,33 @@ impl CompositionLlm for OpenclawLlm {
 }
 
 impl OpenclawLlm {
-    /// Single round-trip to Ollama. The retry loop in `generate_spec` invokes
-    /// this; surfaces all failure modes through `NightdriveError::Llm`.
+    /// Single round-trip to the OpenAI-compatible chat endpoint. The retry
+    /// loop in `generate_spec` invokes this; surfaces all failure modes
+    /// through `NightdriveError::Llm`.
     async fn attempt_generate_spec(&self, user: &str) -> NightdriveResult<CompositionSpec> {
-        let body = OllamaChatRequest {
+        let body = ChatRequest {
             model: &self.cfg.model,
             messages: vec![
-                OllamaMessage { role: "system", content: SYSTEM_PROMPT.to_string() },
-                OllamaMessage { role: "user", content: user.to_string() },
+                ChatMessage { role: "system", content: SYSTEM_PROMPT.to_string() },
+                ChatMessage { role: "user", content: user.to_string() },
             ],
-            stream: false,
-            format: "json",
-            options: OllamaOptions {
-                temperature: self.cfg.temperature,
-                num_predict: self.cfg.max_tokens as i32,
-            },
+            temperature: self.cfg.temperature,
+            max_tokens: self.cfg.max_tokens,
+            response_format: ResponseFormat { kind: "json_object" },
         };
 
-        let url = format!("{}/api/chat", self.cfg.base_url.trim_end_matches('/'));
+        let url = format!(
+            "{}/v1/chat/completions",
+            self.cfg.base_url.trim_end_matches('/'),
+        );
         debug!(url = %url, "sending chat request");
 
-        let resp = self
-            .http
-            .post(&url)
-            .json(&body)
+        let mut req = self.http.post(&url).json(&body);
+        if let Some(key) = self.cfg.api_key.as_deref().filter(|k| !k.is_empty()) {
+            req = req.bearer_auth(key);
+        }
+
+        let resp = req
             .send()
             .await
             .map_err(|e| NightdriveError::Llm(format!("send: {e}")))?;
@@ -183,20 +200,33 @@ impl OpenclawLlm {
         if !status.is_success() {
             let text = resp.text().await.unwrap_or_default();
             return Err(NightdriveError::Llm(format!(
-                "ollama returned {status}: {text}"
+                "llm endpoint returned {status}: {text}"
             )));
         }
 
-        let parsed: OllamaChatResponse = resp
+        let parsed: ChatResponse = resp
             .json()
             .await
             .map_err(|e| NightdriveError::Llm(format!("decode response: {e}")))?;
 
-        debug!(content_len = parsed.message.content.len(), "received content");
+        let content = parsed
+            .choices
+            .into_iter()
+            .next()
+            .ok_or_else(|| NightdriveError::Llm("no choices in response".into()))?
+            .message
+            .content;
 
-        let spec: CompositionSpec = serde_json::from_str(&parsed.message.content)
+        debug!(content_len = content.len(), "received content");
+
+        // Some models (notably Anthropic via LiteLLM) wrap JSON in markdown
+        // code fences even when response_format:json_object is requested.
+        // Strip leading ```json ... ``` / ``` ... ``` blocks before parsing.
+        let cleaned = strip_md_code_fences(&content);
+
+        let spec: CompositionSpec = serde_json::from_str(cleaned)
             .map_err(|e| {
-                warn!(error = %e, raw = %parsed.message.content, "spec parse failed");
+                warn!(error = %e, raw = %content, "spec parse failed");
                 NightdriveError::Llm(format!("spec json parse: {e}"))
             })?;
 
@@ -218,6 +248,26 @@ fn is_retryable(err: &NightdriveError) -> bool {
         || msg.starts_with("no sections")
         || msg.starts_with("musicgen_prompt too long")
         || msg.starts_with("empty youtube tags")
+}
+
+/// Strip a leading ```json / ``` code-fence block from an LLM response.
+/// Defensive against models that wrap JSON in markdown despite explicit
+/// response_format hints. Returns the trimmed slice; if no fences match,
+/// returns the input as-is.
+fn strip_md_code_fences(s: &str) -> &str {
+    let t = s.trim();
+    let after_open = if let Some(rest) = t.strip_prefix("```json") {
+        rest.trim_start_matches('\n').trim_start()
+    } else if let Some(rest) = t.strip_prefix("```") {
+        rest.trim_start_matches('\n').trim_start()
+    } else {
+        return t;
+    };
+    after_open
+        .trim_end()
+        .strip_suffix("```")
+        .map(|x| x.trim_end())
+        .unwrap_or(after_open)
 }
 
 fn validate_spec(spec: &CompositionSpec) -> NightdriveResult<()> {

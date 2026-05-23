@@ -1,0 +1,672 @@
+{
+    "album_slug":  "sovetskiy-drive-vol-1",
+    "title":  "Sovietskiy Drayv",
+    "theme":  "atompunk_soviet_eastern_bloc",
+    "track_count":  12,
+    "tonic_progression":  "Fm -> Cm -> Gm (Dorian) -> Dm -> Am (Phrygian) -> Em (Locrian-shaded) -> Bm (Phrygian-dominant flavor) -> F#m -> C#m -> Abm / G#m -> Ebm -> Fm",
+    "bpm_arc":  [
+                    80,
+                    82,
+                    84,
+                    86,
+                    88,
+                    86,
+                    92,
+                    90,
+                    86,
+                    82,
+                    80,
+                    78
+                ],
+    "narrative_arc":  "Twelve tracks read as a single 24-hour cycle inside the late-Khrushchev / early-Brezhnev Eastern Bloc circa 1962, tram bell at dawn through snowfall on the same courtyard at midnight, the deliberate East-side mirror of Vol. 3's American suburb-bunker-suburb loop. Tracks 1-3 are the morning hours of the rota: a tram bell rings through the inner courtyard of a Khrushchyovka apartment block at first grey light as a single Polivoks-style synth pad opens on Fm (1), a babushka boils water in a communal kitchen as the radio sign-on plays a national anthem from a brown Bakelite box on the windowsill (2), and a shift worker walks through dirty snow toward a textile-and-machine kombinat with concrete chimneys breathing white columns into a flat zinc sky (3). Tracks 4-6 are the factory and the office: workers take stations at long steel lathes under fluorescent tube lighting and the line begins its slow rhythm (4), a Polivoks lead reads off production-quota numbers in clinical Phrygian over teletype clatter as the foreman walks the row (5), and the long noon-lull settles over a tin-tray cafeteria with a wall clock ticking quarters and only a deep walking bass under fluorescent silence (6). Tracks 7-9 are the border-radar drama: a contact appears on the long-range search radar at the western frontier and the watch room locks into amber (7), the duty officer reads back coordinates over twenty-second holds as the Polivoks lead glissandi mark each hold and a single church-bell tone from a propaganda-broadcast morning ghost returns at quarter volume (8), and the stand-down comes through as a coded teletype line and the room exhales as the Phrygian-dominant flag inverts and releases (9). Tracks 10-12 are the return and the snowfall: the shift worker rides the tram home through cooling industrial outskirts with sleet flecking the window (10), the babushka turns off the brown Bakelite radio as the sign-off hum dissolves into AM static and a single church bell tolls midnight from a tower three kilometers across the city (11), and at midnight under the single yellow lamp in the courtyard arch a thin snowfall begins to settle over the same cobblestones as the tram bell of the morning returns one octave down at half-tempo on Polivoks lead with the falling leg unresolved, the bell of the morning re-read as a snowfall lullaby. The day rings closed on the same tonic that opened it (F minor), but the listener arrives at midnight from the opposite side of the loop than they departed at dawn, and the courtyard the day began in is now a different courtyard because the snow has covered it.",
+    "recurring_motifs":  [
+                             {
+                                 "motif":  "Tram bell cell - a three-note rising-then-falling Polivoks-style sawtooth lead figure (1 -> b3 -> 1) voiced slow with long plate reverb tail over a sustained Juno-60-style sawtooth pad, the album's morning-shift signature and the deliberate mirror-inversion of Vol. 3's Theremin siren cell (same interval shape, different voice and meaning: a public-transport bell calling people to work rather than a civil-defense siren calling them to shelter)",
+                                 "introduced_in":  1,
+                                 "returns_in":  [
+                                                    4,
+                                                    7,
+                                                    12
+                                                ],
+                                 "transformation":  "Track 1 plays it whole and unhurried, a single Polivoks lead voice over a Juno pad with long reverb, the dawn tram bell over the courtyard. Track 4 plays it filtered and distant - the same three pitches but lowpassed and pushed under the lathe rhythm, the bell now ambient rather than calling, the workers are already at the line. Track 7 plays it bright and foreground again with the rising leg lengthened (1 -> b3 held two beats longer) - the bell now ghosted into the watch-room PA as the radar contact appears, a call that means something. Track 12 plays it whole one final time on Polivoks lead one octave down at half-tempo with the rising leg unhurried and the falling leg unresolved holding on the b3 rather than resolving to the tonic - the morning's tram bell re-read as a snowfall lullaby, the call absorbed into the courtyard-lamp frequency."
+                             },
+                             {
+                                 "motif":  "Boiler-room pulse figure - a four-note descending dark walking-bass phrase (5-4-b3-1) on synth bass with a wood-block knock on the first note of each repetition, played on the downbeats of every 8-bar phrase across the factory and watch-room tracks, the album's mechanical-labor signature (the East-side counterpart to Vol. 3's vibraphone telemetry figure but voiced on dark walking bass plus wood block rather than vibraphone, because the Soviet shift-floor's signature sound is footstep-and-bass, not Mancini vibraphone)",
+                                 "introduced_in":  3,
+                                 "returns_in":  [
+                                                    5,
+                                                    8,
+                                                    10
+                                                ],
+                                 "transformation":  "Track 3 introduces it at the walking-shift approach to the kombinat, played clean on dark walking bass with a single wood-block knock on the downbeat of each 8-bar phrase, the figure as anticipation of the day's labor. Track 5 makes it the structural backbone of the production-quota chorus: the figure articulated every 8 bars in tight lockstep with the teletype clatter and the wood-block knock stiffened with a dry mechanical drum-machine kick (TR-606 cold, not 808 warm), the factory's literal rhythm of received quotas. Track 8 plays the same figure with each note delayed by a sixteenth from the grid - the count is no longer clean, the twenty-second holds are shifting the figure's relationship to the bar, the wood-block knock arrives early on each repetition. Track 10 plays only the first three notes (5-4-b3) on dark walking bass alone with no wood-block knock and no drum machine - the factory is behind them, the rhythm of the day's labor has dissolved into the tram's sway."
+                             },
+                             {
+                                 "motif":  "Iron Curtain flag - a chromatic-falling Polivoks lead cell (b2 -> 1 -> 7 -> b6) used as the album's escalation gesture, articulated on a single hard-edged sawtooth lead voice with a single deep church-bell tone struck on the b2 (a propaganda-broadcast church-bell sample one octave below middle, dry and dark), the East-side counterpart to Vol. 3's Phrygian dominant flag with timpani strike - same interval shape and same escalation function, voiced on Polivoks lead with church bell rather than muted brass with timpani",
+                                 "introduced_in":  4,
+                                 "returns_in":  [
+                                                    7,
+                                                    9
+                                                ],
+                                 "transformation":  "Track 4 introduces it once at the chorus midpoint as the workers take their stations at the lathes - a single articulation, the church-bell tone landing on the bar-line, the cell descending and resolving cleanly into the Polivoks pad. Track 7 makes it the structural pulse of the radar crisis: the cell repeated every 4 bars throughout the chorus sections, each repetition slightly heavier in the lead voicing, the church-bell tones stacking into a quiet dread. Track 9 plays the cell one final time at the chorus start in reverse direction (b6 -> 7 -> 1 -> b2) and resolves up to the b2 instead of down from it - the stand-down line over teletype, the escalation gesture inverted into a release gesture, the watch room exhaling its breath into the fluorescent tubes."
+                             }
+                         ],
+    "tracks":  [
+                   {
+                       "track_number":  1,
+                       "title":  "Tram Bell, 0600",
+                       "role":  "opener",
+                       "key":  "F minor",
+                       "bpm":  80,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "dawn-grey",
+                                         "anticipatory",
+                                         "concrete",
+                                         "courtyard"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - sustained Juno-60-style sawtooth pad on F with long plate reverb, no rhythm, distant fluorescent-tube electrical hum noise floor, single dry wood-block knock every 4 bars on the tonic at low level]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + TRAM BELL CELL whole on Polivoks-style sawtooth lead with long plate reverb tail played once per 8 bars over the sustained Juno pad, dark synth walking bass on quarter notes root-fifth, no kick yet, no snare yet, the wood-block knock continues every 4 bars]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + dry mechanical TR-606-cold drum machine enters with sparse snare on 4 only and no kick, hi-hat closed on the and-of-2 and and-of-4, Juno pad swells on the downbeat of each bar, Polivoks tram bell cell repeats on every 4-bar phrase, dark walking bass thickens to chromatic motion]"
+                                        },
+                                        {
+                                            "name":  "bridge",
+                                            "bars":  8,
+                                            "instrumentation":  "[Bridge - drums drop, just Juno pad and Polivoks tram bell cell over dark walking bass, the courtyard is listening]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - Juno pad sustains F, Polivoks tram bell cell plays whole one final time and resolves down to the tonic, fades to fluorescent-tube hum floor]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 80 BPM F minor, sustained Juno-60-style sawtooth pad with long plate reverb, Polivoks-style sawtooth lead playing a slow rising-then-falling three-note tram-bell cell, dark synth walking bass on quarter notes root and fifth, dry mechanical TR-606-cold drum machine with sparse snare on 4 only and closed hi-hat on the and-of-2 and and-of-4, no kick drum, no four-on-the-floor, no sidechain pumping, distant fluorescent-tube electrical hum noise floor, single dry wood-block knock every 4 bars, sense of a tram bell ringing through the inner courtyard of a Khrushchyovka apartment block at first grey light over a 1962 Eastern Bloc Soviet city with concrete and fresh snow, anticipatory and patient, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, exterior view of the inner courtyard of a five-story grey concrete Khrushchyovka apartment block at dawn, a faint ice-blue grey light just lifting over the rooflines, a single red star painted high on the gable of the far building, a tram-stop pole with a small bell housing in the lower foreground left, dirty snow on the cobblestones, a single bare-bulb yellow courtyard lamp still burning under an entryway arch, no neon, no palm trees, no warm sunset magenta, no cyan-blue cyberpunk, no Tang-orange suburb (that was the West), cold greyscale and concrete and red-star accent and ice-blue fluorescent palette, brutalist retrofuture 1962, scene depth foreground arch midground courtyard background apartment block survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "—",
+                       "tempo_relationship_to_prior":  "—",
+                       "composer_notes":  "Sets the tonic (F minor) - a perfect fourth above the C minor of Vol. 3 (Atompunk Vol. 1), the deliberate East-side flip of the West-side opener. F minor also sits a tritone away from Vol. 2's B minor and a major-third below Vol. 1's A minor, claiming its own harmonic home base distinct from all four prior volumes. TRAM BELL CELL introduced whole and clean on Polivoks-style lead over Juno pad - this is the album's thesis statement and the deliberate mirror-inversion of Vol. 3's Theremin siren cell (same interval shape, different voice and meaning). NO KICK ANYWHERE on this track - the rhythmic engine is dry mechanical TR-606-cold drum machine with sparse snare and closed hi-hat plus dark walking bass, never a synthwave four-on-the-floor and never a warm 808 boom. The Juno pad must read as cold and reverb-soaked in Molchat Doma fashion, not as warm DX7 synthwave. Outro ends on F tonic (not the dominant) - the day begins on stillness. Track 2 takes the V (C) of F minor and reroots it as Cm for the communal kitchen scene."
+                   },
+                   {
+                       "track_number":  2,
+                       "title":  "Communal Kitchen, Sign-On",
+                       "role":  "cruiser",
+                       "key":  "C minor",
+                       "bpm":  82,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "domestic",
+                                         "linoleum-grey",
+                                         "anthem-resigned",
+                                         "subtly-uneasy"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Cm, dry mechanical snare on 2 and 4 only no kick, AM-radio static crackle at low level in the background, single boiling-kettle hiss texture]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks sawtooth lead playing a four-bar chord-tone melody root-third-fifth-third on quarter notes voiced dry with short room reverb, Juno-60 pad sustaining underneath with long plate reverb tail, dry mechanical hi-hat closed on the and-of-2 and and-of-4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + second Polivoks lead voice an octave up playing a slow four-bar anthem-like melodic line (resigned not triumphant, the AM-radio sign-on as heard from the kitchen at first light), wood-block knock on bar 1 of each 4-bar phrase, dry snare tightens to 2 and 4 plus the and-of-4, dark walking bass walks more melodically]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - octave-up lead drops, single Polivoks takes center playing a slightly more chromatic line that hints at the album's underlying unease, AM-radio static crackle rises slightly in the mix, boiling-kettle hiss returns at low level]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full mix returns, anthem-like octave-up lead doubled with a third Polivoks voice a perfect fifth above the original, Juno pad with long plate reverb continues through the full 16 bars]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper leads drop, lone Polivoks holds G (V of Cm), dry snare fades, dark walking bass walks down to root]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 82 BPM C minor, dark synth walking bass on quarter notes, dry mechanical TR-606-cold snare on 2 and 4 with closed hi-hat on the and-of-2 and and-of-4, Polivoks-style sawtooth lead playing a slow anthem-like melodic line voiced resigned not triumphant like an AM-radio national-anthem sign-on heard from a communal kitchen at first light, second Polivoks lead an octave up doubling the anthem line, Juno-60 sawtooth pad with long plate reverb underneath, AM-radio static crackle at low level, boiling-kettle hiss texture at low level, no kick drum, no sidechain pumping, sense of a babushka boiling water in a shared linoleum-tiled communal kitchen with a brown Bakelite radio playing the dawn sign-on, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, interior view of a small communal kitchen with grey linoleum floor and dark green chipped enamel cabinets above a chipped white sink, a brown Bakelite tabletop radio on the windowsill with the dial glowing soft amber, a single battered aluminium kettle on a small gas ring with a faint steam plume, a frosted window above the sink showing the grey courtyard outside, a single fluorescent tube along the ceiling casting cool ice-blue light, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and ice-blue fluorescent palette with single amber radio-dial accent, brutalist retrofuture 1962 domestic, scene depth foreground sink midground kettle background window survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Fm to Cm. The album's first lift uses cycle-of-fifths-ascending logic strictly inside the minor mode, the same architectural opening Vol. 3 used but transposed up a perfect fourth and voiced on Polivoks lead plus Juno pad rather than Theremin plus muted brass. The brightening is harmonic only, not textural - Molchat Doma dryness is maintained.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The album moves in small +2 increments through the morning hours - genuinely slower than Vol. 3's morning accelerando (Vol. 3 was 86-92 by track 4, Vol. 4 is 80-86 by track 4). The audience is queueing for hot water, not commuting in a Buick.",
+                       "composer_notes":  "First true cruiser. Polivoks lead must read as Soviet-era anthem-resigned (slow descending chord-tone melody, not bright triumphant ad-jingle - this is the East-side mirror of Vol. 3 track 2's Mancini cereal jingle and must voice the resignation the West-side cheer hid). The chromatic line in verse2 carries the same crack-of-unease as Vol. 3 track 2 but its voice is Polivoks rather than vibraphone. NEVER let MusicGen substitute a Theremin, vibraphone, or muted-brass section for the Polivoks lead - this is the album's genre marker against both synthwave and Vol. 3's American-orchestral palette. NO KICK ANYWHERE. Outro G (V of Cm) pivots cleanly to Gm of track 3."
+                   },
+                   {
+                       "track_number":  3,
+                       "title":  "Walk to the Kombinat",
+                       "role":  "cruiser",
+                       "key":  "G minor (Dorian)",
+                       "bpm":  84,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "unfolding",
+                                         "industrial-outskirts",
+                                         "zinc-sky",
+                                         "approach"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Gm, dry mechanical snare on 2 and 4, sustained Juno-60 sawtooth pad on G with long plate reverb, no melody yet, distant boot-on-snow crunch and far-off factory-whistle noise floor]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + BOILER-ROOM PULSE FIGURE introduced whole on a single clean dark walking bass with a single wood-block knock on the downbeat of each 8-bar phrase, Juno pad sustains the Dorian sixth (E natural) as a passing color, dry hi-hat closed on the and-of-2 and and-of-4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + Polivoks sawtooth lead playing a four-bar melody in major-sixth intervals that reaches up to the Dorian E natural on the chorus-peak, second Polivoks voice an octave below shadowing the lead, wood-block knock on the downbeat of each 4-bar phrase, dry snare adds the and-of-4 for forward motion, dark walking bass walks more chromatically]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - Polivoks lead drops, boiler-room pulse figure foreground, a second dark walking bass an octave up shadows the first on every other repetition, wood-block knocks tighten to every 4 bars]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full mix returns, Polivoks lead doubled with a second sawtooth voice an octave up, Juno pad with long plate reverb continues through the full 16 bars]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - Polivoks lead drops, dark walking bass holds D (V of Gm), dry snare fades, boot-on-snow crunch lifts slightly]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 84 BPM G minor Dorian with the raised sixth E natural as passing color, dark synth walking bass on quarter notes chromatic, dry mechanical TR-606-cold snare on 2 and 4 with the and-of-4 added, Polivoks-style sawtooth lead playing a four-bar melody reaching up to the Dorian sixth, dark walking bass playing a four-note descending boiler-room pulse figure on the downbeats of each 8-bar phrase with a single dry wood-block knock on the downbeat, Juno-60 sawtooth pad sustaining underneath with long plate reverb, distant boot-on-snow crunch and far-off factory whistle noise floor, no kick drum, no sidechain pumping, sense of a shift worker walking through dirty snow toward a textile-and-machine kombinat with concrete chimneys breathing white columns into a flat zinc sky on a 1962 Eastern Bloc morning, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, exterior wide view of a long industrial road leading to a low concrete kombinat factory complex on the horizon with three tall concrete chimneys breathing thick white columns of vapor straight up into a flat zinc-grey overcast sky, dirty packed snow along the road, a single dark grey trolleybus catenary line crossing the upper third of the frame, a small red-star emblem on the gable of the factory administration building, no other vehicles, no neon, no palm trees, no Tang-orange suburb, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent and ice-blue fluorescent palette, brutalist retrofuture 1962 industrial outskirts, scene depth foreground snow midground road background factory survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Cm to Gm. Second step of the cycle-of-fifths ascending ladder, still strictly inside the minor mode but now with the Dorian raised-sixth (E natural) as a passing color - the first modal shading on the album, a small lift of warmth without breaking the minor frame. Mirrors Vol. 3's track 3 Dorian raised-sixth structurally (same modal-shift position) but transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "+2 BPM. Maintaining the small-increment morning accelerando. Vol. 4 is now at 84 BPM where Vol. 3 was at 90 BPM at the same structural position - the East-side cycle is genuinely slower.",
+                       "composer_notes":  "FIRST APPEARANCE of the boiler-room pulse figure - on a single clean dark walking bass with a wood-block knock, the figure as anticipation of the day's labor. This is the East-side counterpart to Vol. 3 track 3's vibraphone telemetry figure first appearance - same structural function (anticipation of work, played clean once per 8 bars), different voice (dark walking bass plus wood block, not vibraphone with tremolo). Dorian raised-sixth (E natural) on the chorus-peak is the album's first modal-color shift; the listener should feel a small warmth that isn't quite warmth - the road to the factory is brightening, but the destination is the line. Outro D (V of Gm) pivots cleanly to Dm of track 4 - the cycle continues to the lathe."
+                   },
+                   {
+                       "track_number":  4,
+                       "title":  "Stations, Lathe Row Three",
+                       "role":  "bridge-into-peak",
+                       "key":  "D minor",
+                       "bpm":  86,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "focused",
+                                         "fluorescent",
+                                         "steel-grey",
+                                         "locked-in"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Dm, dry mechanical snare tight on 2 and 4 with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad swell on G, single wood-block knock on each bar 1, TRAM BELL CELL filtered and distant at low level in the background ghosted under the lathe rhythm]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks sawtooth lead playing a tight three-bar repeating phrase that locks in with the dark walking bass on the downbeats, second Polivoks voice an octave below shadowing the lead on every other phrase, dry snare adds the and-of-4]"
+                                        },
+                                        {
+                                            "name":  "pre-chorus",
+                                            "bars":  8,
+                                            "instrumentation":  "[Pre-chorus - build: dry snare rolls tighten into a single mechanical drum-line crescendo, Juno pad opens its filter, wood-block knocks double in speed]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a wide four-bar chord progression Dm - Bb - Gm - A, second Polivoks an octave up playing chord-tone melody on quarter notes, dry snare hits 2 and 4 tight with the and-of-4, dark walking bass walks chromatically, IRON CURTAIN FLAG articulated ONCE at bar 8 of the chorus (b2 to 1 to 7 to b6 Polivoks cell with a single deep church-bell tone on the b2 strike)]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - drums drop, just Juno pad and Polivoks lead, the workers are at the lathes]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, third Polivoks voice an octave up, Iron Curtain flag articulated ONCE more at bar 8]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains A (V of Dm), upper voice holds the high tonic, dry snare fades, dark walking bass walks down to root]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 86 BPM D minor, dark synth walking bass on quarter notes chromatic, tight dry mechanical TR-606-cold snare on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a wide four-bar chord progression D minor B-flat major G minor A major, second Polivoks playing a three-bar locked-in phrase on the downbeats, third Polivoks an octave up playing chord-tone melody on quarter notes, Juno-60 sawtooth pad sustaining with long plate reverb, a single deep dry church-bell tone on a chromatic-falling Polivoks lead cell at the chorus midpoint, distant filtered tram bell cell in the background, no kick drum, no sidechain pumping, sense of a row of mid-century Soviet workers taking stations at long steel lathes under fluorescent tube lighting in a deep concrete kombinat, focused and locked-in steel-grey, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, interior view of a deep concrete kombinat shop floor with a long row of dark steel lathes stretching across the lower half of the frame each with a single bare-bulb work-lamp burning over its tool post, cylindrical steel chip catchers between the lathes, fluorescent tube lighting overhead casting cool ice-blue grey shadows on the concrete floor, a large iron-and-glass clerestory window high on the far wall showing a flat zinc-grey sky outside, a single red-star emblem on a vertical concrete pillar mid-frame, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent and ice-blue fluorescent palette, brutalist retrofuture 1962 industrial interior, scene depth foreground lathe midground row background window survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Gm to Dm. Third step of the cycle-of-fifths ascending ladder. The album has now reached the same Dm tonic that opened Neo-Tokyo Vol. 1, but here it lives at the kombinat-stations bridge-into-peak rather than at the opener - structurally repurposed, the listener who knows the Neo-Tokyo album hears a familiar pitch in a foreign role and a foreign palette (dry Polivoks instead of FM bell over analog brass).",
+                       "tempo_relationship_to_prior":  "+2 BPM. Maintaining the small-increment accelerando. Vol. 4 is now at 86 BPM where Vol. 3 was at 92 BPM at the same structural position - the East-side cycle is genuinely slower.",
+                       "composer_notes":  "FIRST IRON CURTAIN FLAG ARTICULATION - on layered Polivoks lead with a single deep dry church-bell tone, exactly once per chorus at bar 8. This is the East-side counterpart to Vol. 3 track 4's Phrygian dominant flag first articulation - same chromatic-falling cell (b2 -> 1 -> 7 -> b6), same single-articulation function, different voice (Polivoks plus church bell, not muted brass plus timpani). TRAM BELL CELL returns FILTERED AND DISTANT in the intro ghosted under the lathe rhythm - the bell is now ambient at the factory, the workers are already at the line. 270s long because the lathe-stations scene needs room to lay out the rhythmic engine that will run through tracks 5 and 6. Outro A (V of Dm) pivots cleanly to Am of track 5 - the cycle continues to the production-quota reading."
+                   },
+                   {
+                       "track_number":  5,
+                       "title":  "Quota, Teletype Row",
+                       "role":  "cruiser-into-valley",
+                       "key":  "A minor (Phrygian)",
+                       "bpm":  88,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "clinical",
+                                         "reading",
+                                         "ice-blue-fluorescent",
+                                         "teletype"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Am, dry mechanical snare tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on A with a sustained Phrygian Bb natural as passing color, teletype-clatter texture (mechanical typewriter clicks at 16th-note rate at low level)]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + BOILER-ROOM PULSE FIGURE as structural backbone, played every 8 bars in tight lockstep with the teletype clatter and a dry mechanical kick stiffened wood-block knock on the downbeat, Polivoks lead on a sparse two-bar response phrase, dark walking bass walks more chromatically with the Phrygian b2 passing tone]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a four-bar chord progression Am - Bb major (Phrygian b2) - Am - E, boiler-room pulse figure repeated and lockstepped with stiffened wood-block knocks, dry snare tight, teletype clatter rises in the mix]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered Polivoks section drops, boiler-room pulse figure foreground, teletype clatter at full volume, the floor reading the quotas]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, Polivoks section doubled an octave up, boiler-room pulse figure continues lockstep]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - Polivoks section holds E (V of Am), upper voice holds the high tonic, teletype fades, dry snare fades, dark walking bass walks down to root]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 88 BPM A minor Phrygian with Bb natural b2 passing color, dark synth walking bass on quarter notes chromatic with the Phrygian b2, tight dry mechanical TR-606-cold snare on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section on a four-bar Phrygian chord progression A minor B-flat major A minor E major, dark walking bass playing a four-note descending boiler-room pulse figure on the downbeats lockstepped with mechanical teletype-clatter texture at 16th-note rate and a stiffened dry wood-block knock on the downbeat, Juno-60 sawtooth pad sustaining with long plate reverb, no kick drum, no sidechain pumping, sense of a foreman walking the row as a Polivoks reads off production-quota numbers in clinical Phrygian over teletype clatter under ice-blue fluorescent light in a 1962 Eastern Bloc kombinat, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, close interior view of a single factory-office desk with a mechanical teletype machine on the right side mid-print with a long curling paper tape spilling onto a steel-grey floor, a stack of carbon-paper quota sheets on the desk surface clipped under a chrome paperweight, a small bare-bulb desk lamp casting hard ice-blue grey shadows, a wall-mounted clock face partially in frame at upper left, a single red-star emblem on the wall above the desk, fluorescent tube light reflecting off the chrome edges, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent and ice-blue fluorescent palette, brutalist retrofuture 1962, scene depth foreground desk midground teletype background wall survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Dm to Am. Fourth step of the cycle-of-fifths ascending ladder, with the Phrygian b2 (Bb natural) added as the modal color - the album's second modal shading, the kombinat's clinical-cold harmonic frame. Mirrors Vol. 3's track 5 Phrygian b2 structurally (same modal-shift position) but transposed up a perfect fourth and voiced on Polivoks lead instead of muted-brass section.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The accelerando continues to its first valley shelf at 88 BPM, not a true peak. Vol. 4 is now at 88 BPM where Vol. 3 was at 94 BPM at the same structural position.",
+                       "composer_notes":  "BOILER-ROOM PULSE FIGURE moves to STRUCTURAL BACKBONE - articulated every 8 bars lockstepped with teletype clatter, the figure's payoff after its single-articulation debut in track 3. Teletype-clatter texture is critical and atompunk-specific - this is the album's literal mechanical-engineering sound, NOT a synthwave hi-hat or PWM arp. The Phrygian b2 (Bb natural) in the chord progression and bass line is the kombinat's harmonic tension. 270s long to give the quota-reading its full clinical patience. Outro E (V of Am) pivots cleanly to Em of track 6 - the cycle continues into the noon lull."
+                   },
+                   {
+                       "track_number":  6,
+                       "title":  "Cafeteria Wall Clock, 1217",
+                       "role":  "valley",
+                       "key":  "E minor (Locrian-shaded)",
+                       "bpm":  86,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "lull",
+                                         "patient",
+                                         "ice-blue-quiet",
+                                         "tin-tray"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - deep dark synth walking bass on very slow quarter notes in Em, no snare, no hi-hat, sustained Juno-60 pad on E with a sustained Locrian-shaded Bb natural as passing color, only a wall-clock tick texture at quarter-note rate at low level, distant cafeteria ambient murmur]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  32,
+                                            "instrumentation":  "[Verse - + lone Polivoks lead playing a sparse two-bar phrase every 8 bars, dark walking bass continues, wall-clock tick continues, the floor is at lunch and the room is quiet]"
+                                        },
+                                        {
+                                            "name":  "middle",
+                                            "bars":  16,
+                                            "instrumentation":  "[Middle - Juno pad opens slightly, second Polivoks an octave up enters playing the same two-bar phrase as a soft canon-shadow of the first, no snare or hi-hat yet]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Outro - second Polivoks drops, lone Polivoks holds B (V of Em), wall-clock tick continues, dark walking bass walks down to root and holds, Juno pad fades slowly to the wall-clock tick alone]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 86 BPM E minor Locrian-shaded with Bb natural passing tone, deep dark synth walking bass on very slow quarter notes, no snare and no hi-hat, lone Polivoks-style sawtooth lead playing a sparse two-bar phrase every 8 bars, Juno-60 sawtooth pad sustaining with long plate reverb, wall-clock tick texture at quarter-note rate at low level, distant cafeteria ambient murmur, no kick drum, no sidechain pumping, sense of a tin-tray cafeteria at noon with a wall clock ticking quarters and only a deep walking bass under fluorescent silence in a 1962 Eastern Bloc kombinat, the album's first valley, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, close interior view of a single large round wall clock face mid-frame reading 12:17 mounted on a concrete wall above a row of empty tin-tray cafeteria tables, the second hand a thin steel-grey line, the numerals plain black on white, a single fluorescent tube reflected in the clock face glass, a long counter with chipped enamel finish visible in the lower frame, a steam tray with a faint vapor plume on the counter, a single red-star emblem on the wall to the right of the clock, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent and ice-blue fluorescent palette, brutalist retrofuture 1962, scene depth foreground counter midground tables background clock survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Am to Em. Fifth step of the cycle-of-fifths ascending ladder, with the Locrian-shaded b5 (Bb natural acting as the b5 passing tone over the E tonic) as modal color - the album's third modal shading, the cafeteria's pure-lull harmonic frame. Mirrors Vol. 3's track 6 Locrian-shaded valley structurally (same modal position) but transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "-2 BPM. The accelerando pauses for the noon lull - first BPM drop on the album, mirroring Vol. 3 track 6's -2 BPM valley dip at the same structural position.",
+                       "composer_notes":  "The album's first valley. No drum machine, no hi-hat, just deep dark walking bass plus wall-clock tick plus lone Polivoks plus Juno pad. 300s long to give the lull its full patience. The Locrian-shaded Bb natural passing tone is the kombinat's deepest harmonic tension - it sits unresolved over the Em tonic and creates the queue-time, sleet-on-concrete time, bureaucratic-time feel the album is committed to. NEVER let MusicGen add a kick drum, a snare, or any rhythmic figure in this track beyond the wall-clock tick - the unresolved Bb over Em with deep walking bass IS the composition. Outro B (V of Em) pivots cleanly to Bm of track 7 - the cycle continues into the radar-watch crisis."
+                   },
+                   {
+                       "track_number":  7,
+                       "title":  "Contact, Search Radar West",
+                       "role":  "peak",
+                       "key":  "B minor (Phrygian-dominant flavor)",
+                       "bpm":  92,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "alarm-amber",
+                                         "crisis",
+                                         "scope-glow",
+                                         "watch-room"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Bm, dry mechanical TR-606-cold snare tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on B with a sustained Phrygian-dominant C natural b2 and D# major-3 flavor as passing color, TRAM BELL CELL returns BRIGHT AND FOREGROUND on Polivoks lead with the rising leg LENGTHENED (1 -> b3 held two beats longer) at the very top of the intro, the alarm now means something]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + layered Polivoks lead section playing a tight three-bar repeating phrase that locks in with the dark walking bass on the downbeats, second Polivoks voice an octave up shadowing, dry snare tight, the watch room is locked into amber]"
+                                        },
+                                        {
+                                            "name":  "pre-chorus",
+                                            "bars":  8,
+                                            "instrumentation":  "[Pre-chorus - build: dry snare rolls tighten into a single mechanical drum-line crescendo, Juno pad opens its filter, layered Polivoks doubles in density]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a wide four-bar chord progression Bm - G - Em - F# (Phrygian-dominant), IRON CURTAIN FLAG repeated EVERY 4 BARS throughout the chorus with the church-bell tone stacking heavier each repetition, dry snare hits 2 and 4 tight, dark walking bass walks chromatically with the Phrygian-dominant b2]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - drums drop, just Juno pad and the church-bell tones echoing, the watch room holding its breath]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, third Polivoks voice an octave up, IRON CURTAIN FLAG continues every 4 bars with the church-bell tones stacking into a quiet dread]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains F# (V of Bm), upper voice holds the high tonic, dry snare fades, dark walking bass walks down to root, a single church-bell tone holds final and decays]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 92 BPM B minor Phrygian-dominant with C natural b2 and D-sharp major-3 flavor, dark synth walking bass on quarter notes chromatic with the Phrygian-dominant b2, tight dry mechanical TR-606-cold snare on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a wide four-bar chord progression B minor G major E minor F-sharp major Phrygian-dominant, Polivoks playing a bright-and-foreground three-note tram-bell cell with the rising leg lengthened at the very top, repeated chromatic-falling Polivoks Iron Curtain flag cell every 4 bars throughout the chorus with a stacking deep dry church-bell tone on each b2 strike, Juno-60 sawtooth pad sustaining with long plate reverb, no kick drum, no sidechain pumping, sense of a contact appearing on the long-range search radar at the western frontier as the watch room locks into amber alarm in a 1962 Eastern Bloc border watch post, the album's BPM ceiling and crisis peak, Molchat Doma coldwave dryness with mid-century-thriller orchestral pressure, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, close interior view of a single round PPI search-radar CRT scope glowing soft ice-blue with a slow rotating sweep arm and a single bright contact pip in the western upper quadrant, a small amber alarm lamp mounted above the scope just lit, chrome-edged dial bezels around the scope, a steel-grey chair pushed back from the console, a single red-star emblem on the bunker wall above the scope, fluorescent tube light dimmed in the watch room, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete palette with red-star accent and ice-blue scope-glow and amber alarm-lamp accent, brutalist retrofuture 1962, scene depth foreground console midground scope background wall survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Em to Bm. Sixth step of the cycle-of-fifths ascending ladder, with Phrygian-dominant flavor (b2 with raised-3) as the modal color - the album's brightest harmonic gesture at the crisis peak. Mirrors Vol. 3's track 7 Phrygian-dominant peak structurally (same modal position at the BPM ceiling) but transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "+6 BPM. The album's only large BPM jump, from the noon-lull valley shelf at 86 BPM up to the crisis peak at 92 BPM - the album's BPM ceiling. Mirrors Vol. 3's track 6-7 +6 BPM bridge-into-peak jump exactly in step size, at lower absolute BPM (Vol. 3 was 92 -> 98).",
+                       "composer_notes":  "PEAK. TRAM BELL CELL returns BRIGHT AND FOREGROUND with the rising leg LENGTHENED at the very top of the intro - the alarm now means something. IRON CURTAIN FLAG moves to STRUCTURAL PULSE repeated every 4 bars throughout both choruses, with the church-bell tones stacking heavier each repetition into a quiet dread. This is the East-side counterpart to Vol. 3 track 7's Phrygian-dominant-flag structural-pulse peak - same structural function (flag at structural pulse, BPM ceiling, brightest modal color), different voice (Polivoks plus stacked church bells, not muted brass plus stacked timpani). 300s long to give the crisis its full duration. Phrygian-dominant flavor must read as mid-century-thriller-orchestral pressure layered over Molchat Doma coldwave dryness, not as Phrygian metal. Outro F# (V of Bm) pivots cleanly to F#m of track 8 - the cycle continues into the twenty-second holds."
+                   },
+                   {
+                       "track_number":  8,
+                       "title":  "Holds at Twenty",
+                       "role":  "peak-shoulder",
+                       "key":  "F# minor",
+                       "bpm":  90,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "tense",
+                                         "fluorescent-dimmed",
+                                         "watch-room",
+                                         "coordinated-pause"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in F#m, dry mechanical TR-606-cold snare tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on F#, a single Polivoks lead glissando marks the top of each 8-bar phrase, the duty officer reading back coordinates over twenty-second holds]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + BOILER-ROOM PULSE FIGURE returns OFF-GRID with each note delayed by a sixteenth from the grid and the wood-block knock arriving early on each repetition, Polivoks lead glissandi continue to mark each 8-bar top, a single deep church-bell tone from the propaganda-broadcast morning ghost returns at QUARTER VOLUME every 16 bars]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a four-bar chord progression F#m - D - Bm - C# (Phrygian-dominant flavor maintained), boiler-room pulse figure continues off-grid, dry snare tight, Polivoks lead glissandi mark each 8-bar top, the holds and false starts shifting the figure's relationship to the bar]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered Polivoks section drops, boiler-room pulse figure off-grid foreground, Juno pad sustains, church-bell tone ghost returns at quarter volume]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, second Polivoks voice an octave up, Polivoks lead glissandi continue marking each 8-bar top, boiler-room pulse figure continues off-grid]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains C# (V of F#m), upper voice holds the high tonic, dry snare fades, dark walking bass walks down to root, the off-grid boiler-room pulse figure dissolves into the Juno pad]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 90 BPM F-sharp minor with Phrygian-dominant flavor maintained from the peak, dark synth walking bass on quarter notes chromatic, tight dry mechanical TR-606-cold snare on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section on a four-bar chord progression F-sharp minor D major B minor C-sharp major, dark walking bass playing the four-note descending boiler-room pulse figure off-grid with each note delayed by a sixteenth from the grid and the wood-block knock arriving early on each repetition, Polivoks lead playing single glissandi marking the top of each 8-bar phrase, a single deep dry church-bell tone ghost at quarter volume every 16 bars, Juno-60 sawtooth pad sustaining with long plate reverb, no kick drum, no sidechain pumping, sense of a duty officer reading back radar coordinates over twenty-second holds in a 1962 Eastern Bloc border watch post under dimmed fluorescent light, the holds and false starts shifting the rhythm off-grid, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, exterior view of a low concrete border watch post at evening sun-down with the western sky a thin band of pale ice-blue grey over a flat dark horizon, a tall steel mesh radar dish on the roof of the post rotating slowly, a single amber alarm-lamp burning on the post wall by the entry door, a low concrete fence stretching off to the right in the foreground, packed snow on the approach road, no neon, no palm trees, no Tang-orange suburb, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete palette with red-star accent on the post gable and ice-blue evening sky and amber alarm-lamp accent, brutalist retrofuture 1962, scene depth foreground fence midground post background dish survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Bm to F#m. Seventh step of the cycle-of-fifths ascending ladder. Mirrors Vol. 3's track 8 same modal position (Phrygian-dominant-flavor shoulder of the crisis peak) transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "-2 BPM. The first descent step from the BPM ceiling, mirroring Vol. 3 track 7-8's -2 BPM descent step exactly.",
+                       "composer_notes":  "PEAK SHOULDER. BOILER-ROOM PULSE FIGURE returns OFF-GRID with each note delayed by a sixteenth from the grid - the count is no longer clean, the holds are shifting the figure's relationship to the bar. This is the East-side counterpart to Vol. 3 track 8's vibraphone telemetry figure off-grid - same structural function (figure off-grid at the peak-shoulder), different voice (dark walking bass plus wood block, not vibraphone). The single church-bell tone ghost at quarter volume every 16 bars is the propaganda-broadcast morning's first return at the peak-shoulder - the listener should feel the morning's memory bleeding into the evening's crisis. 270s long. Outro C# (V of F#m) pivots cleanly to C#m of track 9 - the cycle continues into the stand-down."
+                   },
+                   {
+                       "track_number":  9,
+                       "title":  "Stand-Down, Teletype Line",
+                       "role":  "release",
+                       "key":  "C# minor",
+                       "bpm":  86,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "release",
+                                         "exhale",
+                                         "ice-blue-quiet",
+                                         "watch-room-late"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in C#m, dry mechanical TR-606-cold snare softening to 2 and 4 only no and-of-4, closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on C# opens slowly with long plate reverb, distant teletype clatter resumes at low level coming back from the verse2-drop of track 5]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks lead playing a soft four-bar phrase that descends across the four bars, layered Polivoks an octave up shadows softly, dark walking bass walks more melodically, dry snare maintains soft 2 and 4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks section playing a four-bar chord progression C#m - A - F#m - G# major, IRON CURTAIN FLAG returns at the chorus start in REVERSE DIRECTION (b6 -> 7 -> 1 -> b2 and resolving UP to the b2 instead of down from it) with a single church-bell tone on the resolution b2 - the stand-down call, the escalation gesture inverted into a release gesture, the watch room exhaling its breath]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops to lone Polivoks, dark walking bass walks softly, the watch room exhaling]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, Polivoks doubled an octave up, Iron Curtain flag reverse-direction articulated ONCE at the chorus start as a final release-gesture echo]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper Polivoks drops, lone Polivoks holds G# (V of C#m), dry snare fades, dark walking bass walks down to root, Juno pad sustains and fades slowly]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 86 BPM C-sharp minor, dark synth walking bass on quarter notes, soft dry mechanical TR-606-cold snare on 2 and 4 only no and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a four-bar chord progression C-sharp minor A major F-sharp minor G-sharp major, chromatic-rising Polivoks Iron Curtain flag cell at the chorus start in REVERSE DIRECTION resolving UP to the b2 with a single deep dry church-bell tone on the resolution, Juno-60 sawtooth pad sustaining with long plate reverb, distant teletype clatter at low level, no kick drum, no sidechain pumping, sense of the stand-down line coming through on teletype and the watch room exhaling its breath into the fluorescent tubes at evening in a 1962 Eastern Bloc border watch post, Molchat Doma coldwave dryness with release rather than tension, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, interior view of the same border watch post control room as track 7 at later evening with the radar scope's amber alarm-lamp now extinguished and the scope sweep continuing at half-brightness, a single steel-grey chair pushed back from the console, an empty enamel-rim coffee cup on the console, a faint paper teletype tape spilling off the side of the desk onto the floor, fluorescent tubes overhead at full ice-blue brightness, a red-star emblem on the wall above the console, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent and ice-blue fluorescent palette with no amber accent (the alarm is over), brutalist retrofuture 1962 watch room at exhale, scene depth foreground console midground chair background wall survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from F#m to C#m. Eighth step of the cycle-of-fifths ascending ladder, completing the sharp-side ascent before the night-descent begins. Mirrors Vol. 3's track 9 same structural position (release/exhale at the eighth fifth) transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "-4 BPM. The first large descent step, returning to the noon-lull pulse-floor of 86 BPM (matching track 6) for the exhale. Mirrors Vol. 3 track 8-9's -4 BPM exhale-descent step exactly.",
+                       "composer_notes":  "RELEASE. IRON CURTAIN FLAG returns at the chorus start in REVERSE DIRECTION resolving UP to the b2 instead of down from it - the stand-down call, the escalation gesture inverted into a release gesture. This is the East-side counterpart to Vol. 3 track 9's Phrygian-dominant-flag reverse-direction inversion - same structural function (flag inverted as release at the eighth fifth), same modal logic, different voice (Polivoks plus single church bell on the resolution, not muted brass plus timpani). The watch room exhaling - the room and the album exhale together. Outro G# (V of C#m) pivots enharmonically into the flat-side descent: G# is reread as Ab tonic of track 10 (Abm / G#m enharmonic pivot) - the flat-side pivot that begins the night descent."
+                   },
+                   {
+                       "track_number":  10,
+                       "title":  "Tram Home, Sleet",
+                       "role":  "comedown",
+                       "key":  "A-flat minor (G# minor enharmonic)",
+                       "bpm":  82,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "tram-sway",
+                                         "evening-sleet",
+                                         "ice-blue-window",
+                                         "going-home"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Abm, dry mechanical TR-606-cold snare soft on 2 and 4 only with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on Ab with long plate reverb, distant tram-rail rumble texture at low level]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + BOILER-ROOM PULSE FIGURE returns FRAGMENTED to only the first three notes (5-4-b3) on dark walking bass alone with NO wood-block knock and NO drum-machine kick stiffening - the kombinat is behind them, the rhythm of the day's labor has dissolved into the tram's sway, Polivoks lead plays a sparse two-bar response phrase]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + layered Polivoks lead section playing a soft four-bar melody that descends a perfect fifth across the phrase, dry snare maintains soft 2 and 4, the tram sways through cooling industrial outskirts]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops, fragmented boiler-room pulse figure continues alone on dark walking bass, Juno pad sustains, distant sleet-on-window texture rises slightly in the mix]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, Polivoks lead doubled with a second voice an octave up softly]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper Polivoks drops, lone Polivoks holds Eb (V of Abm), dry snare fades, dark walking bass walks down to root, tram-rail rumble fades last]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 82 BPM A-flat minor, dark synth walking bass on quarter notes, soft dry mechanical TR-606-cold snare on 2 and 4 only with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a soft four-bar melody that descends a perfect fifth across the phrase, dark walking bass playing a fragmented three-note version of the boiler-room pulse figure (only the first three notes 5-4-flat-3) alone with no wood-block knock and no drum-machine kick stiffening, Juno-60 sawtooth pad sustaining with long plate reverb, distant tram-rail rumble and sleet-on-window texture at low level, no kick drum, no sidechain pumping, sense of a shift worker riding the tram home through cooling industrial outskirts of a 1962 Eastern Bloc city with sleet flecking the window, Molchat Doma coldwave dryness at evening, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, interior view of an empty wooden-bench tram car at evening from inside the car looking down its length, the windows showing flecks of sleet against a smear of dark grey industrial outskirts streaking past, a single brass-and-amber tram-stop pull-cord overhead, a battered enamel handhold pole down the centre of the aisle, a dim ice-blue ceiling lamp casting cool light on the wooden floor, dirty snow tracked into the entry well in the foreground, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and red-star accent on a small wall plaque above the driver's compartment and ice-blue interior lamp palette, brutalist retrofuture 1962 going home, scene depth foreground entry midground aisle background driver compartment survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from C#m to Abm (enharmonic with G#m). The album's flat-side cycle-of-fifths-descending ladder begins here - the night-descent's harmonic logic reverses the morning-ascent's direction of cycle-of-fifths motion. Mirrors Vol. 3's track 9-10 enharmonic flat-side pivot (G#m to Ebm) structurally - same pivot mechanism transposed up a perfect fourth and one fifth-step earlier in the flat-side ladder.",
+                       "tempo_relationship_to_prior":  "-4 BPM. The first large night-descent step. Mirrors Vol. 3 track 9-10's -4 BPM night-descent step exactly.",
+                       "composer_notes":  "COMEDOWN. BOILER-ROOM PULSE FIGURE returns FRAGMENTED to only the first three notes (5-4-b3) with NO wood-block knock and NO drum-machine kick - the kombinat is behind them, the rhythm of the day's labor has dissolved into the tram's sway. This is the East-side counterpart to Vol. 3 track 10's vibraphone-telemetry figure fragmentation - same structural function (motif fragmented as comedown), different voice (dark walking bass alone, not vibraphone alone). The enharmonic Abm / G#m pivot is the night-descent's flat-side entrance - the listener will not consciously hear that the key changed direction of cycle motion, but will feel the album is leaving the bright-side and entering the night-side. Outro Eb (V of Abm) pivots cleanly to Ebm of track 11 - the night descent continues."
+                   },
+                   {
+                       "track_number":  11,
+                       "title":  "Sign-Off, Bell at Eleven",
+                       "role":  "comedown",
+                       "key":  "E-flat minor",
+                       "bpm":  80,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "domestic-late",
+                                         "AM-static",
+                                         "distant-bell",
+                                         "kitchen-quiet"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth walking bass on quarter notes in Ebm, dry mechanical TR-606-cold snare soft on 2 and 4 only with closed hi-hat on the and-of-2 and and-of-4, Juno-60 pad on Eb with long plate reverb, AM-radio static rising in the mix as the sign-off hum dissolves]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks lead playing a soft four-bar phrase mirroring the anthem-line of track 2 in inversion (now resigned-descending rather than resigned-cyclical), second Polivoks an octave up shadowing softly, dark walking bass walks melodically]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + layered Polivoks lead section playing a soft four-bar chord progression Ebm - Cb (B major as flat-VI) - Abm - Bb major, IRON CURTAIN FLAG articulated ONCE at the chorus midpoint at ONE-THIRD VOLUME with a soft single church-bell tone (sign-off latch, mirroring track 4's single articulation but at one-third volume and reversed in meaning - the day's escalation gesture replayed as a quiet farewell at the kitchen window)]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops, lone Polivoks plays the soft anthem-inversion phrase, AM-radio static at full mix volume, a single distant church-bell tone tolls midnight from a tower three kilometres across the city at very low volume]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, layered Polivoks section, no Iron Curtain flag this time, distant church-bell tone continues to toll]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered section drops, lone Polivoks holds Bb (V of Ebm), dry snare fades, dark walking bass walks down to root, AM-radio static fades last]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 80 BPM E-flat minor, dark synth walking bass on quarter notes, soft dry mechanical TR-606-cold snare on 2 and 4 only with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a four-bar chord progression E-flat minor C-flat major A-flat minor B-flat major, Polivoks playing a soft anthem-inversion phrase mirroring the resignation of the dawn sign-on, chromatic-falling Polivoks Iron Curtain flag cell articulated once at the chorus midpoint at one-third volume with a single soft deep dry church-bell tone, distant church-bell tone tolling midnight from a tower three kilometres across the city at very low volume, Juno-60 sawtooth pad sustaining with long plate reverb, AM-radio sign-off static rising in the mix, no kick drum, no sidechain pumping, sense of a babushka turning off the brown Bakelite radio as the sign-off hum dissolves into AM static and a single church bell tolls midnight in a 1962 Eastern Bloc communal kitchen, Molchat Doma coldwave dryness at late night, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, interior view of the same communal kitchen as track 2 at late night with the brown Bakelite radio on the windowsill now dark and silent, the frosted window above the sink showing a deep dark grey nighttime courtyard outside with the first faint flecks of snowfall visible against a single distant amber-yellow window across the courtyard, the single aluminium kettle now cold on the gas ring, the fluorescent tube along the ceiling at half-brightness casting cool ice-blue light, no neon, no palm trees, no Tang-orange, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and ice-blue fluorescent palette with a single far amber window-accent, brutalist retrofuture 1962 domestic late night, scene depth foreground sink midground kettle background window survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Abm to Ebm. Second step of the flat-side cycle-of-fifths-descending ladder. Mirrors Vol. 3's track 10-11 flat-side descending step structurally - same pivot mechanism transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Maintaining the small-increment night descent, back to the opener's tempo shelf.",
+                       "composer_notes":  "COMEDOWN. IRON CURTAIN FLAG returns as a SINGLE ARTICULATION at chorus midpoint at ONE-THIRD VOLUME with a soft single church-bell tone - the sign-off latch, mirroring track 4's single articulation but at one-third volume and reversed in meaning (the day's escalation gesture replayed as a quiet farewell at the kitchen window). The Polivoks anthem-inversion phrase is the deliberate mirror of track 2's anthem-sign-on phrase - now resigned-descending rather than resigned-cyclical, the day closing on the same domestic frame it opened. The distant church-bell tone tolling midnight from three kilometres across the city is the diegetic time-stamp - the listener can place the moment exactly. Outro Bb (V of Ebm) primes the perfect-fifth descent into Fm of track 12 via the flat-side cycle-of-fifths-descending ladder closing the ring."
+                   },
+                   {
+                       "track_number":  12,
+                       "title":  "Courtyard, Snowfall at Midnight",
+                       "role":  "closer",
+                       "key":  "F minor",
+                       "bpm":  78,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "resolved-but-changed",
+                                         "courtyard-lamp",
+                                         "snowfall-quiet",
+                                         "lullaby"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - deep dark synth walking bass on very slow quarter notes in Fm, dry mechanical TR-606-cold snare soft on 2 and 4 only no hi-hat, Juno-60 pad on F with slow filter open over 16 bars and long plate reverb tail, single wood-block knock on each bar 1 ringing out fully, a single soft snowfall-on-cobblestones texture at very low level in the background]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + TRAM BELL CELL whole on Polivoks-style sawtooth lead ONE OCTAVE DOWN at half-tempo with the rising leg unhurried and the falling leg unresolved (the morning's tram bell re-read as a snowfall lullaby), dark walking bass walks more melodically, dry snare maintains soft 2 and 4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + layered Polivoks lead section playing a soft four-bar closer-melody that descends a perfect fifth across the phrase (F - C - Bb - Fm resolving on the tonic), Juno-60 pad sustains underneath, no hi-hat, no wood-block knock]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - layered Polivoks section drops, lone Polivoks plays the tram bell cell one octave down at half-tempo alone with dark walking bass and the snowfall-on-cobblestones texture, the courtyard lamp at midnight]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - layered Polivoks section returns soft, closer-melody octave-doubled an octave up on a second Polivoks voice, Juno pad sustains]"
+                                        },
+                                        {
+                                            "name":  "coda",
+                                            "bars":  16,
+                                            "instrumentation":  "[Coda - layered section drops, TRAM BELL CELL on Polivoks lead one octave down at half-tempo whole one final time with the falling leg UNRESOLVED holding on the b3 rather than resolving to the tonic, Juno pad fades slowly to silence over the 16 bars, dry snare fades, dark walking bass walks down to root and holds, snowfall-on-cobblestones texture fades last - the courtyard, the lamp, the snow]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "soviet atompunk 78 BPM F minor, deep dark synth walking bass on very slow quarter notes, soft dry mechanical TR-606-cold snare on 2 and 4 only no hi-hat, sustained Juno-60 sawtooth pad with slow filter open and long plate reverb, Polivoks-style sawtooth lead playing a slow rising-then-falling three-note tram-bell cell one octave below the original at half-tempo with the falling leg unresolved holding on the flat-third, layered Polivoks playing a soft closer-melody descending a perfect fifth across the four-bar phrase, single dry wood-block knock on each bar 1 ringing out fully, a single soft snowfall-on-cobblestones texture at very low level, no kick drum, no sidechain pumping, sense of midnight in the inner courtyard of a 1962 Eastern Bloc Khrushchyovka apartment block under a single bare-bulb yellow lamp with a thin snowfall beginning to settle over the cobblestones and the morning's tram bell returning as a snowfall lullaby, Molchat Doma coldwave dryness at the closing of the day, resolved but changed, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces. Soviet atompunk 1962 album cover, exterior view of the same Khrushchyovka inner courtyard as track 1 at midnight with the tram-stop pole now dark and silent on the lower foreground left, a single bare-bulb yellow courtyard lamp burning under the entry arch casting a warm pool of yellow light on the cobblestones below it, a thin even snowfall settling on the cobblestones across the foreground and midground, the five-story grey concrete apartment block in the background with two distant amber-yellow windows still lit at upper floors, the red-star emblem on the far gable now barely visible in the dark, a deep cold-grey night sky above, no neon, no palm trees, no Tang-orange suburb, no cyan-blue cyberpunk, no warm sunset, cold greyscale and concrete and courtyard-lamp-yellow accent and snowfall-white accent palette, brutalist retrofuture 1962 nocturnal closing, scene depth foreground snow midground arch background apartment block survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Ebm to Fm via cycle-of-fifths-descending logic - F is a perfect fifth below Bb (the V that closed track 11), and the album closes the ring on the same Fm tonic that opened it. Twelve tracks have traversed a full sharp-side cycle-of-fifths-ascending ladder through the morning and kombinat hours (Fm to C#m, eight perfect-fifth steps) and a partial flat-side cycle-of-fifths-descending ladder through the night hours (Abm to Ebm to Fm, three perfect-fifth steps). The listener arrives at midnight from the opposite side of the loop than they departed at dawn. Mirrors Vol. 3's track 11-12 close-of-ring mechanism exactly, transposed up a perfect fourth.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Lowest BPM on the record, slightly below track 1's 80 BPM - the listener arrives more tired than they started, which is honest for a 24-hour cycle inside a queue-time loop. Mirrors Vol. 3's closer-relationship to its opener (-2 BPM below opening) exactly.",
+                       "composer_notes":  "CLOSER. TRAM BELL CELL RETURNS WHOLE ONE OCTAVE DOWN AT HALF-TEMPO ON POLIVOKS LEAD with the falling leg UNRESOLVED holding on the b3 rather than resolving to the tonic - the morning's tram bell re-read as a snowfall lullaby, the day's tension absorbed into the courtyard-lamp frequency but not fully dissolved. This is the East-side counterpart to Vol. 3 track 12's siren-cell unresolved-lullaby closing - same structural function (motif at half-tempo one octave down with unresolved falling leg), different voice (Polivoks lead with long plate reverb over Juno pad, not Theremin over muted brass). 300s long to give the coda its full lullaby-time. The final 16-bar coda is the tram bell cell alone over fading Juno pad and dark walking bass with snowfall-on-cobblestones texture fading last - do not let MusicGen add a fade-up tail, a stinger, or any rhythmic figure in the final 16 bars; the unresolved Polivoks b3 over the fading pad to silence IS the composition. The album ends on Fm - the same tonic that opened the record - but the listener has lived through the 24-hour cycle and the falling leg of the bell is unresolved, signaling the next dawn's tram is already on the schedule. The ring is closed; the listener is not. Do not let MusicGen substitute a kick drum or a PWM synthwave lead anywhere - the closer must remain in the album's Soviet atompunk voice palette of Polivoks sawtooth lead, Juno-60 pad with long plate reverb, dark synth walking bass, dry mechanical TR-606-cold snare, wood-block knock, and church-bell tone."
+                   }
+               ],
+    "album_notes":  {
+                        "overall_form":  "Single 24-hour cycle over 12 tracks - dawn to midnight - inside the late-Khrushchev / early-Brezhnev Eastern Bloc circa 1962, the deliberate East-side mirror of Vol. 3's American suburb-bunker-suburb loop. Three arcs: Morning (tracks 1-3): tram bell at dawn in the Khrushchyovka inner courtyard, brown-Bakelite-radio sign-on in the communal kitchen, walking-shift commute through dirty snow to the kombinat. Tempo climbs in small +2 BPM increments from 80 to 84 BPM. Factory and office (tracks 4-6): workers take stations at long steel lathes under fluorescent tubes, Polivoks reads production-quota numbers in clinical Phrygian over teletype clatter, noon-lull at the cafeteria wall clock. Tempo climbs to the first valley shelf at 88 BPM (track 5) then dips to 86 BPM (track 6) at the valley. Crisis and night (tracks 7-12): contact on the western search radar at the watch post (track 7, BPM ceiling 92), twenty-second holds at the peak shoulder (track 8, 90 BPM), stand-down via teletype with Iron Curtain flag inverted (track 9, 86 BPM exhale), tram home through sleet (track 10, 82 BPM flat-side pivot), sign-off and distant church bell at the kitchen window (track 11, 80 BPM), midnight snowfall on the same courtyard as track 1 (track 12, 78 BPM). The album ends on Fm - the same tonic that opened it - but the Polivoks tram bell cell's falling leg is left unresolved, signaling the next dawn's tram is already on the schedule. The ring is closed on tonic, the listener is not closed on resolution. The 24-hour-cycle structure deliberately mirrors Vol. 3's morning-bunker-evening-night arc beat-by-beat - Vol. 4 track 1's tram bell is the East-side analogue of Vol. 3 track 1's civil-defense siren, Vol. 4 track 4's lathe row is the East-side analogue of Vol. 3 track 4's bunker stations, Vol. 4 track 7's radar contact is the East-side analogue of Vol. 3 track 7's doppler-scope contact, and Vol. 4 track 12's courtyard snowfall is the East-side analogue of Vol. 3 track 12's porch-light moth.",
+                        "key_strategy":  "Sharp-side cycle-of-fifths ascending through eight perfect-fifth steps for the morning and kombinat and crisis hours: Fm -> Cm -> Gm (Dorian raised-6) -> Dm -> Am (Phrygian b2) -> Em (Locrian-shaded b5) -> Bm (Phrygian-dominant flavor: b2 with natural-3) -> F#m -> C#m. Modal shadings progress from plain minor (Fm, Cm, Dm, F#m, C#m) through Dorian (Gm) into the kombinat's clinical Phrygian (Am) and pure-lull Locrian-shaded (Em) and into the watch-room's Phrygian-dominant (Bm). The Phrygian-dominant flavor in Bm at the peak (track 7) is the album's brightest harmonic gesture and reads as Molchat Doma coldwave dryness layered with mid-century-thriller-orchestral pressure rather than as Phrygian metal. The descent flips to flat-side cycle-of-fifths descending through three perfect-fifth steps for the night hours: C#m -> Abm (enharmonic G#m pivot) -> Ebm -> Fm, returning to the album's home tonic from the opposite side of the loop than the morning departed from. NO MAJOR TONICS appear on the album - Soviet atompunk lives in minor and modal-minor, never in plain major, exactly like Vol. 3 (atompunk lives in minor regardless of which side of the Curtain). The album never resolves to a comfortable harmonic frame; the closer's unresolved Polivoks b3 over Fm is the final harmonic gesture. The home tonic F minor sits a perfect fourth above Vol. 3's C minor - claiming its own harmonic home base distinct from all four prior volumes (Vol. 1 A minor, Vol. 2 A minor, Vol. 3 C minor, Vol. 4 F minor), and the F-to-C perfect-fourth relationship to Vol. 3 is the album-level mirror of the track-level perfect-fifth ascensions used across both albums.",
+                        "tempo_strategy":  "Genuinely slower BPM range than any prior album in the catalog including Vol. 3: 78-92 BPM (Vol. 3 was 84-98 BPM, Sunset Vol. 1 was 82-112, Tron Vol. 1 was 96-112, Neo-Tokyo Vol. 1 was 104-120). Morning accelerando: 80 -> 82 -> 84 -> 86 -> 88 in small +2 increments, the audience is queueing for hot water and walking through snow, not commuting in a Buick. First valley: 86 BPM (track 6, the noon lull). Peak: 92 BPM (track 7, the contact-on-the-search-radar) - the album's BPM ceiling, and a single +6 BPM jump from the valley that mirrors Vol. 3's bridge-into-peak jump step size at lower absolute BPM (Vol. 3 was 92 -> 98, Vol. 4 is 86 -> 92). Peak shoulder: 90 BPM (track 8, the twenty-second holds). Release: 86 BPM (track 9, returns to the noon-lull pulse-floor for the exhale). Night descent: 82 -> 80 -> 78 in small -2/-4 increments, mirroring the morning accelerando step size in reverse direction. Ends one tick below the opener's 80 BPM - the listener arrives more tired than they started, which is honest for a 24-hour queue-time loop. Never crosses below 80 (validation safe at the bottom edge; track 12 at 78 is INSIDE the 78-92 caller-specified album range though one tick below the historic 80 floor used in prior volumes - this is the deliberate East-side slowness; validation in nightdrive-llm enforces 80-118 so the orchestrator should treat this album as needing the relaxed lower bound or each track's BPM must be patched to 80 if the validator is strict; flag for orchestrator review). The mechanical sidechain-pumping BPM range of synthwave (104+ BPM with hard-kick four-on-the-floor) is absent - this album lives in coldwave / post-punk-coldwave tempo territory below even Vol. 3's mid-century-orchestral range.",
+                        "motif_strategy":  "Three motifs, each with four structural appearances across the album, each a deliberate mirror or counterpart of a Vol. 3 motif. (1) Tram bell cell - three-note rising-then-falling Polivoks lead figure (1 -> b3 -> 1) introduced WHOLE in track 1 (thesis, dawn tram bell at the Khrushchyovka courtyard), returned FILTERED AND DISTANT in track 4 (lathe row ambient bell ghosted under the line rhythm), played BRIGHT AND FOREGROUND with the rising leg LENGTHENED in track 7 (contact-on-the-search-radar peak, the bell now means something), and played WHOLE ONE OCTAVE DOWN AT HALF-TEMPO WITH THE FALLING LEG UNRESOLVED in track 12 (closer, the bell re-read as a snowfall lullaby). The four appearances mark the album's four phase transitions: dawn (track 1), kombinat entry (track 4), crisis peak (track 7), midnight closer (track 12). This motif is the deliberate mirror-inversion of Vol. 3's Theremin siren cell - SAME interval shape (1 -> b3 -> 1), SAME four-appearance structural function, SAME transformation pattern across the four appearances - but inverted in voice (Polivoks lead with long plate reverb, not Theremin over muted brass) and inverted in meaning (a public-transport bell calling people to work rather than a civil-defense siren calling them to shelter). The interval shape and structural function are preserved; the voice and meaning are inverted. This is the album's primary cross-volume motif relationship. (2) Boiler-room pulse figure - four-note descending dark walking-bass phrase (5-4-b3-1) with wood-block knock, introduced CLEAN AND ANTICIPATORY in track 3 (walking-shift approach to the kombinat), moved to STRUCTURAL BACKBONE LOCKSTEPPED WITH TELETYPE in track 5 (production-quota chorus), played OFF-GRID (each note delayed by a sixteenth) in track 8 (twenty-second holds, the count is shifting), and returned FRAGMENTED to only the first three notes (5-4-b3) in track 10 (tram home, the kombinat is behind them). This motif is the East-side counterpart to Vol. 3's vibraphone telemetry figure - same structural function (work-rhythm motif appearing at tracks 3/5/8/10), same transformation pattern across the four appearances - voiced on dark walking bass plus wood block rather than vibraphone with tremolo (because the Soviet shift-floor's signature sound is footstep-and-bass, not Mancini vibraphone). (3) Iron Curtain flag - chromatic-falling Polivoks lead cell (b2 -> 1 -> 7 -> b6) with deep dry church-bell tone, introduced as a SINGLE ARTICULATION at chorus midpoint of track 4 (stations-taking event), moved to STRUCTURAL PULSE repeated every 4 bars throughout the chorus of track 7 (crisis-peak, church bells stacking), returned INVERTED at chorus start of track 9 (b6 -> 7 -> 1 -> b2, resolving up to the b2, stand-down release), and returned as a SINGLE ARTICULATION at chorus midpoint of track 11 at one-third volume (sign-off latch, mirroring track 4's single articulation but reversed in meaning). This motif is the East-side counterpart to Vol. 3's Phrygian dominant flag with timpani strike - same chromatic-falling interval shape, same four-appearance structural function, same inversion-as-release logic at track 9 - voiced on Polivoks lead plus single church-bell tone rather than muted brass plus timpani. The single-articulation appearances at tracks 4 and 11 bracket the crisis-and-release arc (tracks 5-9) as a structural unit, exactly as in Vol. 3.",
+                        "tracklist_continuity":  "Each track ends on a pitch that primes the next track's tonic via dominant relationship (V of next tonic), with two flat-side pivot moves at the night-descent boundary (track 9 to 10) and the night-descent close (track 11 to 12). Specifically: 1 ends on Fm tonic (no V - the album begins on stillness; primes the perfect-fifth ascent to Cm). 2 ends on G (V of Cm, also tonic of track 3 reread as Gm). 3 ends on D (V of Gm, also tonic of track 4 reread as Dm). 4 ends on A (V of Dm, also tonic of track 5 reread as Am). 5 ends on E (V of Am, also tonic of track 6 reread as Em). 6 ends on B (V of Em, also tonic of track 7 reread as Bm). 7 ends on F# (V of Bm, also tonic of track 8 reread as F#m). 8 ends on C# (V of F#m, also tonic of track 9 reread as C#m). 9 ends on G# (V of C#m, reread enharmonically as Ab tonic of track 10 - the flat-side pivot that begins the night descent). 10 ends on Eb (V of Abm, also tonic of track 11 reread as Ebm). 11 ends on Bb (V of Ebm, prepares the perfect-fifth descent into Fm of track 12 via the flat-side cycle-of-fifths-descending ladder closing the ring). The listener will not consciously hear most of these pivots - they will only feel that each transition is inevitable, and that the night descent's harmonic logic reverses the morning's ascent's logic by direction of cycle-of-fifths motion rather than by tempo-mirror. This continuity scheme is the exact East-side analogue of Vol. 3's continuity scheme transposed up a perfect fourth.",
+                        "visual_continuity_notes":  "Twelve covers follow the album's narrative arc as a single 24-hour cycle through a 1962 Eastern Bloc Khrushchyovka-kombinat-Khrushchyovka loop, the deliberate East-side mirror of Vol. 3's American suburb-bunker-suburb loop. The aesthetic vocabulary is locked: cold greyscale concrete and chrome surfaces, ice-blue fluorescent tube light, red-star accents on apartment gables and watch-post and factory administration buildings, amber alarm-lamp accents only at the crisis peak (track 7) and as a single far window in track 11 and as the courtyard lamp in track 1 and track 12, no neon (Vol. 1 and Vol. 2 territory), no palm trees, no Tang-orange (Vol. 3's American-suburb territory - explicitly negated in every cover prompt to keep SDXL from inserting it), no cyan-blue cyberpunk (Vol. 2 territory), no warm sunset magenta (Vol. 1 territory), no red-violet anime cityscape (Vol. 2 territory variant), no people visible, no faces, no text legible, no Cyrillic letters (because SDXL would render them garbled and the album avoids legible language entirely). Track 1: Khrushchyovka inner courtyard at dawn with tram-stop pole and single courtyard lamp (exterior). Track 2: communal kitchen with brown Bakelite radio and chipped enamel sink (interior). Track 3: industrial road approach to the kombinat factory complex (exterior wide). Track 4: kombinat shop floor with long row of steel lathes and clerestory window (interior, hero cover 1). Track 5: close-up of factory-office desk with teletype machine and carbon-paper quota sheets (interior close). Track 6: close-up of cafeteria wall-clock face reading 12:17 (interior close). Track 7: close-up of search-radar PPI scope with single contact pip and amber alarm lamp (interior close, hero cover 2). Track 8: border watch-post exterior at evening sun-down with radar dish on roof (exterior). Track 9: same watch-post control room as track 7 at later evening with alarm extinguished (interior). Track 10: empty wooden-bench tram car interior at evening with sleet-streaked windows (interior). Track 11: same communal kitchen as track 2 at late night with dark radio and faint snowfall outside the window (interior). Track 12: same Khrushchyovka inner courtyard as track 1 at midnight with bare-bulb lamp and thin snowfall on cobblestones (exterior). The architectural rhyme of tracks 1 and 12 (same courtyard, different time of day - snow has covered the cobblestones), tracks 2 and 11 (same communal kitchen, different time of day), tracks 4 and 9 (kombinat-stations vs watch-room-control variants of the institutional interior, both with red-star emblem), and tracks 7 and 9 (same watch room at alarm and at exhale) is the album's visual closing-of-the-ring. All cover prompts front-load aggressive SDXL text-suppression in the first 50 words: 'no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no Cyrillic letters, no people visible, no faces' - placed BEFORE the scene description because CLIP truncates at 77 tokens and tail-positioned negatives are dropped. All cover prompts are written for SDXL native generation at 1024x1024, 1344x768, and 768x1344 - scene depth (foreground + midground + background) survives reframing across all three aspect ratios, no pose-locked compositions.",
+                        "execution_notes_for_pipeline":  "ACE-Step 1.5 turbo or XL is the renderer of record (8 turbo inference steps, cnc P100 split-GPU per project_acestep_kokonoe_vram_wall memory - kokonoe 3070 Ti 8GB does not fit). Every section's instrumentation field uses [Section - notes] ACE-Step bracket markers as structural anchors; the prompt-formatter fix (feedback_acestep_lyrics_leak_via_section_hints) strips instrumentation hints from the lyrics field automatically and emits only [Section] names plus [Instrumental] cue, so the section instrumentation text feeds the caption/musicgen_prompt path only. Every musicgen_prompt is explicit about instrumental + no vocals + no kick drum + no sidechain pumping - do not relax these in any per-track override. ACE-Step prompts are tight and front-loaded (BPM and key in the first 12 words, instrumentation in the next 40 words, scene/mood at the tail where truncation is acceptable). Per-track durations sum to 3120 seconds (52 minutes) for the canonical 12 - five 240s tracks (1, 2, 3, 10, 11), four 270s tracks (4, 5, 8, 9), three 300s tracks (6, 7, 12) reflecting the album's denser narrative payload at the valley, peak, and closer. ALL BPMS within the caller-specified 78-92 range, with track 12 at 78 BPM sitting one tick below the nightdrive-llm::validate_spec 80-floor (caller's specified album range is 78-92; flag for orchestrator: either relax the validator to 78 for this album OR patch track 12 BPM to 80 - composer's preference is the 78 to honor the caller's instruction that 'Soviet atompunk should drag - bureaucratic time, queue time, sleet-on-concrete time'). Cover prompts are SDXL-ready for all three native aspects (1024x1024, 1344x768, 768x1344) per feedback_future_albums_native_aspect_gen and specify 'no text, no people, no faces, no Cyrillic letters' aggressively front-loaded per feedback_sdxl_bakes_text_despite_negative_prompt. Sync-drop publish: per feedback_sync_drop_for_future_albums, all 12 tracks should publish at a single anchor timestamp using run-album --publish-at, not trickle. Suggested anchor: a Friday afternoon UTC slot consistent with Tron Vol. 1's sync-drop pattern.",
+                        "differentiation_from_prior_albums":  "Sunset Vol. 1 was warm Miami coastal-drive in synthwave palette (DX7 pads, FM bells, sidechain four-on-the-floor kick, 82-112 BPM, A minor home tonic). Tron Vol. 1 was cold Tron 1982 grid in cyan-magenta cyberpunk palette (PWM saws, triple-stacked aggressive leads, hard sidechain, 96-112 BPM, A minor home tonic). Neo-Tokyo Vol. 1 was Akira-coded vertical-descent in red-orange-violet anime palette (FM bell over analog brass, hard kick, 104-120 BPM, D minor home tonic). Atompunk Vol. 1 (Vol. 3) was mid-century WESTERN Cold War 24-hour cycle in steel-grey/Tang-orange/atomic-teal retrofuture palette (Theremin lead, muted brass section, vibraphone, upright bass, brushed snare, timpani, 84-98 BPM, C minor home tonic, American suburb-bunker-suburb loop). Sovietskiy Drayv (Vol. 4) is the deliberate EAST-SIDE FLIP of Vol. 3: same 1958-1968 Cold War era, same 24-hour-cycle structural arc, same three-motif architecture with same interval shapes and same structural functions - but transposed up a perfect fourth (C minor home -> F minor home), voiced in a completely different palette (Polivoks-style sawtooth lead, Juno-60 sawtooth pad with long plate reverb, dry mechanical TR-606-cold drum machine with sparse snare and closed hi-hat and NO KICK, dark synth walking bass, wood-block knock, deep dry church-bell tone), and set in an Eastern Bloc Khrushchyovka-kombinat-Khrushchyovka loop instead of an American suburb-bunker-suburb loop. Voice palette is POLIVOKS-STYLE SAWTOOTH LEAD (or modeled equivalent - dry hard-edged, never warm), JUNO-60-STYLE SAWTOOTH PAD (long plate reverb tail, Molchat Doma coldwave dryness), DARK SYNTH WALKING BASS (synth or sampled dark upright, never warm fingered electric bass), DRY MECHANICAL TR-606-COLD DRUM MACHINE (sparse snare on 2 and 4, closed hi-hat on the and-of-2 and and-of-4, NEVER a kick drum, NEVER four-on-the-floor, NEVER 808 warmth), WOOD-BLOCK KNOCK (dry single accent on the boiler-room-pulse motif), DEEP DRY CHURCH-BELL TONE (single-strike accents on the Iron Curtain flag motif, one octave below middle, dry and dark not bright cathedral). NO kick drum anywhere on the album - identical constraint to Vol. 3, different rhythmic engine voice (TR-606-cold drum machine instead of brushed military snare). NO sidechain compression - the album's quiet-dynamics pumping is church-bell-stack pressure on the Iron Curtain flag motif, not pad-duck pumping. NO PWM saws (Tron Vol. 1 territory), no FM-bell synthwave accents (Sunset Vol. 1 territory), no Theremin (Vol. 3 territory), no muted brass section (Vol. 3 territory), no vibraphone (Vol. 3 territory), no timpani (Vol. 3 territory). BPM range 78-92 is genuinely slower than ALL prior albums including Vol. 3 (84-98) - this album drags by design, the Soviet 24-hour cycle is slower than the American 24-hour cycle, queue time and sleet-on-concrete time are slower than salt-flat-Buick time. F minor home tonic is a perfect fourth above Vol. 3's C minor tonic, claiming its own harmonic home base while preserving the cross-volume relationship via perfect-fourth interval. The three motifs (tram bell cell, boiler-room pulse figure, Iron Curtain flag) are voiced on Polivoks lead, dark walking bass plus wood block, and Polivoks plus church-bell tone respectively - never on Vol. 3's voices, but each motif preserves the exact interval shape and structural function of its Vol. 3 counterpart, making Vol. 4 read as the structural mirror of Vol. 3 in voice rather than in shape. The album sits on the same shelf as the prior four volumes - same composer, same channel, same audience (late-night programmers) - but reads as the East-side counterpart of Vol. 3: a Soviet Cold War paranoia loop scored for a small Molchat-Doma-coldwave electronic ensemble, in cold greyscale and red-star and ice-blue palette, structurally identical to its Western mirror and voicewise completely distinct. Title danger zone respected: NO 'Stalker' / 'Sacrifice' / 'Solaris' / 'Battleship Potemkin' / 'Komarov' / 'Yuri' / 'Sputnik' / 'Vostok' / 'Chernobyl' / 'Pripyat' / 'Stalin' / 'Lenin' / 'Kremlin' / 'Molchat Doma' titles anywhere. Generic Soviet lexicon used throughout (Tram Bell, Communal Kitchen, Kombinat, Lathe Row, Quota Teletype Row, Cafeteria Wall Clock, Search Radar West, Holds at Twenty, Teletype Line, Tram Home Sleet, Sign-Off Bell at Eleven, Courtyard Snowfall at Midnight)."
+                    }
+}

@@ -9,7 +9,17 @@ User=nightdrive
 Group=nightdrive
 EnvironmentFile=/etc/nightdrive/nightdrive.env
 WorkingDirectory=/opt/nightdrive
+# GPU yield coordination — stop openclaw inference, start ACE-Step sidecar,
+# run the batch, then reverse on completion. `+` prefix runs as root regardless
+# of User=nightdrive. ExecStopPost runs for both success and failure paths in
+# Type=oneshot, so openclaw always comes back.
+ExecStartPre=+/usr/bin/systemctl stop openclaw-inference-embed openclaw-inference-scout openclaw-inference-workhorse
+ExecStartPre=+/usr/bin/sleep 3
+ExecStartPre=+/usr/bin/systemctl start nightdrive-acestep
+ExecStartPre=+/usr/bin/sleep 10
 ExecStart=/opt/nightdrive/bin/nightdrive-orchestrator run-batch --count 1
+ExecStopPost=+/usr/bin/systemctl stop nightdrive-acestep
+ExecStopPost=+/usr/bin/systemctl start openclaw-inference-embed openclaw-inference-scout openclaw-inference-workhorse
 StandardOutput=journal
 StandardError=journal
 TimeoutStartSec=2h

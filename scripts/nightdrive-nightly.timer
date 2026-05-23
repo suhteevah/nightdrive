@@ -2,11 +2,13 @@
 Description=nightdrive nightly batch timer
 
 [Timer]
-# Fire at 22:00 local every day. Persistent so a missed run (laptop suspended,
-# power blip) still fires on next boot.
-OnCalendar=*-*-* 22:00:00
+# Fire at 23:00 local every day — staggered 1h after trw-daily (22:00 local /
+# 05:00 UTC) so the openclaw-inference eviction windows don't overlap on cnc.
+# Persistent so a missed run (laptop suspended, power blip) still fires on
+# next boot. Reduced jitter to 5m so the slot stays predictable.
+OnCalendar=*-*-* 23:00:00
 Persistent=true
-RandomizedDelaySec=10m
+RandomizedDelaySec=5m
 Unit=nightdrive-nightly.service
 
 [Install]

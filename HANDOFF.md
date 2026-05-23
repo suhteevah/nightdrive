@@ -2,8 +2,68 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** SCAFFOLD — vision locked, no code written yet
-**Last updated:** 2026-05-10
+**Status:** 🟡 Pipeline shipped + cnc-deployed; **eviction cycle verified**, full pipeline blocked on cross-host LLM dep (kokonoe Ollama → needs migration to cnc)
+**Last updated:** 2026-05-22 (late evening PDT)
+
+---
+
+## 2026-05-22 — Smoketest verified eviction; LLM dep + port collision flagged
+
+Picked up from a request to "smoketest before flipping scheduled runs on." Fired `nightdrive-nightly.service` via a drop-in that added `--dry-run` to ExecStart. Result: **systemd-level orchestration is correct**, but the actual pipeline aborts at stage 1 because of a kokonoe dependency.
+
+### What we verified ✓
+
+- **systemd Conflicts/ExecStartPre/ExecStopPost cycle works.** Service started 23:21:02, evicted `openclaw-inference-{embed,scout,workhorse}`, started `nightdrive-acestep`, ran the orchestrator, restored the openclaw fleet on exit (ExecStopPost fired despite orchestrator's non-zero exit). Full cycle wall time: 16 s (only because the run aborted early at stage 1; a real run would take 15-20+ min).
+- **`--dry-run` flag exists on `run-batch`** and propagates correctly (the orchestrator log shows `dry_run=true` in the run_batch span).
+- **GPU state restored cleanly** after the run. GPU 0 / GPU 1 returned to the steady-state openclaw allocation pattern (workhorse on P100 #2, scout + embed on P100 #1).
+- **The cnc deploy** of the three units is in place at `/etc/systemd/system/nightdrive-{acestep,nightly,nightly.timer}` (deployed 2026-05-22 22:40 PDT). Binary at `/opt/nightdrive/bin/nightdrive-orchestrator` is present and runs.
+
+### What's broken (blocks full pipeline) 🟥
+
+1. **Stage 1 LLM call fails — kokonoe dependency.** The orchestrator config has `"openclaw":"http://kokonoe.tailb85819.ts.net:11434"` (despite the misleading field name, that's kokonoe's Ollama, not anything openclaw-fleet-related). The composition-spec call (`POST /api/chat` with model `qwen2.5:7b-instruct`) failed with `error sending request for url`. Probing immediately after, kokonoe Ollama IS up (v0.24.0, qwen2.5:7b-instruct loaded, port 11434 listening on 0.0.0.0). So this was either a transient Tailscale blip OR cnc-side DNS resolution intermittency. Either way: **Matt's call is to move the dependency onto cnc entirely so nightdrive doesn't need kokonoe to run.**
+
+   Migration paths (either works):
+   - Install Ollama on cnc (additional service, additional model copies on disk, simplest porting), OR
+   - Port nightdrive's `nightdrive_llm` crate to call OpenAI-compat against the existing cnc LiteLLM proxy at `127.0.0.1:4000` (already has `llama-3.1-8b-instant` aliased to scout). Slightly more code work but no new install.
+
+2. **Port collision: `art: http://127.0.0.1:8081`** — the orchestrator config says stage-3 art (visual gen?) lives at port 8081, but **`openclaw-inference-workhorse` is already on 8081**. During eviction the workhorse is stopped, so the port is free for the actual art service to bind. But if "art" is meant to also run on cnc steady-state, it'll collide with workhorse. Need to identify what "art" actually is (SDXL? a stub? a pre-existing service?) and either reassign port OR confirm it's only meant to run during the eviction window.
+
+3. **`StartLimitIntervalSec` warning** in `nightdrive-acestep.service` at line 63 — the key belongs in `[Unit]`, not `[Service]`. Currently ignored by systemd (so it's a no-op rather than a misconfig), but a one-line fix is to move the key. The `StartLimitBurst=5` next to it has the same issue.
+
+4. **Earlier in the evening, an orphan ACE-Step process was found holding 12.7 GB on the P100s** (PID 3325506/3325507, launched at 23:07 PDT via `bash -c 'nohup ... & disown'`, PPID 1 after detach). All openclaw-inference services were down at the time. Source of the launch unknown — not from a systemd unit, possibly a manual test from another session. Cleaned up by killing both PIDs; openclaw fleet restored to active.
+
+### Files / state on cnc
+
+- `/etc/systemd/system/nightdrive-{acestep,nightly,nightly.timer}.service` — present, disabled
+- `/opt/nightdrive/bin/nightdrive-orchestrator` — present
+- `/etc/nightdrive/nightdrive.{env,toml}` — present, owned by `nightdrive:nightdrive`
+- `/var/lib/nightdrive/nightdrive.sqlite` — created during smoketest (migrations ran)
+- `/var/log/nightdrive/sidecar.log` — created by the orphan ACE-Step process
+
+### Recipe for next attempt
+
+Once cnc-side LLM is wired:
+```bash
+sudo systemctl start nightdrive-nightly.service  # production (with upload)
+# or for another dry-run smoketest:
+sudo mkdir -p /etc/systemd/system/nightdrive-nightly.service.d
+sudo tee /etc/systemd/system/nightdrive-nightly.service.d/smoketest.conf <<'EOF'
+[Service]
+ExecStart=
+ExecStart=/opt/nightdrive/bin/nightdrive-orchestrator run-batch --count 1 --dry-run
+EOF
+sudo systemctl daemon-reload && sudo systemctl start nightdrive-nightly.service
+journalctl -u nightdrive-nightly.service -u nightdrive-acestep.service -f
+# Remember to tear down the drop-in afterward.
+```
+
+### Coordination notes
+
+- **trw-daily is NOT yet deployed to cnc.** Its source-workspace patches landed last session but cnc systemd units don't exist. If both deploy, the timers are staggered: trw-daily at 22:00 PDT, nightdrive at 23:00 PDT, ~1h between evictions.
+- **aether perf-testing on cnc** can collide with nightdrive's eviction window. Aether is manual/on-demand right now (no systemd timer), so for the moment coordination is by-hand — don't run aether 23:00-23:45 PDT once nightdrive is shipping.
+- **OpenClaw red-team roster expansion** (in progress in another conversation thread tonight) will introduce two more eviction-only services: `openclaw-adversary-codestral` (P100 #1) + `openclaw-adversary-glm` (P100 #2). Those will compete for the same VRAM nightdrive needs, but red-team fires only on /redteam invocations (not on a timer), so collision is rare and ad-hoc.
+
+---
 
 A fully automated pipeline that turns a single `cron` tick on a Linux box into a published YouTube video (or live RTMP stream) of original synthwave / "coding chill / nighttime vibes" music with a custom retrowave visualizer. End to end: composition → audio render → mastering → cover art → animated video → YouTube upload, no human in the loop.
 

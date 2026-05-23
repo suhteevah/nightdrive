@@ -3,6 +3,11 @@ Description=nightdrive ACE-Step 1.5 audio-gen sidecar (FastAPI on :8083)
 Documentation=https://github.com/ace-step/ACE-Step-1.5
 After=network-online.target tailscaled.service
 Wants=network-online.target
+# Restart-rate limits live in [Unit] in modern systemd (>=230). The names
+# StartLimitInterval / StartLimitBurst are the legacy aliases that work
+# across versions; cnc's systemd warned on the newer 'StartLimitIntervalSec'.
+StartLimitInterval=3600
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -59,15 +64,16 @@ TimeoutStopSec=30s
 
 Restart=on-failure
 RestartSec=10s
-# Don't loop a hard import failure forever -- 5 restarts per hour ceiling.
-StartLimitIntervalSec=3600
-StartLimitBurst=5
+# (StartLimitInterval + StartLimitBurst moved to [Unit] above per modern systemd.)
 
-# Hardening -- relaxed vs nightdrive-nightly because we need /dev/nvidia*.
-# Do not set PrivateDevices=true here.
+# Hardening -- relaxed vs nightdrive-nightly for two reasons:
+#   1. We need /dev/nvidia* (no PrivateDevices)
+#   2. /opt/acestep/.venv/bin/python symlinks into /root/.local/share/uv/
+#      (uv-managed Python interpreter). ProtectHome=true would mask /root and
+#      break the symlink dereference even when running as User=root. Removed.
 NoNewPrivileges=true
 ProtectSystem=strict
-ProtectHome=true
+# ProtectHome NOT set (breaks the uv-managed python symlink under /root)
 ReadWritePaths=/opt/acestep /tmp
 PrivateTmp=true
 

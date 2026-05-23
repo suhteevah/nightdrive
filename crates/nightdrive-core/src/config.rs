@@ -31,6 +31,12 @@ pub struct PathsConfig {
 pub struct OpenclawConfig {
     pub base_url: String,
     pub model: String,
+    /// Bearer token for OpenAI-compat endpoints (LiteLLM master key, etc.).
+    /// None when pointed at a pure local Ollama that doesn't enforce auth.
+    /// Set 2026-05-23 when nightdrive-llm flipped from Ollama /api/chat to
+    /// OpenAI /v1/chat/completions for LiteLLM compatibility.
+    #[serde(default)]
+    pub api_key: Option<String>,
     #[serde(default = "default_temperature")]
     pub temperature: f32,
     #[serde(default = "default_max_tokens")]

@@ -71,19 +71,23 @@ pub fn format_ace_step_caption(spec: &CompositionSpec) -> String {
 /// When `sections[]` is empty (defensive case) we fall back to a single
 /// `[Instrumental]` tag so the request still has a valid lyrics block.
 pub fn format_ace_step_lyrics(spec: &CompositionSpec) -> String {
+    // 2026-05-22: ACE-Step was synthesizing the instrumentation-hint text
+    // ("pad swell + filtered arp" etc.) as ghost vocal phonemes when those
+    // hints were included inside the [Section - hint] brackets. The hints
+    // are already carried in `spec.musicgen_prompt` (the caption), so
+    // emitting them in the lyrics field is pure leakage. Fix: section name
+    // only — ACE-Step still gets the structural anchor it needs, no
+    // vocalizable content. Lead with `[Instrumental]` as a global no-vocals
+    // cue. See feedback_acestep_lyrics_leak_via_section_hints memory.
     if spec.sections.is_empty() {
         return "[Instrumental]".to_string();
     }
 
-    let mut buf = String::with_capacity(64 * spec.sections.len());
+    let mut buf = String::from("[Instrumental]\n");
+    buf.reserve(16 * spec.sections.len());
     for section in &spec.sections {
         let name_title = title_case_word(&section.name);
-        let inst = section.instrumentation.trim();
-        if inst.is_empty() {
-            buf.push_str(&format!("[{name_title}]\n"));
-        } else {
-            buf.push_str(&format!("[{name_title} - {inst}]\n"));
-        }
+        buf.push_str(&format!("[{name_title}]\n"));
     }
     // Strip the trailing newline so the request is tidy.
     if buf.ends_with('\n') {
@@ -277,15 +281,20 @@ mod tests {
 
     #[test]
     fn ace_step_lyrics_emits_section_blocks() {
+        // 2026-05-22: format intentionally NO LONGER includes the
+        // instrumentation hint after the dash — ACE-Step was vocalizing
+        // those phrases as ghost lyrics. Section name only; [Instrumental]
+        // at top as global no-vocals cue.
         let spec = sample_spec_5_section();
         let lyrics = format_ace_step_lyrics(&spec);
         let lines: Vec<&str> = lyrics.split('\n').collect();
-        assert_eq!(lines.len(), 5);
-        assert_eq!(lines[0], "[Intro - pad swell + filtered arp]");
-        assert_eq!(lines[1], "[Verse - + sub bass + soft drums]");
-        assert_eq!(lines[2], "[Chorus - + lead + sidechain pump]");
-        assert_eq!(lines[3], "[Bridge - stripped, only pad + bass]");
-        assert_eq!(lines[4], "[Outro - tape stop fade]");
+        assert_eq!(lines.len(), 6);
+        assert_eq!(lines[0], "[Instrumental]");
+        assert_eq!(lines[1], "[Intro]");
+        assert_eq!(lines[2], "[Verse]");
+        assert_eq!(lines[3], "[Chorus]");
+        assert_eq!(lines[4], "[Bridge]");
+        assert_eq!(lines[5], "[Outro]");
     }
 
     #[test]
