@@ -2349,4 +2349,160 @@ needs a `transactional-update`.
 
 ---
 
+## 30. Session 2026-05-23 — ffmpeg installed, Vol. 3+4 fully rendered, partial upload (GCP quota), 3-day staggered cron plan
+
+### Outcome (status: 🟡 Vol. 3 9/12 uploaded + re-anchored; tracks 10-12 + all Vol. 4 cron-staggered across 3 days because of project-level video.insert quota of 6/day)
+
+Major ship pass: cnc went from "missing ffmpeg" to "two albums fully
+encoded with title cards + TWC overlays + part-uploaded" in one session.
+Hit a NEW rate-limit class (Google Cloud project-level
+`defaultVideoInsertPerDayPerProject = 6`) that's separate from
+yesterday's channel cap and surfaces only in 429 errors. Schedule
+pushed accordingly + walkthrough written for the GCP quota-increase
+request.
+
+### What got done
+
+1. **ffmpeg installed on cnc** via `transactional-update pkg install
+   ffmpeg-7` (`ffmpeg`-3.4.2 + `ffmpeg`-7-7.1.2 conflict — picked
+   the modern one). Reboot ~25 s for sshd to stabilize.
+2. **Discovered openSUSE Leap Micro ffmpeg-7 ships WITHOUT the
+   `drawtext` filter** despite linking libfreetype + libfontconfig.
+   `vf_drawtext` is explicitly excluded from the OBS package's filter
+   set. All 24 stage-6 encodes failed `No such filter: 'drawtext'`.
+   Memory: `feedback_opensuse_ffmpeg_lacks_drawtext`.
+3. **Workaround: dropped BtbN static-build full ffmpeg** at
+   `/usr/local/bin/ffmpeg` (takes precedence over `/usr/bin/ffmpeg`
+   per PATH order). drawtext + every other standard filter present.
+   No package conflicts, no reboot.
+4. **Vol. 3 + Vol. 4 master + encode + thumbnail** completed
+   2026-05-23T17:00-19:00Z. ~63 min per album wall (130 min total —
+   the full TWC overlay's 68 chained drawtext + radar GIF + showwaves
+   + libx264 CRF 18 is the bottleneck on a cnc shared with openclaw
+   load average 5-7). Each `final.mp4` is 48-57 MB / 240-300 s
+   1080p30 + AAC 320k.
+5. **Vol. 3 upload kicked from cnc-native orchestrator** — first run
+   with the new Linux `/opt/nightdrive/bin/nightdrive-orchestrator`
+   binary. 9/12 uploaded clean, then HTTP 429 `RESOURCE_EXHAUSTED` on
+   `defaultVideoInsertPerDayPerProject`.
+6. **NEW quota class identified**: Google Cloud project-level
+   `youtube.googleapis.com/video_insert` daily cap = **6/day per
+   project** (separate from the 10,000-unit unit quota AND the
+   channel-side rolling-24h cap that bit Vol. 2). Surfaces only via
+   the 429. Default for unverified API projects. Memory:
+   `feedback_gcp_youtube_video_insert_project_quota`.
+7. **Sync-drops re-scheduled** per Matt's hybrid choice:
+   - Vol. 3: was Sat 2026-05-24T00:00Z → **Mon 2026-05-26T00:00Z**
+   - Vol. 4: was Sun 2026-05-25T00:00Z → **Wed 2026-05-28T00:00Z**
+8. **9 Vol. 3 videos re-anchored** via `videos.update` to the new
+   anchor. Stale Vol. 4 cron `14c08e02` (old Sun anchor) deleted.
+9. **Three new staggered crons armed** (each fires ~07:15 UTC =
+   00:15 PDT just after Pacific-midnight project-quota reset):
+   - `01a94bd1` (Sat 2026-05-24T07:15Z) → Vol. 3 tracks 10-12 with
+     `--from-track 10 --publish-at 2026-05-26T00:00:00Z`
+   - `7f70b2a9` (Sun 2026-05-25T07:15Z) → Vol. 4 tracks 1-6 with
+     `--from-track 1 --to-track 6 --publish-at 2026-05-28T00:00:00Z`
+   - `4cd8ad0b` (Mon 2026-05-26T07:15Z) → Vol. 4 tracks 7-12 with
+     `--from-track 7 --publish-at 2026-05-28T00:00:00Z`
+10. **GCP quota-increase walkthrough written** at
+    `scratch/yt-quota-increase-walkthrough.md`. Form fields pre-filled
+    based on actual project state (project_number = 1010811540325,
+    nightdrive client, recommended ask: 6/day → 50/day). Form URL:
+    `https://support.google.com/youtube/contact/yt_api_form`. Matt
+    files this in parallel; if it approves before the 3-day staggered
+    cron runs out, schedule collapses to one upload day.
+
+### Final video ID table (so far)
+
+**Vol. 3 (Atiom Punikn)** — sync-drop 2026-05-26T00:00:00Z:
+
+| # | Title | Video ID | Status |
+|---|---|---|---|
+| 01 | Drill Siren, 0600 | `4Hzrd4QsmKI` | ✅ uploaded, re-anchored |
+| 02 | Foil Curtain Morning | `4DvRL4fJsjY` | ✅ uploaded, re-anchored |
+| 03 | Salt Flats Commute | `ClxSHJI6Fjg` | ✅ uploaded, re-anchored |
+| 04 | Stations, Console Six | `hSjLaAtKjZw` | ✅ uploaded, re-anchored |
+| 05 | Telemetry, Range Window 2 | `ZqgSLpEb9Zk` | ✅ uploaded, re-anchored |
+| 06 | Wall Clock, 1217 | `yKq2s8BvRx0` | ✅ uploaded, re-anchored |
+| 07 | Contact on the Doppler | `cBcebC2ZtuI` | ✅ uploaded, re-anchored |
+| 08 | Twenty-Second Holds | `Hc2BUUpN5Xc` | ✅ uploaded, re-anchored |
+| 09 | All Stand Down | `JOAOfz04B0U` | ✅ uploaded, re-anchored |
+| 10 | Salt Flats After Sundown | (pending cron `01a94bd1`) | — |
+| 11 | Sign-Off, Test Pattern Hum | (pending cron `01a94bd1`) | — |
+| 12 | Courtyard, Snowfall at Midnight | (pending cron `01a94bd1`) | — |
+
+**Vol. 4 (Sovietskiy Drayv)** — sync-drop 2026-05-28T00:00:00Z:
+
+All 12 final.mp4 + thumbnail.jpg on cnc disk at
+`/var/lib/nightdrive/tracks/nd-sovetskiy-drive-vol-1-NNN/`. Upload
+split across two cron-fired runs (6 + 6) on 2026-05-25 and
+2026-05-26.
+
+### Blocking issues
+
+- **None hard-blocking.** Three crons + the staggered schedule
+  handle the project-quota constraint. The crons are harness
+  "session-only" despite `durable: true` — if my session dies
+  overnight, Matt has the manual fallback commands in the Telegram
+  thread I sent before each scheduling.
+- **Soft blocker**: until the GCP quota-increase approves (Matt
+  filing in parallel), every future album drop hits the same
+  3-day staggered constraint. The sync-drop format isn't broken
+  by this, just delayed.
+
+### What's next (in order)
+
+1. **Wait for cron `01a94bd1`** (~07:15 UTC 2026-05-24, ~10 h from
+   this writing). Vol. 3 finishes if quota window holds.
+2. **Wait for cron `7f70b2a9`** (~07:15 UTC 2026-05-25). Vol. 4 day 1.
+3. **Wait for cron `4cd8ad0b`** (~07:15 UTC 2026-05-26). Vol. 4 day 2.
+4. **Watch for GCP quota approval** — if it lands mid-week, the
+   remaining staggered crons can be killed + replaced with a single
+   batch upload + tighter sync-drop schedule.
+5. **Per memory `feedback_twc_cities_must_match_album_theme`**:
+   plumb per-album city overrides in `nightdrive-encoder` before
+   the next Soviet-themed album (Vol. 5+). NWS Ridge2 is US-only;
+   Soviet cities would need Yandex Weather or static 1960s-era
+   archival data for atompunk-retro-future authenticity.
+6. **Enable `nightdrive-nightly.timer`** for daily VOD cadence once
+   the project-quota increase lands. Daily VOD = 1 upload/day so it
+   fits even under the current 6/day cap, but no point arming it
+   until the album backlog clears.
+
+### Notes for next session
+
+- **THE quota stack is now fully characterized**:
+  | Layer | Limit | Reset | Surfaces as |
+  |---|---|---|---|
+  | API unit quota | 10,000 units/day | Pacific midnight | `quota exceeded` |
+  | `videos.insert` cost | 100 units/call | (same as unit) | Same as above |
+  | **GCP project video.insert cap** | **6/day default** | Pacific midnight | `429 rateLimitExceeded global` |
+  | **YouTube channel daily upload** | ~10/day rolling 24h | rolling from first upload | `400 uploadLimitExceeded youtube.video` |
+
+  The middle one (GCP project cap) was hidden until 2026-05-23. The
+  channel one is what bit Vol. 2. The 10,000-unit quota is never the
+  actual constraint for an upload-only workload.
+- **openSUSE Leap Micro ffmpeg-7 has no `drawtext` filter.** Use
+  `/usr/local/bin/ffmpeg` (BtbN static) instead. `ffmpeg-4` has the
+  same issue per the package description ("limited in the number
+  of codecs supported"). Memory has the install pattern.
+- **GCP quota walkthrough lives at
+  `scratch/yt-quota-increase-walkthrough.md`** — pre-filled form
+  values + recommended 50/day ask. The form at
+  `https://support.google.com/youtube/contact/yt_api_form` is
+  gateless.
+- **All 24 final.mp4 + 24 master.flac + 24 raw.wav** live on cnc at
+  `/var/lib/nightdrive/tracks/nd-{atompunk,sovetskiy}-drive-vol-1-NNN/`.
+  Skip-on-state in the orchestrator means re-runs only do stage 7
+  upload + thumbnails.set.
+- **Atompunk Vol. 3 covers had an SDXL text hallucination** that
+  Matt canonized as the album title ("Atiom Punikn"). Per
+  `feedback_sdxl_bakes_text_despite_negative_prompt` — review covers
+  for unexpected baked text before committing to titles.
+- **Don't kill openclaw** to free GPUs unless Matt OKs. The
+  album-mode pipeline doesn't need GPU eviction past audio gen, so
+  encode + upload can run concurrent with openclaw.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
