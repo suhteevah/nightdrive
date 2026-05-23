@@ -2188,4 +2188,165 @@ side. **Don't kill openclaw** — it's Matt's primary inference fleet
 
 ---
 
+## 29. Session 2026-05-22 / 23 — cnc full systemd install + Vol. 3/4 audio rendered + LiteLLM patch + ffmpeg gap
+
+### Outcome (status: 🟡 audio bytes rendered for both new albums but ffmpeg-missing on cnc blocks master+encode)
+
+Deep installation pass following Matt's "you actually finish the
+setup work I asked for" prompt. The systemd plumbing for the daily-VOD
+timer (`scripts/nightdrive-nightly.{service,timer}`) is fully wired
+end-to-end on cnc EXCEPT for one missing host package (ffmpeg) that
+needs a `transactional-update`.
+
+### What got done
+
+1. **Vol. 3 title rename** — "Atompunk Drive, Vol. 1" → **"Atiom Punikn"**
+   (SDXL hallucinated text canonized — see
+   `feedback_sdxl_bakes_text_despite_negative_prompt`). Slug stays
+   `atompunk-drive-vol-1` (already wired into cover dir paths + DB
+   track_ids); only the JSON `title` field was changed.
+2. **Vol. 4 (Sovietskiy Drayv) composed** by album-composer subagent →
+   `docs/albums/sovetskiy-drive-vol-1.json`. F minor home tonic
+   (perfect-fourth above Vol. 3's Cm — preserves cross-volume interval
+   logic), BPM 78-92, 53 min total. East-side mirror of Vol. 3's 24h
+   cycle.
+3. **Three saved themes banked** for future Vols. 5+:
+   `project_future_album_theme_bank` (VHS Bootleg Horror, Hong Kong
+   Rooftop Noir, Arctic Ice Station).
+4. **ACE-Step lyrics-leak fix** in
+   `crates/nightdrive-audio-gen/src/prompt.rs::format_ace_step_lyrics`:
+   stopped emitting `[Section - instrumentation hint]` (ACE-Step was
+   vocalizing the hint as ghost phonemes). Now emits `[Instrumental]`
+   + section-name-only. Memory:
+   `feedback_acestep_lyrics_leak_via_section_hints`.
+   Vol. 2 (Neo-Tokyo, already public) is affected and stays as-is;
+   Vol. 3+ clean.
+5. **Vol. 3 covers** already on disk from 2026-05-20.
+6. **Vol. 4 covers rendered** on cnc — 36 PNGs at
+   `/opt/nightdrive/assets/covers/albums/sovetskiy-drive-vol-1/` +
+   mirrored to kokonoe. Matt confirmed the Atompunk cover aesthetic
+   ("covers look good") so used the same SDXL pipeline for Vol. 4
+   without re-confirmation.
+7. **Full cnc-side systemd install** (per Matt's "go for it"):
+   - `nightdrive` user/group created (`useradd -r -s /sbin/nologin -d
+     /var/lib/nightdrive`)
+   - `/etc/nightdrive/{nightdrive.env, nightdrive.toml}` — YT creds +
+     Linux-pathed runtime config. **`.env` was originally BOM-prefixed
+     from PowerShell `Set-Content -Encoding utf8`; stripped.** Same BOM
+     trap hit `docs/albums/atompunk-drive-vol-1.json` after my title
+     rewrite — memory:
+     `feedback_powershell_set_content_utf8_adds_bom`.
+   - `/opt/nightdrive/src/` — full Rust workspace scp'd, native build
+     `cargo build --release --bin nightdrive-orchestrator` clean in
+     3m 22s (sqlx is runtime-only, no compile-time queries — no
+     DATABASE_URL needed).
+   - `/opt/nightdrive/bin/nightdrive-orchestrator` — installed
+     0755 root-owned. `--help` shows all subcommands.
+   - `/etc/systemd/system/{nightdrive-acestep, nightdrive-nightly.{service,timer}}`
+     installed. `daemon-reload` clean. Timer intentionally DISABLED
+     until end-to-end ffmpeg path works.
+8. **nightdrive-acestep.service patched** (`ProtectHome=true` was
+   masking `/root/.local/share/uv/python/.../python3.12` which is the
+   target of `/opt/acestep/.venv/bin/python` symlink — boot failed
+   with `203/EXEC` "No such file or directory" 5× before the
+   restart limit triggered). Also moved `StartLimitInterval` from
+   `[Service]` to `[Unit]` (modern systemd warning). Memory:
+   `feedback_systemd_protecthome_blocks_uv_python_symlink`.
+9. **LiteLLM patch landed** for the `[openclaw]` LLM call path:
+   - `nightdrive-llm/src/lib.rs` rewritten from Ollama `/api/chat`
+     (`{model, messages, stream, format, options}`) to OpenAI
+     `/v1/chat/completions` (`{model, messages, temperature, max_tokens,
+     response_format: {"type":"json_object"}}`) with Bearer auth.
+   - Added `strip_md_code_fences()` parser-side defense for when
+     LiteLLM falls back to Anthropic (Claude wraps JSON in markdown
+     fences even with `response_format`).
+   - `OpenclawConfig` gained optional `api_key: Option<String>` field.
+   - `/etc/nightdrive/nightdrive.toml` `[openclaw]` block now points
+     at `http://127.0.0.1:4000` with `model=llama-3.1-8b-instant` +
+     `api_key=sk-openclaw-litellm-master`.
+   - Curl-tested end-to-end: clean JSON response, parses direct.
+10. **Vol. 3 + Vol. 4 audio rendered cleanly on cnc** via the new
+    systemd path (`systemctl start nightdrive-acestep` + cnc-native
+    Linux `nightdrive-orchestrator run-album --dry-run`). Per-track
+    `raw.wav` at `/var/lib/nightdrive/tracks/nd-<slug>-NNN/` =
+    44 MB / ~4 min stereo 48 kHz PCM. Audio gen wall: ~325 s per album
+    (~27 s/track at 240-300 s duration × 8× realtime).
+
+### Blocking issues
+
+- **ffmpeg is NOT installed on cnc** → master + encode fail for all
+  24 tracks with `Audio mastering error: spawn ffmpeg pass 1: No such
+  file or directory`. cnc is openSUSE Leap Micro 6.2 (transactional
+  root) so install path is
+  `transactional-update pkg install ffmpeg` + reboot. Reboot also
+  bounces all openclaw services + 24/7 fleet workloads, so Matt
+  picks the moment. Until ffmpeg lands, the cnc-native daily VOD path
+  (`nightdrive-nightly.timer` → `run-batch --count 1`) can't fully
+  ship.
+- **LiteLLM has a port typo for the small-model backend** — the
+  `llama-3.1-8b-instant` route in `/opt/litellm/config.yaml` points at
+  `host.containers.internal:8083`, but openclaw-inference-scout
+  actually listens on `8087`. Port 8083 is ACE-Step's port (rendered
+  audio sidecar, not an OpenAI-compat LLM). Net effect: LiteLLM silently
+  falls back to `claude-haiku-4-5` for all small-model requests. Works
+  fine for nightdrive's spec-gen needs (Claude returns valid JSON
+  after fence-strip), but isn't your local-cost-zero qwen-7b. Fix is
+  one-line edit in `/opt/litellm/config.yaml` + `podman restart
+  litellm-proxy` — but it's openclaw config, not nightdrive's, so
+  flagged not patched.
+
+### What's next (in priority order)
+
+1. **Install ffmpeg on cnc** via `transactional-update pkg install
+   ffmpeg ffmpeg-7` + reboot. After reboot, re-run the cnc-native
+   script — Vol. 3 + Vol. 4 should master + encode + leave 24
+   `final.mp4`s ready for upload.
+2. **Decide Vol. 3 + Vol. 4 upload + sync-drop schedule.** Vol. 2's
+   last upload was 2026-05-20T16:04Z, rolling-24h cleared 16:04Z
+   the next day — so any time post-2026-05-21T16:04Z is fair game on
+   the cap. Recommend Vol. 3 at Sat 2026-05-24T00:00Z and Vol. 4 at
+   Mon 2026-05-26T00:00Z (24h gap between drops to avoid stacking the
+   cap on consecutive days, plus separates the listener experience).
+3. **Verify nightdrive-nightly.timer end-to-end** once ffmpeg lands.
+   `systemctl start nightdrive-nightly.service` (manual fire) to test
+   eviction + run-batch + restore. Then `systemctl enable --now
+   nightdrive-nightly.timer` to arm the 23:00 PDT daily cron.
+4. **Fix LiteLLM port typo** for small-model route (Matt's openclaw
+   config, ~1-line fix, optional but recovers local-cost-zero path).
+
+### Notes for next session
+
+- **PowerShell `Set-Content -Encoding utf8` writes BOM-prefixed UTF-8.**
+  Rust serde rejects BOM, .NET parses silently. Use
+  `[IO.File]::WriteAllText($path, $text, [Text.UTF8Encoding]::new($false))`
+  for BOM-free output. Bit me twice this session before I caught it.
+  Memory `feedback_powershell_set_content_utf8_adds_bom` has the
+  pattern.
+- **`Write` tool emits BOM-free files** by default; only PowerShell's
+  Set-Content is the trap.
+- **systemd `ProtectHome=true` masks `/root` even when the unit runs
+  as `User=root`** — broke the uv-managed python symlink. Memory
+  `feedback_systemd_protecthome_blocks_uv_python_symlink`.
+- **Telegram script `/j/baremetal claude/tools/notify-telegram.sh`
+  has a space in its path** which crashes PowerShell-launched `bash`
+  invocations with arg-parsing. No-oped the Tg() function in
+  `scratch/run-vol3-vol4-evict-restore.ps1` as a workaround. Future
+  PS scripts that want to notify Matt should use the Bash tool
+  directly (which handles the path-with-space correctly) or call the
+  Telegram API via curl directly.
+- **The cnc-native systemd path is now the production path for daily
+  VOD.** The kokonoe-driven PS1 script (`scratch/run-vol3-vol4-evict-restore.ps1`)
+  was an interim mechanism — once ffmpeg lands, the
+  `nightdrive-nightly.timer` is the canonical autopilot.
+- **The album-mode pipeline** (`run-album --dry-run`) is unaffected
+  by the LiteLLM patch — album mode skips stage 1 (LLM). The LLM path
+  matters only for `run-batch` (daily LLM-spec'd VOD).
+- **24 `raw.wav` files exist on cnc** at
+  `/var/lib/nightdrive/tracks/nd-{atompunk,sovetskiy}-drive-vol-1-{001..012}/raw.wav`.
+  If ffmpeg lands soon, these are ready to master + encode without
+  re-rendering audio (1 GB+ saved in compute time).
+- **Vol. 2 (Neo-Tokyo Drive)** is live and stable on the channel.
+
+---
+
 **Single-source-of-truth:** this file. Update it when decisions change.
