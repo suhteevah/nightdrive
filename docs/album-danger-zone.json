@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-24",
+  "policy": "Track titles must not double-hit (film dialogue/object AND canonical soundtrack title). Single-hit OK.",
+  "themes": {
+    "tron": {
+      "soundtrack_titles": ["Derez", "Recognizer", "End of Line", "Rinzler", "Adagio for TRON", "Disc Wars", "C.L.U.", "Solar Sailer", "Outlands", "Tron Legacy (End Titles)"],
+      "film_objects":      ["Derez", "Recognizer", "Light Cycle", "Disc", "Sark", "MCP", "I/O Tower", "Grid"]
+    },
+    "blade_runner": {
+      "soundtrack_titles": ["Tears in Rain", "Memories of Green", "Wait for Me", "Damask Rose", "Esper Edit", "Blade Runner Blues", "Rachel's Song", "Love Theme"],
+      "film_objects":      ["Tears in Rain", "Spinner", "Voight-Kampff", "Replicant", "Off-world", "Tyrell", "Esper", "Nexus-6"]
+    },
+    "tokyo_cyberpunk": {
+      "soundtrack_titles": ["Kaneda", "Tetsuo", "Battle Against Clown", "Requiem", "Reincarnation", "Ghost City", "Inner Universe", "Run Rabbit Junk", "I Do", "Cyberbird"],
+      "film_objects":      ["Kaneda", "Tetsuo", "Akira", "Major", "Section 9", "Puppet Master", "Stand Alone Complex"]
+    },
+    "miami_vice": {
+      "soundtrack_titles": ["In the Air Tonight", "Crockett's Theme", "You Belong to the City", "Smuggler's Blues", "Brothers in Arms", "Miami Vice Theme"],
+      "film_objects":      ["Crockett", "Tubbs", "Ferrari Daytona", "Vice", "South Beach", "Calderone"]
+    },
+    "berlin_wall": {
+      "soundtrack_titles": ["Heroes", "Wind of Change", "Nikita", "99 Luftballons", "Final Countdown"],
+      "film_objects":      ["Checkpoint Charlie", "Stasi", "Trabant", "Brandenburg", "Wall", "GDR"]
+    },
+    "atompunk": {
+      "soundtrack_titles": [],
+      "film_objects": ["Fallout", "Vault-Tec", "Pip-Boy", "Sputnik"]
+    },
+    "sovetskiy": {
+      "soundtrack_titles": [],
+      "film_objects": []
+    },
+    "sunset": {
+      "soundtrack_titles": [],
+      "film_objects": []
+    },
+    "neo_tokyo": {
+      "soundtrack_titles": [],
+      "film_objects": []
+    }
+  }
+}

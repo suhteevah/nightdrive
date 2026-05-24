@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "youtube_strikes": 0,
+  "proposed": [],
+  "approved": [
+    {
+      "slug": "tokyo-cyberpunk-vol-1",
+      "theme": "Tokyo cyberpunk noir — neon Shinjuku rain, lonely salaryman last train, Akira-meets-Blade-Runner mood",
+      "approved_at": "2026-05-24T07:30:00Z",
+      "danger_zone_keys": ["tokyo_cyberpunk", "blade_runner"]
+    },
+    {
+      "slug": "miami-vice-vol-1",
+      "theme": "Miami Vice / Vapor Coast — pastel coke-era 1986, Ferrari Daytona at sunset, palm shadows, cocaine pink and turquoise",
+      "approved_at": "2026-05-24T07:30:00Z",
+      "danger_zone_keys": ["miami_vice"]
+    },
+    {
+      "slug": "blade-runner-2049-vol-1",
+      "theme": "Blade Runner / LA 2049 — rain, neon Chinatown signage, Vangelis-adjacent pads, Wallace Corporation cold",
+      "approved_at": "2026-05-24T07:30:00Z",
+      "danger_zone_keys": ["blade_runner"]
+    },
+    {
+      "slug": "berlin-wall-vol-1",
+      "theme": "Cold War East — Checkpoint Charlie, Trabants, divided city, brutalist apartment blocks, watchful gray dawn",
+      "approved_at": "2026-05-24T07:30:00Z",
+      "danger_zone_keys": ["berlin_wall", "sovetskiy"]
+    }
+  ],
+  "history": [
+    { "slug": "sunset-drive-vol-1",      "dropped_at": "2026-05-12T00:00:00Z" },
+    { "slug": "neo-tokyo-drive-vol-1",   "dropped_at": "2026-05-21T00:00:00Z" },
+    { "slug": "tron-drive-vol-1",        "dropped_at": "2026-05-15T15:00:00Z" },
+    { "slug": "sovetskiy-drive-vol-1",   "dropped_at": "2026-05-23T00:00:00Z" },
+    { "slug": "atompunk-drive-vol-1",    "dropped_at": "2026-05-26T00:00:00Z" }
+  ]
+}

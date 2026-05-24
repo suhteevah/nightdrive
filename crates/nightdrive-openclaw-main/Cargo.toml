@@ -1,0 +1,15 @@
+[package]
+name = "nightdrive-openclaw-main"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+
+[dependencies]
+tokio = { workspace = true, features = ["process", "io-util", "macros", "rt", "time"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "process", "io-util", "time"] }
