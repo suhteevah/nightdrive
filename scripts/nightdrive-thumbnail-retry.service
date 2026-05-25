@@ -1,0 +1,12 @@
+[Unit]
+Description=NightDrive — thumbnail retry sweep
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/nightdrive/nightdrive.env
+ExecStart=/opt/nightdrive/bin/nightdrive-cli thumbnails retry-failed --max 80
+StandardOutput=append:/var/log/nightdrive/thumbnail-retry.log
+StandardError=append:/var/log/nightdrive/thumbnail-retry.log
+TimeoutStartSec=10m

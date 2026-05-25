@@ -1,0 +1,12 @@
+[Unit]
+Description=NightDrive — weekly theme proposal via openclaw main
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/nightdrive/nightdrive.env
+ExecStart=/opt/nightdrive/bin/nightdrive-cli album propose --count 3
+StandardOutput=append:/var/log/nightdrive/theme-propose.log
+StandardError=append:/var/log/nightdrive/theme-propose.log
+TimeoutStartSec=10m

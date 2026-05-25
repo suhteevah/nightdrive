@@ -16,6 +16,8 @@ nightdrive-core.workspace = true
 nightdrive-storage.workspace = true
 nightdrive-youtube.workspace = true
 nightdrive-stems.workspace = true
+nightdrive-openclaw-main = { path = "../nightdrive-openclaw-main" }
+nightdrive-album-composer = { path = "../nightdrive-album-composer" }
 tokio.workspace = true
 tracing.workspace = true
 anyhow.workspace = true

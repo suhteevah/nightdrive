@@ -2505,4 +2505,114 @@ split across two cron-fired runs (6 + 6) on 2026-05-25 and
 
 ---
 
+## §31 — Autonomous album mode SHIPPED + ARMED (2026-05-24)
+
+Stacked systemd timers now drive the album pipeline with no human in the loop.
+Tested end-to-end through real openclaw main + real cnc GPU + real YouTube API.
+
+### What landed
+
+**New crates** (`crates/`):
+- `nightdrive-openclaw-main` — thin podman-exec wrapper for openclaw `main` (Opus
+  4.7 OAuth Max). One async fn `ask_main(cfg, prompt)`. Witness: `tests/real_endpoint.rs`,
+  passes in ~7s.
+- `nightdrive-album-composer` — generates 12-track AlbumSpec JSON from a theme.
+  Calls openclaw main (free under Matt's Max 20x), few-shot from most-recent
+  album, danger-zone validates output, retries up to 3x. Witness: `tests/real_compose.rs`,
+  passes in ~155s.
+
+**New module**:
+- `nightdrive_core::backlog` — file-backed queue at `docs/album-backlog.json`.
+  Atomic writes via flock + temp+rename. Helpers: `mutate`, `load`,
+  `promote_expired`, `pop_approved`, `peek_approved`. 3 unit tests passing.
+- `nightdrive_core::telegram` — best-effort `notify(msg)` shells to
+  `notify-telegram.sh`. Path overridable via `NIGHTDRIVE_TELEGRAM_SCRIPT`.
+
+**New CLI subcommands** on `nightdrive-cli`:
+- `thumbnails retry-failed [--max N] [--dry-run]` — DB-driven retry of failed
+  custom thumbs. Respects per-channel ~100/day cap (breaks on first 429).
+- `album backlog {list, add, approve, nack, remove}` — manual backlog control.
+- `album propose --count N` — asks openclaw main for N new themes → proposed[]
+  with 24h soak.
+- `album drop-next [--dry-run]` — pops next approved slug, runs composer,
+  shells out to `nightdrive-orchestrator run-album --slug X --publish-at <iso>`.
+  Sync-drop publish_at = (now+3d) at 00:00 UTC.
+
+**New systemd units** (`scripts/`):
+- `nightdrive-thumbnail-retry.{service,timer}` — every 6h (02:30/08:30/14:30/20:30 PT).
+- `nightdrive-theme-propose.{service,timer}` — weekly Sunday 03:00 PT.
+- `nightdrive-album-drop.{service,timer}` — every 3 days (days 1/4/7/.../28 of month)
+  at 02:00 PT. Reuses the proven eviction pattern (stop
+  openclaw-inference-{embed,scout,workhorse} → start ACE-Step → drop-next →
+  stop ACE-Step → **wait-gpu-free.sh 60** → start openclaw-inference).
+
+**New helper script**:
+- `scripts/wait-gpu-free.sh` — polls `nvidia-smi --query-compute-apps`, blocks up
+  to N seconds for GPUs to clear. Best-effort (exits 0 even on timeout).
+  Inserted between ACE-Step shutdown and openclaw-inference restart to dodge the
+  restart-loop hazard main flagged on 2026-05-24.
+
+**Storage migration**: `20260524000000_thumbnail_state.sql` — adds
+`custom_thumbnail_set` (default 0) + `thumbnail_last_attempt_at` columns to
+`tracks` + partial index `idx_tracks_thumb_retry`. Backfilled: 10 already-good
+published tracks set to 1; the 2 known-failed Vol. 3 tracks (011, 012) left at 0.
+
+**Seed files**:
+- `docs/album-backlog.json` — 4 approved slugs: tokyo-cyberpunk-vol-1,
+  miami-vice-vol-1, blade-runner-2049-vol-1, berlin-wall-vol-1. 5 history entries.
+- `docs/album-danger-zone.json` — 9 theme keys with soundtrack + film-object lists.
+
+### Status: ARMED
+
+All three timers enabled on cnc-server (2026-05-24). Next fires per `systemctl
+list-timers`:
+
+| Timer | Next fire | Behavior |
+|-------|-----------|----------|
+| thumbnail-retry | 2026-05-24 08:30 PT | runs every 6h |
+| album-drop | **2026-05-25 02:09 PT** | first autonomous drop (tokyo-cyberpunk-vol-1) |
+| theme-propose | 2026-05-31 03:00 PT | weekly |
+
+Openclaw main coordinated + approved the GPU window. Telegram-arm message sent.
+
+### LLM routing
+
+- **Composer + theme-propose** → openclaw `main` (Opus 4.7 OAuth, free under Max 20x)
+  via `podman exec openclaw-gateway openclaw agent --agent main --message <prompt> --json`.
+- **Per-track composition spec gen** → unchanged, stays on LiteLLM Sonnet
+  (already-wired in `nightdrive-llm`).
+
+### Override controls
+
+Anything in the chain can be stopped or redirected via:
+
+```bash
+# Stop the autonomous mode
+sudo systemctl disable --now nightdrive-album-drop.timer
+
+# Stop just the proposal pings
+sudo systemctl disable --now nightdrive-theme-propose.timer
+
+# NACK a single proposed theme during its 24h soak
+nightdrive-cli album backlog nack <slug>
+
+# Drop a slug from approved before it gets popped
+nightdrive-cli album backlog remove <slug>
+
+# Mark channel as struck — refuses all future drops until cleared
+# (edit docs/album-backlog.json, set youtube_strikes > 0)
+
+# Fire a one-off drop immediately (bypasses timer)
+sudo systemctl start nightdrive-album-drop.service
+
+# Fire a one-off thumbnail retry sweep
+sudo systemctl start nightdrive-thumbnail-retry.service
+```
+
+### Files for next session
+
+Spec: `docs/superpowers/specs/2026-05-24-autonomous-album-mode-design.md`
+Plan: `docs/superpowers/plans/2026-05-24-autonomous-album-mode.md`
+This handoff entry: §31.
+
 **Single-source-of-truth:** this file. Update it when decisions change.

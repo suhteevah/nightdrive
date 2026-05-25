@@ -244,7 +244,7 @@ async fn pipeline_one(
     // 403 youtube.thumbnail.forbidden. The video itself uploads fine and
     // YouTube auto-generates a thumbnail from frame samples — that's good
     // enough for MVP, so we log + continue rather than fail the pipeline.
-    set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
+    set_thumbnail_best_effort(&yt, db, track_id, &result.video_id, &paths.thumbnail_jpg()).await?;
 
     Tracks::update_state(db, track_id, TrackState::Published).await?;
     info!(video_id = %result.video_id, "track published");
@@ -258,8 +258,14 @@ async fn pipeline_one(
 /// auto-generates a thumbnail from frame samples when we don't set one,
 /// so the video is still presentable. Any other thumbnail error (auth
 /// expired, malformed JPEG, etc.) still bubbles.
+///
+/// On success, stamps `custom_thumbnail_set = 1` in the DB.
+/// On 403/429, stamps `thumbnail_last_attempt_at` so the retry sweep
+/// can skip recent attempts.
 async fn set_thumbnail_best_effort(
     yt: &nightdrive_youtube::YoutubeClient,
+    db: &Db,
+    track_id: &nightdrive_core::TrackId,
     video_id: &str,
     thumb_path: &std::path::Path,
 ) -> anyhow::Result<()> {
@@ -273,13 +279,23 @@ async fn set_thumbnail_best_effort(
                 video_id,
                 "thumbnail 403 — channel needs phone verification at youtube.com/verify; YT auto-generated thumbnail will be used"
             );
+            if let Err(db_err) = Tracks::mark_thumbnail_attempted(db, track_id).await {
+                warn!(%db_err, "failed to stamp thumbnail_last_attempt_at after 403");
+            }
         } else if is_429_ratelimit {
             warn!(
                 video_id,
                 "thumbnail 429 — YT per-channel thumbnail upload rate limit hit (~100/day); auto-generated thumbnail will be used. Retry later via a `nightdrive-cli thumbnails retry-failed` pass."
             );
+            if let Err(db_err) = Tracks::mark_thumbnail_attempted(db, track_id).await {
+                warn!(%db_err, "failed to stamp thumbnail_last_attempt_at after 429");
+            }
         } else {
             return Err(e.into());
+        }
+    } else {
+        if let Err(db_err) = Tracks::mark_thumbnail_set(db, track_id).await {
+            warn!(%db_err, "thumbnail uploaded OK but failed to stamp custom_thumbnail_set=1");
         }
     }
     Ok(())
@@ -638,7 +654,7 @@ async fn pipeline_one_album(
     };
     let result = yt.upload_video(req).await?;
     Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
-    set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
+    set_thumbnail_best_effort(&yt, db, track_id, &result.video_id, &paths.thumbnail_jpg()).await?;
     Tracks::update_state(db, track_id, TrackState::Published).await?;
     info!(video_id = %result.video_id, "album track published");
     Ok(())
@@ -933,7 +949,7 @@ async fn resume_one(
         };
         let result = yt.upload_video(req).await?;
         Uploads::set_youtube_id(db, upload_id, &result.video_id).await?;
-        set_thumbnail_best_effort(&yt, &result.video_id, &paths.thumbnail_jpg()).await?;
+        set_thumbnail_best_effort(&yt, db, &track_id, &result.video_id, &paths.thumbnail_jpg()).await?;
         Tracks::update_state(db, &track_id, TrackState::Published).await?;
         info!(video_id = %result.video_id, "resumed track published");
     }

@@ -1,13 +1,14 @@
 //! nightdrive-cli — manual triggers, db operations, YouTube auth, status queries.
 //!
 //! Subcommands:
-//!   db migrate            — run pending sqlx migrations
-//!   youtube auth          — OAuth Desktop flow to obtain a refresh token
-//!   tracks list           — print recent tracks and their pipeline state
-//!   uploads list          — print upload history
-//!   stream status         — check whether the 24/7 livestream service is running
-//!   stems generate        — run Demucs on a track or album to produce stems
-//!   export album          — bundle FLAC + cover + (optional) stems for Spotify/DistroKid
+//!   db migrate                         — run pending sqlx migrations
+//!   youtube auth                       — OAuth Desktop flow to obtain a refresh token
+//!   tracks list                        — print recent tracks and their pipeline state
+//!   uploads list                       — print upload history
+//!   stream status                      — check whether the 24/7 livestream service is running
+//!   stems generate                     — run Demucs on a track or album to produce stems
+//!   export album                       — bundle FLAC + cover + (optional) stems for Spotify/DistroKid
+//!   thumbnails retry-failed            — retry custom thumbnail upload for published tracks where it failed
 //!
 //! All subcommands that touch the database resolve their SQLite path via
 //! `AppConfig` (NIGHTDRIVE_CONFIG env / fallback list). Override the config
@@ -16,6 +17,7 @@
 use anyhow::{Context, anyhow};
 use clap::{Parser, Subcommand};
 use nightdrive_core::{CompositionSpec, TrackPaths, config::AppConfig};
+use nightdrive_youtube::YoutubeUploader;
 use nightdrive_stems::{DemucsCli, StemSeparator, StemsConfig};
 use nightdrive_storage::{Db, Tracks, Uploads};
 use serde::Deserialize;
@@ -69,6 +71,16 @@ enum Command {
         #[command(subcommand)]
         action: ExportAction,
     },
+    /// Thumbnail maintenance.
+    Thumbnails {
+        #[command(subcommand)]
+        cmd: ThumbnailsCmd,
+    },
+    /// Album backlog + drop control.
+    Album {
+        #[command(subcommand)]
+        cmd: AlbumCmd,
+    },
 }
 
 #[derive(Subcommand)]
@@ -121,6 +133,61 @@ enum StemsAction {
     },
 }
 
+#[derive(Debug, Subcommand)]
+enum ThumbnailsCmd {
+    /// Retry custom thumbnail upload for published tracks where it failed.
+    RetryFailed {
+        /// Max tracks to attempt this pass (respect per-day YT cap).
+        #[arg(long, default_value_t = 80)]
+        max: i64,
+        /// Don't actually call YT; just print what would be tried.
+        #[arg(long)]
+        dry_run: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum AlbumCmd {
+    /// Backlog management (list, add, approve, nack, remove).
+    Backlog {
+        #[command(subcommand)]
+        cmd: BacklogCmd,
+    },
+    /// Ask openclaw main to propose N new themes -> backlog.proposed[].
+    Propose {
+        #[arg(long, default_value_t = 3)]
+        count: u32,
+    },
+    /// Pop next approved slug, run composer + render + upload + schedule. Idempotent.
+    DropNext {
+        #[arg(long)]
+        dry_run: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum BacklogCmd {
+    /// Print proposed / approved / history sections.
+    List,
+    /// Add a slug to the backlog. Default: proposed[] with 24h promote_at.
+    /// Pass --approved to skip the soak and go straight to approved[].
+    Add {
+        slug: String,
+        #[arg(long)]
+        theme: String,
+        #[arg(long)]
+        approved: bool,
+        #[arg(long, value_delimiter = ',')]
+        danger_zone_keys: Vec<String>,
+    },
+    /// Move a proposed slug to approved immediately (manual approval).
+    Approve { slug: String },
+    /// Delete a proposed slug (manual rejection — soak override).
+    Nack { slug: String },
+    /// Delete a slug from both proposed and approved (does NOT touch history).
+    Remove { slug: String },
+}
+
 #[derive(Subcommand)]
 enum ExportAction {
     /// Build an `exports/<slug>/` bundle: per-track FLAC + cover + (optional)
@@ -139,6 +206,203 @@ enum ExportAction {
         include_stems: bool,
     },
 }
+
+// =============================================================================
+// album propose
+// =============================================================================
+
+#[tracing::instrument(skip(cfg))]
+async fn album_propose(cfg: &nightdrive_core::config::AppConfig, count: u32) -> anyhow::Result<()> {
+    if count == 0 {
+        anyhow::bail!("--count must be >= 1");
+    }
+    let backlog_path = cfg.paths.backlog_json();
+    let albums_dir = cfg.paths.albums_dir();
+    let existing_slugs = collect_existing_slugs(&albums_dir, &backlog_path);
+
+    let prompt = build_propose_prompt(count, &existing_slugs);
+    let gw = nightdrive_openclaw_main::GatewayConfig::from_env()?;
+    let reply = nightdrive_openclaw_main::ask_main(&gw, &prompt).await?;
+    let proposals: Vec<ProposedFromLlm> = parse_proposals(&reply)?;
+
+    if proposals.is_empty() {
+        println!("openclaw main returned 0 proposals");
+        return Ok(());
+    }
+
+    let now = chrono::Utc::now();
+    let mut accepted: Vec<String> = Vec::new();
+    nightdrive_core::backlog::mutate(&backlog_path, |bl| {
+        for p in &proposals {
+            if existing_slugs.contains(&p.slug) {
+                tracing::warn!(slug = %p.slug, "propose: openclaw returned existing slug, skipping");
+                continue;
+            }
+            bl.proposed.push(nightdrive_core::backlog::Proposed {
+                slug: p.slug.clone(),
+                theme: p.theme.clone(),
+                proposed_at: now,
+                promote_at: now + chrono::Duration::hours(24),
+                proposed_by: "openclaw-main".into(),
+                danger_zone_keys: p.danger_zone_keys.clone(),
+            });
+            accepted.push(p.slug.clone());
+        }
+        Ok(())
+    })?;
+
+    println!("proposed: {:?}", accepted);
+    println!("(24h soak; NACK any via 'nightdrive-cli album backlog nack <slug>')");
+    if !accepted.is_empty() {
+        let _ = nightdrive_core::telegram::notify(&format!(
+            "nightdrive: {} new themes proposed — 24h soak. NACK any via 'nightdrive-cli album backlog nack <slug>' on cnc. Slugs: {}",
+            accepted.len(),
+            accepted.join(", ")
+        ));
+    }
+    Ok(())
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct ProposedFromLlm {
+    slug: String,
+    theme: String,
+    #[serde(default)]
+    danger_zone_keys: Vec<String>,
+}
+
+fn collect_existing_slugs(
+    albums_dir: &std::path::Path,
+    backlog_path: &std::path::Path,
+) -> std::collections::HashSet<String> {
+    let mut set = std::collections::HashSet::new();
+    if let Ok(rd) = std::fs::read_dir(albums_dir) {
+        for e in rd.flatten() {
+            if let Some(name) = e.path().file_stem().and_then(|s| s.to_str()) {
+                set.insert(name.to_string());
+            }
+        }
+    }
+    if let Ok(bl) = nightdrive_core::backlog::load(backlog_path) {
+        for a in &bl.approved { set.insert(a.slug.clone()); }
+        for p in &bl.proposed { set.insert(p.slug.clone()); }
+        for h in &bl.history { set.insert(h.slug.clone()); }
+    }
+    set
+}
+
+fn build_propose_prompt(count: u32, existing_slugs: &std::collections::HashSet<String>) -> String {
+    let mut sorted: Vec<&str> = existing_slugs.iter().map(|s| s.as_str()).collect();
+    sorted.sort_unstable();
+    format!(
+        "You are nightdrive's theme curator. Propose {count} new synthwave album themes for a YouTube channel that already has these slugs: {sorted:?}\n\n\
+         Each new theme MUST be visually + sonically distinct from existing ones (no near-duplicates).\n\
+         Each theme should be evocative + concrete enough that an SDXL cover prompt and a 12-track musical arc can be derived.\n\n\
+         Output ONLY a JSON array (no prose, no fence). Each element:\n\
+         {{\n  \"slug\": \"<kebab-case>-vol-1\",\n  \"theme\": \"<1-2 sentence vivid description>\",\n  \"danger_zone_keys\": [\"<key>\", ...]   // theme keys from docs/album-danger-zone.json this theme should danger-zone-check against (may be empty)\n}}\n\n\
+         Available danger_zone keys: tron, blade_runner, tokyo_cyberpunk, miami_vice, berlin_wall, atompunk, sovetskiy, sunset, neo_tokyo. Use only those keys.\n\
+         Return exactly {count} elements as a JSON array (top-level [ ... ])."
+    )
+}
+
+fn parse_proposals(reply: &str) -> anyhow::Result<Vec<ProposedFromLlm>> {
+    let cleaned = reply.trim()
+        .trim_start_matches("```json")
+        .trim_start_matches("```")
+        .trim_end_matches("```")
+        .trim();
+    serde_json::from_str(cleaned)
+        .map_err(|e| anyhow::anyhow!("could not parse openclaw reply as proposals JSON: {e}\nraw reply: {}", &cleaned.chars().take(400).collect::<String>()))
+}
+
+// =============================================================================
+// thumbnails retry-failed
+// =============================================================================
+
+#[tracing::instrument(fields(max, dry_run))]
+async fn thumbnails_retry_failed(max: i64, dry_run: bool) -> anyhow::Result<()> {
+    let cfg = AppConfig::load().context("load nightdrive.toml")?;
+    let db = nightdrive_storage::Db::connect_and_migrate(&cfg.paths.sqlite_db)
+        .await
+        .context("connect_and_migrate")?;
+    let candidates = nightdrive_storage::Tracks::list_published_with_missing_thumbnail(&db, max)
+        .await
+        .context("list_published_with_missing_thumbnail")?;
+    tracing::info!(count = candidates.len(), max, dry_run, "thumbnail-retry: candidates loaded");
+
+    if candidates.is_empty() {
+        println!("no failed thumbnails to retry");
+        return Ok(());
+    }
+
+    if dry_run {
+        for (track, video_id) in &candidates {
+            println!("DRY-RUN would retry {} (video={})", track.id, video_id);
+        }
+        return Ok(());
+    }
+
+    let creds = nightdrive_youtube::YoutubeCredentials::from_env()?;
+    let yt = nightdrive_youtube::YoutubeClient::new(creds)?;
+    let mut ok_count: u32 = 0;
+    let mut rate_limited = false;
+
+    for (track, video_id) in &candidates {
+        let thumb_path = local_thumbnail_path(&cfg, track.id.as_str());
+        if !thumb_path.exists() {
+            tracing::warn!(
+                track_id = %track.id,
+                path = %thumb_path.display(),
+                "thumbnail-retry: local thumb file missing, skipping"
+            );
+            continue;
+        }
+
+        match yt.set_thumbnail(video_id, &thumb_path).await {
+            Ok(_) => {
+                nightdrive_storage::Tracks::mark_thumbnail_set(&db, &track.id)
+                    .await
+                    .with_context(|| format!("mark_thumbnail_set {}", track.id))?;
+                ok_count += 1;
+                tracing::info!(track_id = %track.id, video_id = %video_id, "thumbnail-retry: set");
+                println!("OK {} (video={})", track.id, video_id);
+            }
+            Err(e) if is_rate_limited_yt(&e) => {
+                let _ = nightdrive_storage::Tracks::mark_thumbnail_attempted(&db, &track.id).await;
+                tracing::warn!(track_id = %track.id, "thumbnail-retry: 429 — stopping pass");
+                rate_limited = true;
+                break;
+            }
+            Err(e) => {
+                let _ = nightdrive_storage::Tracks::mark_thumbnail_attempted(&db, &track.id).await;
+                tracing::warn!(track_id = %track.id, err = %e, "thumbnail-retry: non-429 error, continuing");
+                println!("FAIL {} (video={}): {}", track.id, video_id, e);
+            }
+        }
+    }
+
+    let suffix = if rate_limited { " (rate-limited mid-pass)" } else { "" };
+    println!("retried {} thumbnails{}", ok_count, suffix);
+    Ok(())
+}
+
+/// Prefer `thumbnail.jpg` (final encode thumb) if present, fall back to `cover.png`.
+fn local_thumbnail_path(cfg: &AppConfig, track_id: &str) -> std::path::PathBuf {
+    // TrackPaths::new constructs  <work_dir>/tracks/<track_id>/
+    // which matches the on-disk artifact layout used everywhere else.
+    use nightdrive_core::TrackId;
+    let tid = TrackId(track_id.to_string());
+    let paths = TrackPaths::new(&cfg.paths.work_dir, &tid);
+    let jpg = paths.thumbnail_jpg();
+    if jpg.exists() { jpg } else { paths.cover_png() }
+}
+
+fn is_rate_limited_yt(e: &nightdrive_core::NightdriveError) -> bool {
+    let s = format!("{e}");
+    s.contains("429") || s.contains("rateLimitExceeded") || s.contains("uploadLimitExceeded")
+}
+
+// =============================================================================
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -164,6 +428,19 @@ async fn main() -> anyhow::Result<()> {
         }
         Command::Export { action: ExportAction::Album { slug, out, include_stems } } => {
             export_album(&slug, out, include_stems).await
+        }
+        Command::Thumbnails { cmd } => match cmd {
+            ThumbnailsCmd::RetryFailed { max, dry_run } => {
+                thumbnails_retry_failed(max, dry_run).await
+            }
+        },
+        Command::Album { cmd } => {
+            let cfg = AppConfig::load().context("load nightdrive.toml")?;
+            match cmd {
+                AlbumCmd::Backlog { cmd } => album_backlog(&cfg, cmd).await,
+                AlbumCmd::Propose { count } => album_propose(&cfg, count).await,
+                AlbumCmd::DropNext { dry_run } => album_drop_next(&cfg, dry_run).await,
+            }
         }
     }
 }
@@ -591,6 +868,316 @@ fn sanitize_filename(s: &str) -> String {
         .trim()
         .trim_end_matches('.')
         .to_string()
+}
+
+// =============================================================================
+// album backlog
+// =============================================================================
+
+#[tracing::instrument(skip(cfg))]
+async fn album_backlog(cfg: &AppConfig, cmd: BacklogCmd) -> anyhow::Result<()> {
+    let path = cfg.paths.backlog_json();
+    match cmd {
+        BacklogCmd::List => {
+            let bl = nightdrive_core::backlog::load(&path).unwrap_or_else(|_| {
+                nightdrive_core::backlog::Backlog {
+                    version: 1,
+                    youtube_strikes: 0,
+                    proposed: vec![],
+                    approved: vec![],
+                    history: vec![],
+                }
+            });
+            println!("=== proposed ({}) ===", bl.proposed.len());
+            for p in &bl.proposed {
+                println!("  {} (promotes at {}) -- {}", p.slug, p.promote_at, p.theme);
+            }
+            println!("=== approved ({}) ===", bl.approved.len());
+            for a in &bl.approved {
+                println!("  {} -- {}", a.slug, a.theme);
+            }
+            println!("=== history ({}) ===", bl.history.len());
+            for h in bl.history.iter().rev().take(10) {
+                println!("  {} (dropped {})", h.slug, h.dropped_at);
+            }
+            Ok(())
+        }
+        BacklogCmd::Add { slug, theme, approved, danger_zone_keys } => {
+            // Validate no duplicate across all three sections before mutating.
+            {
+                let bl = nightdrive_core::backlog::load(&path).unwrap_or_else(|_| {
+                    nightdrive_core::backlog::Backlog {
+                        version: 1,
+                        youtube_strikes: 0,
+                        proposed: vec![],
+                        approved: vec![],
+                        history: vec![],
+                    }
+                });
+                if bl.approved.iter().any(|a| a.slug == slug) {
+                    anyhow::bail!("slug already exists in approved[]: {}", slug);
+                }
+                if bl.proposed.iter().any(|p| p.slug == slug) {
+                    anyhow::bail!("slug already exists in proposed[]: {}", slug);
+                }
+                if bl.history.iter().any(|h| h.slug == slug) {
+                    anyhow::bail!("slug already exists in history[]: {}", slug);
+                }
+            }
+            nightdrive_core::backlog::mutate(&path, |bl| {
+                if approved {
+                    bl.approved.push(nightdrive_core::backlog::Approved {
+                        slug: slug.clone(),
+                        theme: theme.clone(),
+                        approved_at: chrono::Utc::now(),
+                        danger_zone_keys: danger_zone_keys.clone(),
+                    });
+                } else {
+                    let now = chrono::Utc::now();
+                    bl.proposed.push(nightdrive_core::backlog::Proposed {
+                        slug: slug.clone(),
+                        theme: theme.clone(),
+                        proposed_at: now,
+                        promote_at: now + chrono::Duration::hours(24),
+                        proposed_by: "manual".into(),
+                        danger_zone_keys: danger_zone_keys.clone(),
+                    });
+                }
+                Ok(())
+            })?;
+            println!("added: {}", slug);
+            Ok(())
+        }
+        BacklogCmd::Approve { slug } => {
+            let mut found = false;
+            nightdrive_core::backlog::mutate(&path, |bl| {
+                if let Some(idx) = bl.proposed.iter().position(|p| p.slug == slug) {
+                    let p = bl.proposed.remove(idx);
+                    bl.approved.push(nightdrive_core::backlog::Approved {
+                        slug: p.slug,
+                        theme: p.theme,
+                        approved_at: chrono::Utc::now(),
+                        danger_zone_keys: p.danger_zone_keys,
+                    });
+                    found = true;
+                }
+                Ok(())
+            })?;
+            if found {
+                println!("approved: {}", slug);
+            } else {
+                println!("not found in proposed: {}", slug);
+            }
+            Ok(())
+        }
+        BacklogCmd::Nack { slug } => {
+            let mut found = false;
+            nightdrive_core::backlog::mutate(&path, |bl| {
+                let before = bl.proposed.len();
+                bl.proposed.retain(|p| p.slug != slug);
+                found = bl.proposed.len() != before;
+                Ok(())
+            })?;
+            if found {
+                println!("nack'd: {}", slug);
+            } else {
+                println!("not found in proposed: {}", slug);
+            }
+            Ok(())
+        }
+        BacklogCmd::Remove { slug } => {
+            let mut found_proposed = 0usize;
+            let mut found_approved = 0usize;
+            nightdrive_core::backlog::mutate(&path, |bl| {
+                let bp = bl.proposed.len();
+                bl.proposed.retain(|p| p.slug != slug);
+                found_proposed = bp - bl.proposed.len();
+                let ba = bl.approved.len();
+                bl.approved.retain(|a| a.slug != slug);
+                found_approved = ba - bl.approved.len();
+                Ok(())
+            })?;
+            println!(
+                "removed: {} (proposed: {}, approved: {})",
+                slug, found_proposed, found_approved
+            );
+            Ok(())
+        }
+    }
+}
+
+// =============================================================================
+// album drop-next
+// =============================================================================
+
+#[tracing::instrument(skip(cfg))]
+async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool) -> anyhow::Result<()> {
+    let backlog_path = cfg.paths.backlog_json();
+    let albums_dir = cfg.paths.albums_dir();
+    let danger_zone_path = cfg.paths.danger_zone_json();
+    let now = chrono::Utc::now();
+
+    // 1. Channel-health gate.
+    {
+        let bl = nightdrive_core::backlog::load(&backlog_path)?;
+        if bl.youtube_strikes > 0 {
+            let msg = format!(
+                "nightdrive: drop-next refused (youtube_strikes={}). Reset via backlog edit.",
+                bl.youtube_strikes
+            );
+            tracing::warn!("{}", msg);
+            println!("{}", msg);
+            let _ = nightdrive_core::telegram::notify(&msg);
+            return Ok(());
+        }
+    }
+
+    // 2. Promote expired proposals.
+    let bl = nightdrive_core::backlog::mutate(&backlog_path, |bl| {
+        let promoted = nightdrive_core::backlog::promote_expired(bl, now);
+        if !promoted.is_empty() {
+            tracing::info!(?promoted, "drop-next: auto-promoted expired proposals");
+        }
+        Ok(())
+    })?;
+
+    // 3 + 4. Refuse if no approved.
+    if bl.approved.is_empty() {
+        println!("backlog empty — run `nightdrive-cli album propose` or add slugs manually");
+        return Ok(());
+    }
+
+    // Peek head (no mutation yet — dry-run must not consume).
+    let (head_slug, head_theme, head_dz_keys) = {
+        let head = nightdrive_core::backlog::peek_approved(&bl).expect("non-empty checked above");
+        (head_slug_clone(&head.slug), head.theme.clone(), head.danger_zone_keys.clone())
+    };
+
+    // 5. Compute publish_at = (now + 3 days) at 00:00 UTC.
+    let publish_at = (now + chrono::Duration::days(3))
+        .date_naive()
+        .and_hms_opt(0, 0, 0)
+        .expect("midnight UTC always valid")
+        .and_utc();
+
+    // 6. Dry-run exit BEFORE consuming.
+    if dry_run {
+        println!(
+            "DRY-RUN drop-next: slug={} publish_at={} theme={:?}",
+            head_slug,
+            publish_at.to_rfc3339(),
+            head_theme
+        );
+        return Ok(());
+    }
+
+    // 7. POP head — commit.
+    nightdrive_core::backlog::mutate(&backlog_path, |bl| {
+        // Defensive: verify slug still at head before popping (concurrent mutate guard).
+        if let Some(h) = bl.approved.first() {
+            if h.slug == head_slug {
+                bl.approved.remove(0);
+            }
+        }
+        Ok(())
+    })?;
+    tracing::info!(slug = %head_slug, "drop-next: popped head, beginning compose+render");
+    let _ = nightdrive_core::telegram::notify(&format!(
+        "nightdrive: dropping {}. ETA ~3h render + 2-day upload window. Sync-drop {}.",
+        head_slug, publish_at.to_rfc3339()
+    ));
+
+    // 8. Compose if album JSON doesn't yet exist.
+    let album_json_path = albums_dir.join(format!("{}.json", head_slug));
+    if !album_json_path.exists() {
+        let gw = nightdrive_openclaw_main::GatewayConfig::from_env()?;
+        let req = nightdrive_album_composer::ComposeRequest {
+            slug: head_slug.clone(),
+            theme: head_theme.clone(),
+            track_count: 12,
+            danger_zone_keys: head_dz_keys.clone(),
+            albums_dir: albums_dir.clone(),
+            danger_zone_path: danger_zone_path.clone(),
+            max_retries: 3,
+        };
+        match nightdrive_album_composer::compose(&gw, &req).await {
+            Ok(spec) => {
+                std::fs::write(&album_json_path, serde_json::to_string_pretty(&spec)?)?;
+                tracing::info!(slug = %head_slug, "drop-next: composed + wrote album JSON");
+            }
+            Err(e) => {
+                tracing::warn!(
+                    slug = %head_slug,
+                    error = %e,
+                    "drop-next: composer failed, restoring slug to head of approved"
+                );
+                nightdrive_core::backlog::mutate(&backlog_path, |bl| {
+                    bl.approved.insert(
+                        0,
+                        nightdrive_core::backlog::Approved {
+                            slug: head_slug.clone(),
+                            theme: head_theme.clone(),
+                            approved_at: now,
+                            danger_zone_keys: head_dz_keys.clone(),
+                        },
+                    );
+                    Ok(())
+                })?;
+                return Err(anyhow::anyhow!("composer failed for {}: {}", head_slug, e));
+            }
+        }
+    } else {
+        tracing::info!(slug = %head_slug, "drop-next: album JSON already exists, skipping composer");
+    }
+
+    // 9. Shell out to orchestrator.
+    let orch_path = std::env::var("NIGHTDRIVE_ORCHESTRATOR_BIN")
+        .unwrap_or_else(|_| "/opt/nightdrive/bin/nightdrive-orchestrator".to_string());
+    tracing::info!(
+        slug = %head_slug,
+        publish_at = %publish_at.to_rfc3339(),
+        "drop-next: invoking orchestrator run-album"
+    );
+    let status = std::process::Command::new(&orch_path)
+        .args([
+            "run-album",
+            "--slug",
+            &head_slug,
+            "--publish-at",
+            &publish_at.to_rfc3339(),
+        ])
+        .status()?;
+
+    if !status.success() {
+        let msg = format!(
+            "orchestrator run-album exit={:?} for {}",
+            status.code(),
+            head_slug
+        );
+        tracing::warn!("{}", msg);
+        return Err(anyhow::anyhow!(msg));
+    }
+
+    // 10. Append to history.
+    nightdrive_core::backlog::mutate(&backlog_path, |bl| {
+        bl.history.push(nightdrive_core::backlog::HistoryEntry {
+            slug: head_slug.clone(),
+            dropped_at: now,
+        });
+        Ok(())
+    })?;
+    tracing::info!(slug = %head_slug, publish_at = %publish_at.to_rfc3339(), "drop-next: complete");
+    let _ = nightdrive_core::telegram::notify(&format!(
+        "nightdrive: {} 12/12 done — sync-drop {} armed.",
+        head_slug, publish_at.to_rfc3339()
+    ));
+    println!("drop complete: {} (publish_at {})", head_slug, publish_at.to_rfc3339());
+    Ok(())
+}
+
+/// Trivial alias — makes the peek-then-pop pattern self-documenting.
+fn head_slug_clone(s: &str) -> String {
+    s.to_string()
 }
 
 async fn stream_status() -> anyhow::Result<()> {

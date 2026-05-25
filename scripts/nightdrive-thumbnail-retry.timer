@@ -1,0 +1,11 @@
+[Unit]
+Description=NightDrive thumbnail retry — every 6 hours
+
+[Timer]
+OnCalendar=*-*-* 02,08,14,20:30:00 America/Los_Angeles
+Persistent=true
+RandomizedDelaySec=5m
+Unit=nightdrive-thumbnail-retry.service
+
+[Install]
+WantedBy=timers.target

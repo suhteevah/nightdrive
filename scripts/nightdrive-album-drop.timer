@@ -1,0 +1,11 @@
+[Unit]
+Description=NightDrive album drop — every 3 days at 02:00 PT
+
+[Timer]
+OnCalendar=*-*-01,04,07,10,13,16,19,22,25,28 02:00:00 America/Los_Angeles
+Persistent=true
+RandomizedDelaySec=10m
+Unit=nightdrive-album-drop.service
+
+[Install]
+WantedBy=timers.target

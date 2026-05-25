@@ -1,0 +1,25 @@
+[Unit]
+Description=NightDrive — autonomous album drop
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/nightdrive/nightdrive.env
+
+# Eviction: free P100s by stopping openclaw inference units.
+ExecStartPre=+/usr/bin/systemctl stop openclaw-inference-embed openclaw-inference-scout openclaw-inference-workhorse
+ExecStartPre=+/bin/sleep 3
+ExecStartPre=+/usr/bin/systemctl start nightdrive-acestep
+ExecStartPre=+/bin/sleep 10
+
+ExecStart=/opt/nightdrive/bin/nightdrive-cli album drop-next
+
+# Restoration: stop ACE-Step, wait for CUDA contexts to drain, bring openclaw inference back online.
+ExecStopPost=+/usr/bin/systemctl stop nightdrive-acestep
+ExecStopPost=+/bin/bash /opt/nightdrive/tools/wait-gpu-free.sh 60
+ExecStopPost=+/usr/bin/systemctl start openclaw-inference-embed openclaw-inference-scout openclaw-inference-workhorse
+
+StandardOutput=append:/var/log/nightdrive/album-drop.log
+StandardError=append:/var/log/nightdrive/album-drop.log
+TimeoutStartSec=6h

@@ -10,6 +10,7 @@ pub mod backlog;
 pub mod config;
 pub mod observability;
 pub mod retry;
+pub mod telegram;
 
 // =============================================================================
 // IDs

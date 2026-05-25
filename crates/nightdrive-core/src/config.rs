@@ -25,6 +25,30 @@ pub struct PathsConfig {
     pub work_dir: PathBuf,
     pub sqlite_db: PathBuf,
     pub tracks_dir: PathBuf,
+    /// Root of the nightdrive source/data tree. Defaults to /opt/nightdrive.
+    /// Override via NIGHTDRIVE_REPO_ROOT env var (consulted at startup, before
+    /// the config file is read, so it can redirect where backlog/album JSON
+    /// lives without requiring a full config rewrite).
+    #[serde(default = "default_repo_root")]
+    pub repo_root: PathBuf,
+}
+
+fn default_repo_root() -> PathBuf {
+    std::env::var("NIGHTDRIVE_REPO_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from("/opt/nightdrive"))
+}
+
+impl PathsConfig {
+    pub fn backlog_json(&self) -> PathBuf {
+        self.repo_root.join("docs/album-backlog.json")
+    }
+    pub fn danger_zone_json(&self) -> PathBuf {
+        self.repo_root.join("docs/album-danger-zone.json")
+    }
+    pub fn albums_dir(&self) -> PathBuf {
+        self.repo_root.join("docs/albums")
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]

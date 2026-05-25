@@ -1,15 +1,15 @@
 [package]
 name = "nightdrive-album-composer"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
 
 [dependencies]
-nightdrive-core = { workspace = true }
-tokio = { workspace = true }
+nightdrive-core = { path = "../nightdrive-core" }
+nightdrive-openclaw-main = { path = "../nightdrive-openclaw-main" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt"] }
 tracing = { workspace = true }
 thiserror = { workspace = true }
 anyhow = { workspace = true }

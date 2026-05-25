@@ -94,6 +94,8 @@ pub struct TrackRow {
     pub duration_secs: Option<i64>,
     pub created_at: String,
     pub updated_at: String,
+    pub custom_thumbnail_set: bool,
+    pub thumbnail_last_attempt_at: Option<String>,
 }
 
 fn parse_state(raw: &str) -> NightdriveResult<TrackState> {
@@ -131,6 +133,12 @@ fn row_to_track(row: &sqlx::sqlite::SqliteRow) -> NightdriveResult<TrackRow> {
         duration_secs: row.try_get("duration_secs").map_err(map_sqlx)?,
         created_at: row.try_get("created_at").map_err(map_sqlx)?,
         updated_at: row.try_get("updated_at").map_err(map_sqlx)?,
+        custom_thumbnail_set: row
+            .try_get::<i64, _>("custom_thumbnail_set")
+            .map_err(map_sqlx)? != 0,
+        thumbnail_last_attempt_at: row
+            .try_get("thumbnail_last_attempt_at")
+            .map_err(map_sqlx)?,
     })
 }
 
@@ -214,7 +222,8 @@ impl Tracks {
             Some(state) => {
                 sqlx::query(
                     "SELECT id, title, bpm, key, seed, spec_json, state, audio_path, \
-                     cover_path, visualizer_path, duration_secs, created_at, updated_at \
+                     cover_path, visualizer_path, duration_secs, created_at, updated_at, \
+                     custom_thumbnail_set, thumbnail_last_attempt_at \
                      FROM tracks WHERE state = ? ORDER BY created_at ASC",
                 )
                 .bind(state.as_str())
@@ -224,7 +233,8 @@ impl Tracks {
             None => {
                 sqlx::query(
                     "SELECT id, title, bpm, key, seed, spec_json, state, audio_path, \
-                     cover_path, visualizer_path, duration_secs, created_at, updated_at \
+                     cover_path, visualizer_path, duration_secs, created_at, updated_at, \
+                     custom_thumbnail_set, thumbnail_last_attempt_at \
                      FROM tracks ORDER BY created_at ASC",
                 )
                 .fetch_all(&db.pool)
@@ -241,7 +251,8 @@ impl Tracks {
     pub async fn get(db: &Db, id: &TrackId) -> NightdriveResult<Option<TrackRow>> {
         let maybe_row = sqlx::query(
             "SELECT id, title, bpm, key, seed, spec_json, state, audio_path, \
-             cover_path, visualizer_path, duration_secs, created_at, updated_at \
+             cover_path, visualizer_path, duration_secs, created_at, updated_at, \
+             custom_thumbnail_set, thumbnail_last_attempt_at \
              FROM tracks WHERE id = ?",
         )
         .bind(id.as_str())
@@ -250,6 +261,82 @@ impl Tracks {
         .map_err(map_sqlx)?;
 
         maybe_row.as_ref().map(row_to_track).transpose()
+    }
+
+    /// List published tracks that have a YouTube video ID but whose thumbnail
+    /// has not yet been successfully set. Used by the thumbnail-retry sweep
+    /// (`nightdrive-cli thumbnails retry-failed`) and the album post-publish pass.
+    ///
+    /// The `youtube_video_id` is resolved from the most recent completed upload
+    /// for the track. `limit` caps the returned set for incremental retry passes
+    /// (use 100 to drain the backlog in one shot).
+    #[instrument(skip(db), fields(limit))]
+    pub async fn list_published_with_missing_thumbnail(
+        db: &Db,
+        limit: i64,
+    ) -> NightdriveResult<Vec<(TrackRow, String)>> {
+        // Join to uploads to pick up the video_id. A track can have >1 upload
+        // row (retries); take the most recent completed one.
+        let rows = sqlx::query(
+            "SELECT t.id, t.title, t.bpm, t.key, t.seed, t.spec_json, t.state, \
+                    t.audio_path, t.cover_path, t.visualizer_path, t.duration_secs, \
+                    t.created_at, t.updated_at, t.custom_thumbnail_set, \
+                    t.thumbnail_last_attempt_at, u.youtube_video_id \
+             FROM tracks t \
+             JOIN uploads u ON u.track_id = t.id AND u.status = 'complete' \
+             WHERE t.state = 'published' \
+               AND t.custom_thumbnail_set = 0 \
+               AND u.youtube_video_id IS NOT NULL \
+             ORDER BY u.completed_at DESC \
+             LIMIT ?",
+        )
+        .bind(limit)
+        .fetch_all(&db.pool)
+        .await
+        .map_err(map_sqlx)?;
+
+        rows.iter()
+            .map(|row| {
+                let track = row_to_track(row)?;
+                let video_id: String =
+                    row.try_get("youtube_video_id").map_err(map_sqlx)?;
+                Ok((track, video_id))
+            })
+            .collect()
+    }
+
+    /// Mark a track's custom thumbnail as successfully set. Clears the
+    /// retry-eligible flag and stamps the attempt timestamp.
+    #[instrument(skip(db), fields(track_id = %track_id))]
+    pub async fn mark_thumbnail_set(db: &Db, track_id: &TrackId) -> NightdriveResult<()> {
+        sqlx::query(
+            "UPDATE tracks \
+             SET custom_thumbnail_set = 1, thumbnail_last_attempt_at = datetime('now'), \
+                 updated_at = datetime('now') \
+             WHERE id = ?",
+        )
+        .bind(track_id.as_str())
+        .execute(&db.pool)
+        .await
+        .map_err(map_sqlx)
+        .map(|_| ())
+    }
+
+    /// Record a failed or rate-limited thumbnail attempt without marking it
+    /// as set. The track remains in the retry-eligible pool; only the
+    /// last-attempt timestamp advances (so callers can implement a cooldown).
+    #[instrument(skip(db), fields(track_id = %track_id))]
+    pub async fn mark_thumbnail_attempted(db: &Db, track_id: &TrackId) -> NightdriveResult<()> {
+        sqlx::query(
+            "UPDATE tracks \
+             SET thumbnail_last_attempt_at = datetime('now'), updated_at = datetime('now') \
+             WHERE id = ?",
+        )
+        .bind(track_id.as_str())
+        .execute(&db.pool)
+        .await
+        .map_err(map_sqlx)
+        .map(|_| ())
     }
 }
 
@@ -403,7 +490,8 @@ impl LivestreamRotation {
         let maybe_row = sqlx::query(
             "SELECT t.id, t.title, t.bpm, t.key, t.seed, t.spec_json, t.state, \
                     t.audio_path, t.cover_path, t.visualizer_path, t.duration_secs, \
-                    t.created_at, t.updated_at \
+                    t.created_at, t.updated_at, t.custom_thumbnail_set, \
+                    t.thumbnail_last_attempt_at \
              FROM tracks t \
              LEFT JOIN ( \
                  SELECT track_id, MAX(started_at) AS last_started \

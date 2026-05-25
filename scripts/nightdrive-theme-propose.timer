@@ -1,0 +1,11 @@
+[Unit]
+Description=NightDrive theme proposal — weekly Sunday 03:00 PT
+
+[Timer]
+OnCalendar=Sun *-*-* 03:00:00 America/Los_Angeles
+Persistent=true
+RandomizedDelaySec=10m
+Unit=nightdrive-theme-propose.service
+
+[Install]
+WantedBy=timers.target
