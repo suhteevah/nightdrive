@@ -512,7 +512,7 @@ fn spec_from_album_track(
         "Track {track_number:02} of {album_title}.\n\n\
          Key: {musical_key} · {bpm} BPM · {duration_seconds}s\n\n\
          Part of nightdrive's autonomous synthwave album series. \
-         Best listened to in order — playlist link in pinned comment.\n\n\
+         Best listened to in order.\n\n\
          #synthwave #codingmusic #lofi #study #{slug}",
         slug = slug.replace('-', "")
     );

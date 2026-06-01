@@ -2,8 +2,8 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** 🟡 Pipeline shipped + cnc-deployed; **eviction cycle verified**, full pipeline blocked on cross-host LLM dep (kokonoe Ollama → needs migration to cnc)
-**Last updated:** 2026-05-22 (late evening PDT)
+**Status:** 🟢 Publishing again. The 5-day dark spell (since 2026-05-26) was a dead YouTube OAuth refresh token — re-minted + OAuth app published to Production (durable, no more 7-day expiry). Vol. 4 batch-1 uploaded (sync-drop 2026-06-02T00:00Z); batch-2 armed 06-01. Pipeline hardened this session: tmpfs working-tree landmine relocated, composer timeout + Opus-4.8 schema fixed, and **playlists + per-day upload stagger shipped**. **See §32 + §33 for the full 2026-05-31 session.**
+**Last updated:** 2026-05-31 (PDT)
 
 ---
 
@@ -2616,3 +2616,159 @@ Plan: `docs/superpowers/plans/2026-05-24-autonomous-album-mode.md`
 This handoff entry: §31.
 
 **Single-source-of-truth:** this file. Update it when decisions change.
+
+---
+
+## §32 — Session 2026-05-31 — "5 days dark" diagnosed + pipeline restored
+
+**Trigger:** Matt — "read handoff, our last post was 5 days ago whats up."
+Last public post was atompunk (Vol. 3) on 2026-05-26; nothing since.
+
+### Root cause (the headline): YouTube OAuth refresh token expired
+
+The `NIGHTDRIVE_YT_REFRESH_TOKEN` (minted 2026-05-19) **died ~2026-05-26** —
+Google expires refresh tokens after **7 days** for OAuth apps in **"Testing"**
+publishing status. Every upload since failed at the OAuth refresh with
+`invalid_grant: Token has been expired or revoked`. The 05-26 atompunk drop
+slipped out anyway because YouTube flips already-uploaded scheduled videos
+**server-side** (no token call needed). Everything after 05-26 needed the
+token → silent failure.
+
+**Fixed:** re-minted via `nightdrive-cli youtube auth` (Chrome-MCP-driven
+consent, account `mmichels88@gmail.com`, scope `youtube`). Verified: refresh
+OK + lands on NightDrive channel `UCsS7L4PUedZ-zus3rV3AMDw`. Deployed to
+`/etc/nightdrive/nightdrive.env` on cnc.
+
+**RESOLVED 2026-05-31:** Matt published the OAuth app → **In production**
+(GCP Auth Platform → Audience now shows "In production" + a "Back to testing"
+button; the first re-auth's consent screen had confirmed it was Testing). Then
+re-authed once more under production → **durable, non-expiring refresh token**
+minted, verified (channel NightDrive `UCsS7L4PUedZ-zus3rV3AMDw`), deployed to
+cnc `/etc/nightdrive/nightdrive.env`. The 7-day expiry is gone. The batch-2
+timer + all future runs use this token. (batch-1 was uploaded under the earlier
+testing token — harmless, it's already scheduled.) Secret hygiene: the
+listener's `scratch/ytauth.log` (held the token plaintext) was deleted;
+`scratch/` + `.env*` are gitignored and no token string is in git history.
+
+### Vol. 4 (sovetskiy) — was never uploaded; now staggered out
+
+All 12 final.mp4 were encoded 05-23 but the §30 **harness crons** that were
+to upload them died with that session (the "session-only despite durable:true"
+trap §30 flagged). So the 05-28 sync-drop had nothing to flip. Re-uploaded
+properly under the GCP **6/day** `video.insert` cap:
+- **batch-1 (tracks 1-6):** uploaded 2026-05-31 ~08:21 PDT. IDs: 01 `iwiEX76gpUQ`,
+  02 `cqMJ8Z7DttQ`, 03 `vEOfV7AyddE`, 04 `zXOjvb5m79A`, 05 `XaPF8SIE_hk`, 06 `0mAjrP6hGFw`.
+- **batch-2 (tracks 7-12):** armed on **`nd-vol4-b2.timer`** (systemd transient,
+  Persistent=true) for **2026-06-01 09:00 PDT** — >24h after batch-1 (rolling
+  channel cap) + fresh GCP day. Durable: survives session death (unlike §30 crons).
+- **sync-drop anchor:** `2026-06-02T00:00:00Z` on all 12 → flip public together.
+  Manual fallback if the timer misses: `cd /opt/nightdrive-ws && set -a && . /etc/nightdrive/nightdrive.env && set +a && /opt/nightdrive/bin/nightdrive-orchestrator run-album --slug sovetskiy-drive-vol-1 --from-track 7 --publish-at 2026-06-02T00:00:00Z`
+
+### tmpfs landmine — FIXED (was urgent)
+
+`NIGHTDRIVE_REPO_ROOT` pointed at `/tmp/nightdrive-ws-check`, and **`/tmp` on
+cnc is tmpfs (RAM, 7.8 G)**. The entire active working tree — album-mode
+source, build cache, AND the live autonomous-mode backlog — was RAM-backed.
+A reboot would have wiped all of it. **Relocated to persistent
+`/opt/nightdrive-ws`** (`cp -a`, build cache preserved; `assets`→ symlink to
+`/opt/nightdrive/assets`). Set `NIGHTDRIVE_REPO_ROOT=/opt/nightdrive-ws` +
+`WorkingDirectory=/opt/nightdrive-ws` on album-drop.service.
+
+### Composer — FIXED (the autonomous 05-25/28 hang)
+
+The 180s `openclaw main: podman exec timeout` was **NOT** embed eviction (my
+first hypothesis — disproved: compose-only timed out at 180s with embed UP).
+It was the **180s `NIGHTDRIVE_OPENCLAW_TIMEOUT_SECS` being too short** for the
+real 12-track composer generation. Worked under Opus 4.7 (~155s, 05-24); Opus
+4.8 spills past 180s.
+- **Fix 1:** `NIGHTDRIVE_OPENCLAW_TIMEOUT_SECS=180→900` (env).
+- **Fix 2 (code):** Opus 4.8 emitted `sections[]` as bare strings → deser
+  reject. Added explicit "sections are objects {name,bars,instrumentation}"
+  rule to `album-composer/src/prompt.rs` + made parse failures **retry**
+  (`lib.rs` — was aborting via `?`).
+- **Fix 3 (belt+suspenders):** `album-drop.service` now composes BEFORE
+  eviction (Phase-0 `drop-next --compose-only`, new flag) so a cloud-LLM call
+  never races GPU teardown + fails before disturbing the openclaw fleet.
+- **Validated:** clean 12-track tokyo spec in ~150s; `docs/albums/tokyo-cyberpunk-vol-1.json`
+  **pre-staged** so the next drop skips compose.
+- Source edits are in the canonical repo (local J:\nightdrive) AND cnc
+  `/opt/nightdrive-ws`; cli rebuilt + deployed to `/opt/nightdrive/bin`.
+
+### Autonomous album-drop — DISABLED, do not blindly re-arm
+
+`nightdrive-album-drop.timer` is **disabled**. It's repaired (composer + token
++ tokyo pre-staged), BUT a single `drop-next` uploads all 12 tracks in one
+run → only 6 land before the GCP **6/day** `video.insert` cap 429s the rest
+(same wall as Vol. 3 §30). Re-arming autonomously will produce partial drops
+until **either** the GCP quota increase lands (form: see
+`scratch/yt-quota-increase-walkthrough.md`) **or** `drop-next` learns to
+stagger across days. Manual staggered drops work fine in the meantime.
+
+### Status snapshot
+
+- Token: **durable** — OAuth app published to Production 2026-05-31, non-expiring token deployed + verified on NightDrive.
+- Vol. 4: batch-1 up, batch-2 armed 06-01, all public 06-02 00:00 UTC.
+- Repo tree: persistent `/opt/nightdrive-ws`.
+- Composer: fixed + validated; tokyo pre-staged.
+- album-drop.timer: OFF (6/day cap). thumbnail-retry + theme-propose timers: still ON.
+- Local `J:\nightdrive\.env` still holds the OLD dead token (cosmetic; cnc is authoritative).
+- Backups on cnc: `nightdrive-cli.bak-*`, `nightdrive.env.bak-*`, `nightdrive-album-drop.service.bak-*`.
+
+---
+
+## §33 — Session 2026-05-31 (cont.) — playlists + upload stagger + the pinned-comment truth
+
+Matt: "teach drop-next to stagger; it never makes the playlists; it says
+'playlist in the pinned comment' which never happens either."
+
+**Diagnosis:** all three were real. Playlists + comments were **never built** —
+the orchestrator description hardcoded "playlist link in pinned comment"
+(`main.rs:515`) but no playlist/comment code existed anywhere. And the **YouTube
+Data API v3 cannot pin comments** (Studio-UI-only) nor comment on private/
+scheduled videos — so that promise was never keepable via API. `run-album` also
+uploaded all 12 in one loop (429s after the GCP 6/day cap) with no
+skip-already-uploaded guard (re-runs would dup).
+
+**Key constraint that shaped the build:** the orchestrator can't be rebuilt on
+cnc — `/opt/nightdrive-ws` is the reduced 7-crate album workspace (no
+orchestrator crate); the full tree (`/opt/nightdrive/src`, stale 05-22, has
+wgpu etc.) is risky to build headless. **So playlists + stagger were built
+entirely CLI-side** (the CLI builds clean on `/opt/nightdrive-ws`), shelling the
+already-deployed `run-album` for uploads. No orchestrator rebuild.
+
+**Shipped (built + deployed to `/opt/nightdrive/bin/nightdrive-cli`):**
+- `nightdrive-youtube`: `ensure_playlist` (find-by-title or create),
+  `list_playlist_video_ids`, `add_video_to_playlist`,
+  `ensure_playlist_link_in_description` (idempotent; rewrites the stale
+  "pinned comment" line → real link), `playlist_url`.
+- CLI **`album playlist-sync --slug X`**: ensure playlist + add the album's
+  uploaded videos + put the playlist link in each description. Idempotent +
+  incremental (backfills already-shipped albums).
+- CLI **`album publish-staggered --slug X --publish-at <iso> --per-day N`**:
+  uploads ≤N un-uploaded tracks/run (via `run-album --from-track/--to-track`),
+  runs playlist-sync, self-schedules a **+25h** systemd continuation
+  (`nightdrive-stagger-<slug>`) until complete. Resumable (skips already-uploaded
+  — no dups), anti-loop (stops if a batch makes no progress).
+- `drop-next` now calls `publish-staggered` (per_day = new
+  `[youtube].max_uploads_per_day`, default 6) instead of one-shot `run-album`.
+- `nightdrive-core` config: `max_uploads_per_day` (serde default 6 — existing
+  tomls still parse). Bump it (no recompile) when the GCP quota increase lands.
+
+**Tested live:** backfilled Vol.4 → playlist **"Sovietskiy Drayv"**
+`PLc304hwLOBm_6shMVcgRKe1iZ22vnIP_k` (public, 6 items); track-01 description
+verified clean ("…Best listened to in order — full album playlist: <url>.").
+Vol.4 batch-2 timer (`nd-vol4-b2`, 06-01 09:00 PDT) swapped from raw run-album to
+`publish-staggered` → it'll upload 7-12 AND complete the playlist.
+
+**Pinned comment — the honest answer:** can't be done via API. The playlist link
+now lives in the **description** (reliable, top of fold). Actually *pinning* a
+comment would require **browser automation** (Chrome MCP — mmichels88 is already
+logged in — or Wraith/Playwright) driving Studio UI, and only AFTER videos are
+public (Vol.4: 06-02). Tracked as a post-drop, decide-if-worth-it item (the
+description link already covers discoverability). See HANDOFF task / memory.
+
+**Source state:** edits in canonical local repo + cnc `/opt/nightdrive-ws`
+(config.rs, youtube/lib.rs, cli/main.rs). Orchestrator `main.rs` description-line
+fix is in local source only — deploys whenever the full workspace is next built;
+until then `playlist-sync` overwrites descriptions post-upload so it doesn't
+matter functionally.

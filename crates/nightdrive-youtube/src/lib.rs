@@ -27,6 +27,8 @@ const OAUTH_TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const VIDEOS_INSERT_URL: &str = "https://www.googleapis.com/upload/youtube/v3/videos";
 const THUMBNAILS_SET_URL: &str = "https://www.googleapis.com/upload/youtube/v3/thumbnails/set";
 const VIDEOS_UPDATE_URL: &str = "https://www.googleapis.com/youtube/v3/videos";
+const PLAYLISTS_URL: &str = "https://www.googleapis.com/youtube/v3/playlists";
+const PLAYLIST_ITEMS_URL: &str = "https://www.googleapis.com/youtube/v3/playlistItems";
 
 /// 8 MB chunks. YouTube requires chunks be a multiple of 256 KB except for the
 /// last; 8 MB is the conventional default and gives good throughput on typical
@@ -169,6 +171,231 @@ impl YoutubeClient {
             .map_err(|e| NightdriveError::Youtube(format!("decode token: {e}")))?;
         debug!(expires_in = t.expires_in, "got access token");
         Ok(t.access_token)
+    }
+}
+
+// =============================================================================
+// Playlists (album playlist support) — playlists.insert / playlistItems.*
+//
+// The YouTube Data API v3 supports creating playlists and adding videos, but
+// it does NOT support PINNING comments (a Studio-UI-only affordance). So the
+// album playlist link goes in each video's DESCRIPTION (reliable), set here via
+// `ensure_playlist_link_in_description`. Pinning, if wanted, is a separate
+// browser-automation step run after the videos go public.
+// =============================================================================
+
+impl YoutubeClient {
+    /// Public watch URL for a playlist id.
+    pub fn playlist_url(playlist_id: &str) -> String {
+        format!("https://www.youtube.com/playlist?list={playlist_id}")
+    }
+
+    /// Find an existing playlist on the authenticated channel whose snippet.title
+    /// exactly matches `title`, else create one. Returns the playlist id. Idempotent
+    /// across staggered re-runs so an album gets exactly one playlist.
+    #[instrument(skip(self, description), fields(title))]
+    pub async fn ensure_playlist(
+        &self,
+        title: &str,
+        description: &str,
+        privacy: &str,
+    ) -> NightdriveResult<String> {
+        if let Some(id) = self.find_playlist_by_title(title).await? {
+            info!(playlist_id = %id, "found existing album playlist");
+            return Ok(id);
+        }
+        let access = self.access_token().await?;
+        let body = serde_json::json!({
+            "snippet": { "title": title, "description": description },
+            "status": { "privacyStatus": privacy },
+        });
+        let resp = self
+            .http
+            .post(PLAYLISTS_URL)
+            .query(&[("part", "snippet,status")])
+            .bearer_auth(&access)
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| NightdriveError::Youtube(format!("playlists.insert send: {e}")))?;
+        if !resp.status().is_success() {
+            let st = resp.status();
+            let text = resp.text().await.unwrap_or_default();
+            return Err(NightdriveError::Youtube(format!("playlists.insert {st}: {text}")));
+        }
+        let pl: VideoResource = resp
+            .json()
+            .await
+            .map_err(|e| NightdriveError::Youtube(format!("decode playlists.insert: {e}")))?;
+        info!(playlist_id = %pl.id, "created album playlist");
+        Ok(pl.id)
+    }
+
+    /// First playlist id whose snippet.title == `title` among playlists owned by
+    /// the authenticated channel. Paginates defensively (albums are few).
+    async fn find_playlist_by_title(&self, title: &str) -> NightdriveResult<Option<String>> {
+        let access = self.access_token().await?;
+        let mut page_token: Option<String> = None;
+        for _ in 0..10 {
+            let mut q = vec![
+                ("part".to_string(), "snippet".to_string()),
+                ("mine".to_string(), "true".to_string()),
+                ("maxResults".to_string(), "50".to_string()),
+            ];
+            if let Some(t) = &page_token {
+                q.push(("pageToken".to_string(), t.clone()));
+            }
+            let resp = self
+                .http
+                .get(PLAYLISTS_URL)
+                .query(&q)
+                .bearer_auth(&access)
+                .send()
+                .await
+                .map_err(|e| NightdriveError::Youtube(format!("playlists.list send: {e}")))?;
+            if !resp.status().is_success() {
+                let st = resp.status();
+                let text = resp.text().await.unwrap_or_default();
+                return Err(NightdriveError::Youtube(format!("playlists.list {st}: {text}")));
+            }
+            let body: serde_json::Value = resp
+                .json()
+                .await
+                .map_err(|e| NightdriveError::Youtube(format!("decode playlists.list: {e}")))?;
+            if let Some(items) = body.get("items").and_then(|v| v.as_array()) {
+                for it in items {
+                    let t = it.pointer("/snippet/title").and_then(|v| v.as_str()).unwrap_or("");
+                    if t == title {
+                        if let Some(id) = it.get("id").and_then(|v| v.as_str()) {
+                            return Ok(Some(id.to_string()));
+                        }
+                    }
+                }
+            }
+            match body.get("nextPageToken").and_then(|v| v.as_str()) {
+                Some(t) => page_token = Some(t.to_string()),
+                None => break,
+            }
+        }
+        Ok(None)
+    }
+
+    /// Video ids currently in `playlist_id` (for idempotent adds). Paginates.
+    pub async fn list_playlist_video_ids(&self, playlist_id: &str) -> NightdriveResult<Vec<String>> {
+        let access = self.access_token().await?;
+        let mut out = Vec::new();
+        let mut page_token: Option<String> = None;
+        for _ in 0..20 {
+            let mut q = vec![
+                ("part".to_string(), "contentDetails".to_string()),
+                ("playlistId".to_string(), playlist_id.to_string()),
+                ("maxResults".to_string(), "50".to_string()),
+            ];
+            if let Some(t) = &page_token {
+                q.push(("pageToken".to_string(), t.clone()));
+            }
+            let resp = self
+                .http
+                .get(PLAYLIST_ITEMS_URL)
+                .query(&q)
+                .bearer_auth(&access)
+                .send()
+                .await
+                .map_err(|e| NightdriveError::Youtube(format!("playlistItems.list send: {e}")))?;
+            if !resp.status().is_success() {
+                let st = resp.status();
+                let text = resp.text().await.unwrap_or_default();
+                return Err(NightdriveError::Youtube(format!("playlistItems.list {st}: {text}")));
+            }
+            let body: serde_json::Value = resp
+                .json()
+                .await
+                .map_err(|e| NightdriveError::Youtube(format!("decode playlistItems.list: {e}")))?;
+            if let Some(items) = body.get("items").and_then(|v| v.as_array()) {
+                for it in items {
+                    if let Some(v) = it.pointer("/contentDetails/videoId").and_then(|v| v.as_str()) {
+                        out.push(v.to_string());
+                    }
+                }
+            }
+            match body.get("nextPageToken").and_then(|v| v.as_str()) {
+                Some(t) => page_token = Some(t.to_string()),
+                None => break,
+            }
+        }
+        Ok(out)
+    }
+
+    /// Append `video_id` to `playlist_id` (playlistItems.insert). Caller is
+    /// responsible for dedupe (see [`Self::list_playlist_video_ids`]).
+    #[instrument(skip(self))]
+    pub async fn add_video_to_playlist(
+        &self,
+        playlist_id: &str,
+        video_id: &str,
+    ) -> NightdriveResult<()> {
+        let access = self.access_token().await?;
+        let body = serde_json::json!({
+            "snippet": {
+                "playlistId": playlist_id,
+                "resourceId": { "kind": "youtube#video", "videoId": video_id },
+            }
+        });
+        let resp = self
+            .http
+            .post(PLAYLIST_ITEMS_URL)
+            .query(&[("part", "snippet")])
+            .bearer_auth(&access)
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| NightdriveError::Youtube(format!("playlistItems.insert send: {e}")))?;
+        if !resp.status().is_success() {
+            let st = resp.status();
+            let text = resp.text().await.unwrap_or_default();
+            return Err(NightdriveError::Youtube(format!("playlistItems.insert {st}: {text}")));
+        }
+        info!("added video to playlist");
+        Ok(())
+    }
+
+    /// Idempotently ensure the video's description carries the album playlist
+    /// link, and rewrite the stale "playlist link in pinned comment" claim (the
+    /// API can't pin, so the link lives in the description). Returns true if the
+    /// description was changed, false if it already had the link.
+    #[instrument(skip(self, playlist_url), fields(video_id))]
+    pub async fn ensure_playlist_link_in_description(
+        &self,
+        video_id: &str,
+        playlist_url: &str,
+    ) -> NightdriveResult<bool> {
+        let access = self.access_token().await?;
+        let snippet = self.fetch_video_snippet(video_id, &access).await?;
+        let desc = snippet
+            .get("description")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+        if desc.contains(playlist_url) {
+            return Ok(false);
+        }
+        let new_desc = if desc.contains("playlist link in pinned comment") {
+            desc.replace(
+                "playlist link in pinned comment",
+                &format!("full album playlist: {playlist_url}"),
+            )
+        } else {
+            format!("{desc}\n\n\u{25B6} Full album playlist: {playlist_url}")
+        };
+        self.update_video(
+            video_id,
+            VideoUpdate {
+                description: Some(new_desc),
+                ..Default::default()
+            },
+        )
+        .await?;
+        Ok(true)
     }
 }
 

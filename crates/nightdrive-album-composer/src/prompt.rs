@@ -24,6 +24,8 @@ pub fn build_prompt(
          - Each track has key, role (opener|cruiser|peak|bridge|closer), bpm, duration_seconds,\n\
            mood_tags[], sections[], musicgen_prompt, cover_prompt, key_relationship_to_prior,\n\
            tempo_relationship_to_prior, composer_notes.\n\
+         - sections[] MUST be an array of OBJECTS, each exactly\n\
+           {{\"name\": string, \"bars\": integer, \"instrumentation\": string}} — never bare strings.\n\
          - Use recurring_motifs to thread the album together (3-5 musical motifs that recur).\n\
          - Compose a narrative_arc (1-2 sentences).\n\
          - bpm_arc[] is the BPM of each track in order.\n\

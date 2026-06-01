@@ -171,7 +171,15 @@ pub struct YoutubeConfig {
     pub publish_window_start_hour: u32,
     pub publish_window_end_hour: u32,
     pub declare_synthetic_content: bool,
+    /// Max `video.insert` calls per Pacific day (GCP project-level cap
+    /// `defaultVideoInsertPerDayPerProject`, default 6). `album
+    /// publish-staggered` uses this to batch album uploads across days so a
+    /// 12-track album self-completes instead of 429-ing after 6. Bump this
+    /// (no recompile) once the GCP quota increase lands.
+    #[serde(default = "default_max_uploads_per_day")]
+    pub max_uploads_per_day: u32,
 }
+fn default_max_uploads_per_day() -> u32 { 6 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct LivestreamConfig {

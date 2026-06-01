@@ -53,6 +53,7 @@ pub async fn compose(cfg: &GatewayConfig, req: &ComposeRequest) -> Result<AlbumS
         .map_err(|e| ComposerError::DangerZoneLoad(e.to_string()))?;
 
     let mut last_hits: Vec<danger_zone::Hit> = Vec::new();
+    let mut last_json_err: Option<String> = None;
     for attempt in 0..req.max_retries {
         let prompt_text = prompt::build_prompt(
             &req.theme,
@@ -67,10 +68,19 @@ pub async fn compose(cfg: &GatewayConfig, req: &ComposeRequest) -> Result<AlbumS
         // Task 15's drop-next flow. We do NOT retry LLM transport here.
         let reply = ask_main(cfg, &prompt_text).await?;
         let json = strip_fence(&reply);
-        let spec: AlbumSpec = serde_json::from_str(&json).map_err(|e| ComposerError::InvalidJson {
-            attempt,
-            reason: e.to_string(),
-        })?;
+        // Parse failures ARE retried — the LLM is non-deterministic, so a re-ask
+        // often yields valid JSON. Observed 2026-05-31: Opus 4.8 intermittently
+        // emits sections[] as bare strings; the prompt now forbids that explicitly
+        // and a retry recovers. (Previously a single parse error aborted the whole
+        // drop via `?`, wasting the remaining attempts.)
+        let spec: AlbumSpec = match serde_json::from_str(&json) {
+            Ok(spec) => spec,
+            Err(e) => {
+                warn!(attempt, error = %e, "composer: invalid JSON from LLM, retrying");
+                last_json_err = Some(e.to_string());
+                continue;
+            }
+        };
 
         let titles: Vec<&str> = spec.tracks.iter().map(|t| t.title.as_str()).collect();
         let hits = danger_zone::check_titles(&titles, &zones, &req.danger_zone_keys);
@@ -82,10 +92,18 @@ pub async fn compose(cfg: &GatewayConfig, req: &ComposeRequest) -> Result<AlbumS
         last_hits = hits;
     }
 
-    Err(ComposerError::DangerZoneBlocked {
-        attempts: req.max_retries,
-        hits: last_hits,
-    })
+    // Exhausted retries — surface the dominant failure mode.
+    if !last_hits.is_empty() {
+        Err(ComposerError::DangerZoneBlocked {
+            attempts: req.max_retries,
+            hits: last_hits,
+        })
+    } else {
+        Err(ComposerError::InvalidJson {
+            attempt: req.max_retries,
+            reason: last_json_err.unwrap_or_else(|| "no spec produced".to_string()),
+        })
+    }
 }
 
 fn strip_fence(s: &str) -> String {

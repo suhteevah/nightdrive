@@ -17,7 +17,7 @@
 use anyhow::{Context, anyhow};
 use clap::{Parser, Subcommand};
 use nightdrive_core::{CompositionSpec, TrackPaths, config::AppConfig};
-use nightdrive_youtube::YoutubeUploader;
+use nightdrive_youtube::{YoutubeUploader, YoutubeClient, YoutubeCredentials};
 use nightdrive_stems::{DemucsCli, StemSeparator, StemsConfig};
 use nightdrive_storage::{Db, Tracks, Uploads};
 use serde::Deserialize;
@@ -162,6 +162,32 @@ enum AlbumCmd {
     DropNext {
         #[arg(long)]
         dry_run: bool,
+        /// Compose the head slug's album JSON (if missing) and exit — no pop,
+        /// no render, no upload. Run as a pre-eviction step so the cloud-LLM
+        /// composer reaches openclaw `main` while inference-embed is still up.
+        #[arg(long)]
+        compose_only: bool,
+    },
+    /// Create/sync the album's YouTube playlist: ensure one playlist exists,
+    /// add the album's uploaded videos, and put the playlist link in each
+    /// video's description (idempotent). Run after uploads.
+    PlaylistSync {
+        #[arg(long)]
+        slug: String,
+    },
+    /// Upload an album's tracks staggered under the per-day video.insert cap,
+    /// syncing the playlist each batch and self-scheduling a +25h continuation
+    /// until the album completes. Resumable + idempotent (skips already-uploaded
+    /// tracks). This is what `drop-next` calls.
+    PublishStaggered {
+        #[arg(long)]
+        slug: String,
+        /// RFC3339 sync-drop timestamp applied to every track's scheduled publish.
+        #[arg(long)]
+        publish_at: Option<String>,
+        /// Max uploads per run/day (GCP project video.insert cap).
+        #[arg(long, default_value_t = 6)]
+        per_day: u32,
     },
 }
 
@@ -439,7 +465,19 @@ async fn main() -> anyhow::Result<()> {
             match cmd {
                 AlbumCmd::Backlog { cmd } => album_backlog(&cfg, cmd).await,
                 AlbumCmd::Propose { count } => album_propose(&cfg, count).await,
-                AlbumCmd::DropNext { dry_run } => album_drop_next(&cfg, dry_run).await,
+                AlbumCmd::DropNext { dry_run, compose_only } => album_drop_next(&cfg, dry_run, compose_only).await,
+                AlbumCmd::PlaylistSync { slug } => album_playlist_sync(&cfg, &slug).await,
+                AlbumCmd::PublishStaggered { slug, publish_at, per_day } => {
+                    let pa = match publish_at {
+                        Some(s) => Some(
+                            chrono::DateTime::parse_from_rfc3339(&s)
+                                .context("parse --publish-at (RFC3339)")?
+                                .with_timezone(&chrono::Utc),
+                        ),
+                        None => None,
+                    };
+                    album_publish_staggered(&cfg, &slug, pa, per_day).await
+                }
             }
         }
     }
@@ -1011,7 +1049,7 @@ async fn album_backlog(cfg: &AppConfig, cmd: BacklogCmd) -> anyhow::Result<()> {
 // =============================================================================
 
 #[tracing::instrument(skip(cfg))]
-async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool) -> anyhow::Result<()> {
+async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool, compose_only: bool) -> anyhow::Result<()> {
     let backlog_path = cfg.paths.backlog_json();
     let albums_dir = cfg.paths.albums_dir();
     let danger_zone_path = cfg.paths.danger_zone_json();
@@ -1052,6 +1090,38 @@ async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool
         let head = nightdrive_core::backlog::peek_approved(&bl).expect("non-empty checked above");
         (head_slug_clone(&head.slug), head.theme.clone(), head.danger_zone_keys.clone())
     };
+
+    // Compose-only: ensure the head slug's album JSON exists, then exit — no pop,
+    // no render, no upload, no history. This runs as a pre-eviction ExecStartPre
+    // so the cloud-LLM composer reaches openclaw `main` while inference-embed
+    // (which `main` uses for memory) is still up. The subsequent full drop-next
+    // then finds the JSON present (see the `album_json_path.exists()` skip below)
+    // and runs only the GPU-bound render + upload after eviction. Without this,
+    // eviction stops embed first and `main` hangs → 180s podman-exec timeout
+    // (the cause of the 2026-05-25/28 silent autonomous-drop failures).
+    if compose_only {
+        let album_json_path = albums_dir.join(format!("{head_slug}.json"));
+        if album_json_path.exists() {
+            println!("compose-only: {head_slug} album JSON already present — nothing to do");
+            return Ok(());
+        }
+        let gw = nightdrive_openclaw_main::GatewayConfig::from_env()?;
+        let req = nightdrive_album_composer::ComposeRequest {
+            slug: head_slug.clone(),
+            theme: head_theme.clone(),
+            track_count: 12,
+            danger_zone_keys: head_dz_keys.clone(),
+            albums_dir: albums_dir.clone(),
+            danger_zone_path: danger_zone_path.clone(),
+            max_retries: 3,
+        };
+        let spec = nightdrive_album_composer::compose(&gw, &req)
+            .await
+            .map_err(|e| anyhow::anyhow!("compose-only failed for {head_slug}: {e}"))?;
+        std::fs::write(&album_json_path, serde_json::to_string_pretty(&spec)?)?;
+        println!("compose-only: composed + wrote {}", album_json_path.display());
+        return Ok(());
+    }
 
     // 5. Compute publish_at = (now + 3 days) at 00:00 UTC.
     let publish_at = (now + chrono::Duration::days(3))
@@ -1130,32 +1200,21 @@ async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool
         tracing::info!(slug = %head_slug, "drop-next: album JSON already exists, skipping composer");
     }
 
-    // 9. Shell out to orchestrator.
-    let orch_path = std::env::var("NIGHTDRIVE_ORCHESTRATOR_BIN")
-        .unwrap_or_else(|_| "/opt/nightdrive/bin/nightdrive-orchestrator".to_string());
+    // 9. Upload staggered under the GCP per-day video.insert cap. This does the
+    //    first batch now (≤ max_uploads_per_day tracks), syncs the album playlist
+    //    + descriptions, and self-schedules +25h continuations until the album
+    //    completes. Replaces the old single run-album call that 429-ed after 6.
     tracing::info!(
         slug = %head_slug,
         publish_at = %publish_at.to_rfc3339(),
-        "drop-next: invoking orchestrator run-album"
+        per_day = cfg.youtube.max_uploads_per_day,
+        "drop-next: invoking staggered publish"
     );
-    let status = std::process::Command::new(&orch_path)
-        .args([
-            "run-album",
-            "--slug",
-            &head_slug,
-            "--publish-at",
-            &publish_at.to_rfc3339(),
-        ])
-        .status()?;
-
-    if !status.success() {
-        let msg = format!(
-            "orchestrator run-album exit={:?} for {}",
-            status.code(),
-            head_slug
-        );
-        tracing::warn!("{}", msg);
-        return Err(anyhow::anyhow!(msg));
+    if let Err(e) =
+        album_publish_staggered(cfg, &head_slug, Some(publish_at), cfg.youtube.max_uploads_per_day).await
+    {
+        tracing::warn!(error = %e, "drop-next: publish-staggered first batch failed");
+        return Err(anyhow::anyhow!("publish-staggered failed for {}: {}", head_slug, e));
     }
 
     // 10. Append to history.
@@ -1178,6 +1237,248 @@ async fn album_drop_next(cfg: &nightdrive_core::config::AppConfig, dry_run: bool
 /// Trivial alias — makes the peek-then-pop pattern self-documenting.
 fn head_slug_clone(s: &str) -> String {
     s.to_string()
+}
+
+/// Set of track numbers in `slug` that already have a completed YouTube upload
+/// (a uploads row with a non-null youtube_video_id). Used to resume staggered
+/// uploads + to know what's already in the channel without re-uploading.
+async fn album_uploaded_nums(
+    db: &Db,
+    slug: &str,
+) -> anyhow::Result<std::collections::HashSet<u32>> {
+    let rows = Uploads::list_recent(db, 5000).await.unwrap_or_default();
+    let prefix = format!("nd-{slug}-");
+    let mut set = std::collections::HashSet::new();
+    for r in rows {
+        if r.youtube_video_id.is_some() && r.track_id.0.starts_with(&prefix) {
+            if let Some(n) = r.track_id.0.rsplit('-').next().and_then(|s| s.parse::<u32>().ok()) {
+                set.insert(n);
+            }
+        }
+    }
+    Ok(set)
+}
+
+/// Ensure the album's YouTube playlist exists, contains every uploaded video,
+/// and that each video's description carries the playlist link. Idempotent +
+/// incremental — safe to call after every staggered batch and on already-shipped
+/// albums (backfill). The API can't pin comments, so the link lives in the
+/// description (see `nightdrive_youtube::ensure_playlist_link_in_description`).
+async fn album_playlist_sync(cfg: &nightdrive_core::config::AppConfig, slug: &str) -> anyhow::Result<()> {
+    let album_path = cfg.paths.albums_dir().join(format!("{slug}.json"));
+    let album: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(&album_path)
+            .with_context(|| format!("read {}", album_path.display()))?,
+    )
+    .with_context(|| format!("parse {}", album_path.display()))?;
+    let album_title = album["title"].as_str().unwrap_or(slug).to_string();
+
+    let db = Db::connect_and_migrate(&cfg.paths.sqlite_db).await.context("open db")?;
+    let rows = Uploads::list_recent(&db, 5000).await.unwrap_or_default();
+    let prefix = format!("nd-{slug}-");
+    // track_num -> video_id. list_recent is DESC by started_at, so the first
+    // row seen per track is the most recent completed upload.
+    let mut by_num: std::collections::BTreeMap<u32, String> = std::collections::BTreeMap::new();
+    for r in rows {
+        if let Some(vid) = r.youtube_video_id {
+            if r.track_id.0.starts_with(&prefix) {
+                if let Some(n) = r.track_id.0.rsplit('-').next().and_then(|s| s.parse::<u32>().ok()) {
+                    by_num.entry(n).or_insert(vid);
+                }
+            }
+        }
+    }
+    if by_num.is_empty() {
+        println!("{slug}: no uploaded videos yet; nothing to sync.");
+        return Ok(());
+    }
+
+    let yt = YoutubeClient::new(YoutubeCredentials::from_env()?)?;
+    let pl_desc = format!("{album_title} — full album, in order. nightdrive autonomous synthwave for coding.");
+    let playlist_id = yt.ensure_playlist(&album_title, &pl_desc, "public").await?;
+    let url = YoutubeClient::playlist_url(&playlist_id);
+    let existing: std::collections::HashSet<String> = yt
+        .list_playlist_video_ids(&playlist_id)
+        .await
+        .unwrap_or_default()
+        .into_iter()
+        .collect();
+
+    let (mut added, mut fixed) = (0u32, 0u32);
+    for (num, vid) in &by_num {
+        if !existing.contains(vid) {
+            match yt.add_video_to_playlist(&playlist_id, vid).await {
+                Ok(()) => added += 1,
+                Err(e) => tracing::warn!(track = *num, video_id = %vid, error = %e, "playlist add failed"),
+            }
+        }
+        match yt.ensure_playlist_link_in_description(vid, &url).await {
+            Ok(true) => fixed += 1,
+            Ok(false) => {}
+            Err(e) => tracing::warn!(track = *num, video_id = %vid, error = %e, "description link update failed"),
+        }
+    }
+    println!(
+        "{slug}: playlist \"{album_title}\" {url} — {} videos ({} newly added, {} descriptions updated).",
+        by_num.len(),
+        added,
+        fixed
+    );
+    Ok(())
+}
+
+/// Upload `slug`'s tracks in batches of `per_day`, syncing the playlist after
+/// each batch and self-scheduling a +25h continuation until every track is up.
+/// Resumable + idempotent: skips already-uploaded tracks, so continuations (and
+/// accidental re-runs) resume rather than duplicate.
+async fn album_publish_staggered(
+    cfg: &nightdrive_core::config::AppConfig,
+    slug: &str,
+    publish_at: Option<chrono::DateTime<chrono::Utc>>,
+    per_day: u32,
+) -> anyhow::Result<()> {
+    let per_day = per_day.max(1);
+    let album_path = cfg.paths.albums_dir().join(format!("{slug}.json"));
+    let album: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(&album_path)
+            .with_context(|| format!("read {}", album_path.display()))?,
+    )
+    .with_context(|| format!("parse {}", album_path.display()))?;
+    let track_count = album["tracks"].as_array().map(|a| a.len()).unwrap_or(0) as u32;
+    if track_count == 0 {
+        anyhow::bail!("album {slug} has no tracks");
+    }
+
+    let db = Db::connect_and_migrate(&cfg.paths.sqlite_db).await.context("open db")?;
+    let uploaded_before = album_uploaded_nums(&db, slug).await?;
+    let todo: Vec<u32> = (1..=track_count).filter(|n| !uploaded_before.contains(n)).collect();
+
+    if todo.is_empty() {
+        album_playlist_sync(cfg, slug).await?;
+        let msg = format!("nightdrive: {slug} already fully uploaded ({track_count}/{track_count}); playlist synced.");
+        tracing::info!("{msg}");
+        let _ = nightdrive_core::telegram::notify(&msg);
+        println!("{msg}");
+        return Ok(());
+    }
+
+    let batch: Vec<u32> = todo.iter().copied().take(per_day as usize).collect();
+    let publish_iso = publish_at.map(|p| p.to_rfc3339());
+    tracing::info!(slug, ?batch, todo = todo.len(), "publish-staggered: uploading batch");
+
+    let orch = std::env::var("NIGHTDRIVE_ORCHESTRATOR_BIN")
+        .unwrap_or_else(|_| "/opt/nightdrive/bin/nightdrive-orchestrator".to_string());
+    for num in &batch {
+        let mut args: Vec<String> = vec![
+            "run-album".into(),
+            "--slug".into(),
+            slug.into(),
+            "--from-track".into(),
+            num.to_string(),
+            "--to-track".into(),
+            num.to_string(),
+        ];
+        if let Some(iso) = &publish_iso {
+            args.push("--publish-at".into());
+            args.push(iso.clone());
+        }
+        tracing::info!(track = *num, "publish-staggered: run-album single track");
+        match std::process::Command::new(&orch).args(&args).status() {
+            Ok(s) if s.success() => {}
+            Ok(s) => tracing::warn!(track = *num, code = ?s.code(), "run-album track non-zero (continuing)"),
+            Err(e) => tracing::warn!(track = *num, error = %e, "run-album spawn failed (continuing)"),
+        }
+    }
+
+    // Playlist + descriptions (incremental, idempotent, non-fatal).
+    if let Err(e) = album_playlist_sync(cfg, slug).await {
+        tracing::warn!(error = %e, "publish-staggered: playlist sync failed (non-fatal)");
+    }
+
+    let uploaded_after = album_uploaded_nums(&db, slug).await?;
+    let remaining: Vec<u32> = (1..=track_count).filter(|n| !uploaded_after.contains(n)).collect();
+    let progressed = uploaded_after.len() > uploaded_before.len();
+
+    if remaining.is_empty() {
+        let msg = format!(
+            "nightdrive: {slug} COMPLETE — {track_count}/{track_count} uploaded + playlist synced. Sync-drop {}.",
+            publish_iso.as_deref().unwrap_or("(per-track default)")
+        );
+        tracing::info!("{msg}");
+        let _ = nightdrive_core::telegram::notify(&msg);
+        println!("{msg}");
+    } else if progressed {
+        schedule_stagger_continuation(slug, publish_at, per_day, remaining.len())?;
+    } else {
+        let msg = format!(
+            "nightdrive: {slug} STALLED — {} tracks un-uploaded after a no-progress batch. Not rescheduling; needs a look.",
+            remaining.len()
+        );
+        tracing::warn!("{msg}");
+        let _ = nightdrive_core::telegram::notify(&msg);
+        println!("{msg}");
+    }
+    Ok(())
+}
+
+/// Arm a durable +25h systemd timer that re-invokes `album publish-staggered`
+/// for the next batch (next Pacific day — clears both the rolling-24h channel
+/// cap and the per-day GCP project cap, since 25h always crosses one midnight).
+/// Best-effort; on failure prints the manual fallback command.
+fn schedule_stagger_continuation(
+    slug: &str,
+    publish_at: Option<chrono::DateTime<chrono::Utc>>,
+    per_day: u32,
+    remaining: usize,
+) -> anyhow::Result<()> {
+    let exe = std::env::current_exe().context("current_exe")?;
+    let cwd = std::env::current_dir().context("current_dir")?;
+    let unit = format!("nightdrive-stagger-{slug}");
+    let _ = std::process::Command::new("systemctl")
+        .args(["reset-failed", &format!("{unit}.timer"), &format!("{unit}.service")])
+        .status();
+
+    let mut args: Vec<String> = vec![
+        "--on-active=25h".into(),
+        format!("--unit={unit}"),
+        "--collect".into(),
+        format!("--property=WorkingDirectory={}", cwd.display()),
+        "--property=EnvironmentFile=/etc/nightdrive/nightdrive.env".into(),
+        exe.display().to_string(),
+        "album".into(),
+        "publish-staggered".into(),
+        "--slug".into(),
+        slug.into(),
+        "--per-day".into(),
+        per_day.to_string(),
+    ];
+    if let Some(p) = publish_at {
+        args.push("--publish-at".into());
+        args.push(p.to_rfc3339());
+    }
+
+    let manual = format!(
+        "nightdrive-cli album publish-staggered --slug {slug} --per-day {per_day}{}",
+        publish_at.map(|p| format!(" --publish-at {}", p.to_rfc3339())).unwrap_or_default()
+    );
+
+    match std::process::Command::new("systemd-run").args(&args).status() {
+        Ok(s) if s.success() => {
+            let msg = format!("nightdrive: {slug} batch done; {remaining} tracks armed for +25h (next GCP day) via {unit}.");
+            tracing::info!("{msg}");
+            let _ = nightdrive_core::telegram::notify(&msg);
+            println!("scheduled +25h continuation for {remaining} remaining tracks ({unit}).");
+        }
+        other => {
+            let msg = format!(
+                "nightdrive: {slug} — FAILED to arm continuation ({other:?}). {remaining} tracks pending. Manual: {manual}"
+            );
+            tracing::error!("{msg}");
+            let _ = nightdrive_core::telegram::notify(&msg);
+            println!("{msg}");
+        }
+    }
+    Ok(())
 }
 
 async fn stream_status() -> anyhow::Result<()> {
