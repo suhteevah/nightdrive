@@ -133,7 +133,7 @@ impl FinalEncoder for FfmpegEncoder {
         // in the filter graph; here we just download + path-record.
         let radar_archive = paths.root.join("radar.gif");
         let radar_path: Option<PathBuf> =
-            match fetch_radar_gif(&forecast_data.region, &radar_archive).await {
+            match fetch_radar_gif(&forecast_data, &radar_archive, &ffmpeg).await {
                 Ok(p) => {
                     info!(
                         archive = %p.display(),
@@ -258,6 +258,7 @@ impl FinalEncoder for FfmpegEncoder {
             &city_lo_paths,
             cta_path.as_deref(),
             radar_path.is_some(),
+            forecast_data.radar_prestyled,
         );
 
         let mut cmd = tokio::process::Command::new(&ffmpeg);
@@ -352,6 +353,7 @@ fn build_filter_graph(
     city_lo_paths: &[Vec<PathBuf>],
     cta_path: Option<&Path>,
     radar_present: bool,
+    radar_prestyled: bool,
 ) -> String {
     // Base layers: showwaves → cover scale/crop → panel boxes → seam → radar
     // inner box → radar gif overlay (if present) → waveform overlay → drawtexts.
@@ -382,12 +384,26 @@ fn build_filter_graph(
     //   4. scale=-1:480 — preserves aspect, pillarbox-centers at x=218
     //      (=(880-524)/2+40).
     if radar_present {
-        graph.push_str(
-            ";[2:v]format=rgba,chromakey=color=0xC2EAF0:similarity=0.12:blend=0.04,\
-                  negate,scale=-1:480[radar_scaled];\
-             [bg_radar][radar_scaled]overlay=x=218:y=300:shortest=0[bg_with_radar];\
-             [bg_with_radar][wave]overlay=x=0:y=820:format=yuv420[v_base]",
-        );
+        if radar_prestyled {
+            // RainViewer path: the GIF is already a dark synthwave map with
+            // magenta precip (composited in weather::build_rainviewer_gif).
+            // Skip chromakey+negate — just scale the 512² tile to the inset
+            // height and center it (square → x=(880-480)/2+40=240).
+            graph.push_str(
+                ";[2:v]format=rgba,scale=-1:480[radar_scaled];\
+                 [bg_radar][radar_scaled]overlay=x=240:y=300:shortest=0[bg_with_radar];\
+                 [bg_with_radar][wave]overlay=x=0:y=820:format=yuv420[v_base]",
+            );
+        } else {
+            // NWS Ridge2 path: light basemap + colored precip. Key the
+            // pale-cyan water, negate to dark land + magenta/cyan precip.
+            graph.push_str(
+                ";[2:v]format=rgba,chromakey=color=0xC2EAF0:similarity=0.12:blend=0.04,\
+                      negate,scale=-1:480[radar_scaled];\
+                 [bg_radar][radar_scaled]overlay=x=218:y=300:shortest=0[bg_with_radar];\
+                 [bg_with_radar][wave]overlay=x=0:y=820:format=yuv420[v_base]",
+            );
+        }
     } else {
         graph.push_str(";[bg_radar][wave]overlay=x=0:y=820:format=yuv420[v_base]");
     }
