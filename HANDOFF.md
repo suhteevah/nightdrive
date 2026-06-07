@@ -2,8 +2,8 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** 🟢 Publishing again. The 5-day dark spell (since 2026-05-26) was a dead YouTube OAuth refresh token — re-minted + OAuth app published to Production (durable, no more 7-day expiry). Vol. 4 batch-1 uploaded (sync-drop 2026-06-02T00:00Z); batch-2 armed 06-01. Pipeline hardened this session: tmpfs working-tree landmine relocated, composer timeout + Opus-4.8 schema fixed, and **playlists + per-day upload stagger shipped**. **See §32 + §33 for the full 2026-05-31 session.**
-**Last updated:** 2026-05-31 (PDT)
+**Status:** 🟢 **Lost Worlds #1 "Telos: Beneath Shasta, Vol.1" RENDERED 12/12** (covers approved, new Siskiyou Co./Mt Shasta NWS weather region live) + uploads durably scheduled (Telos b1 06-08, b2 06-09; public sync-drop 2026-06-11T00:00Z). Same pass caught + rescued **Tokyo Vol.1 batch-2** (lost transient timer killed by a 06-06 reboot → re-armed durable, fires 06-07, keeps Tokyo's 06-09 drop whole). Per-album/global weather system shipped (Japan/Soviet/Arctic Open-Meteo+RainViewer; US/Shasta NWS). **See §35 for the 2026-06-06 (cont.) Telos build session.**
+**Last updated:** 2026-06-06 (PDT)
 
 ---
 
@@ -2772,3 +2772,202 @@ description link already covers discoverability). See HANDOFF task / memory.
 fix is in local source only — deploys whenever the full workspace is next built;
 until then `playlist-sync` overwrites descriptions post-upload so it doesn't
 matter functionally.
+
+---
+
+## §34 — Session 2026-06-06 — Per-album weather system shipped + Tokyo "Last Train" dropped + Lost Worlds saga designed
+
+### Last Updated
+2026-06-06 (PDT)
+
+### Project Status
+🟢 Per-album/global weather system SHIPPED + deployed. Tokyo Cyberpunk Vol.1 "Last
+Train" rendered (12/12) with real Japanese weather; batch-1 (6) uploaded, batch-2
+auto-uploads 06-07, public sync-drop 2026-06-09T00:00Z. 5-album "Lost Worlds"
+shared-universe saga designed + queued.
+
+### What Was Done This Session
+
+**1. Per-album / global weather system (the headline) — `crates/nightdrive-encoder`.**
+- Problem Matt flagged: the TWC overlay was hardcoded to 4 US NWS regions selected by
+  `djb2(track_id) % 4`, so a Tokyo album rendered Miami/Seattle weather. NWS is US-only.
+- `weather.rs` rewritten with a region registry. `region_for(track_id)` routes by the
+  **album slug embedded in the track id**: `tokyo`→JAPAN, `soviet`/`sovetskiy`→SOVIET,
+  `arctic`/`ice-station`→ARCTIC, `hong-kong`→HONGKONG, else hashed-US (unchanged).
+- Forecast: US→NWS, non-US→**Open-Meteo** (global, keyless, daily hi/lo °F + WMO codes).
+- Radar: US→NWS Ridge2 loop (encoder negates, as before). Non-US→`build_rainviewer_gif`:
+  RainViewer transparent precip tiles recolored magenta (`lutrgb=r=255:g=42:b=168`)
+  composited over a toned-down **OSM** night-map basemap → prestyled loop GIF.
+  `Forecast.radar_prestyled=true` → `lib.rs` SKIPS the negate/chromakey chain (conditional).
+- Coverage probed live: RainViewer covers Japan/Iceland/most-Europe; NOT Russia/Greenland/
+  high-arctic-Canada (those = dark regional map, no echoes — honest). Open-Meteo: everywhere.
+- 11 unit tests pass; full live encode verified on cnc via `tests/tokyo_encode_live.rs`
+  (`#[ignore]`). Orchestrator rebuilt on cnc (`cargo build -p nightdrive-orchestrator
+  --release`, no wgpu in its dep graph) + deployed to `/opt/nightdrive/bin/`; old binary
+  backed up `nightdrive-orchestrator.bak-20260605-214232`.
+- Reference: `memory/reference_nightdrive_per_album_weather.md`, `scratch/jp-radar-test/DESIGN.md`.
+
+**2. Tokyo Cyberpunk Vol.1 "Last Train" dropped.**
+- 12 SDXL covers + 11/12 ACE-Step render in one ~58-min main-coordinated GPU window;
+  **track 12 re-rendered separately** (ACE-Step sidecar crashed near the end of the long
+  run → dead `/generate` socket). Covers reviewed/approved (track-04 = warm baked-text
+  outlier, Matt said keep).
+- batch-1 (1-6) uploaded private: `LUUzkCO-ZFQ WcpsV_EBpCc UGYKeQoJ0WI WQmK8wkTxi0
+  vDDlofzurk8 gzbCsfk5uCQ`. batch-2 (7-12) self-scheduled
+  `nightdrive-stagger-tokyo-cyberpunk-vol-1.timer` → Sun 2026-06-07 08:24 PDT.
+- Sync-drop: all 12 public 2026-06-09T00:00:00Z. Playlist "Last Train"
+  `PLc304hwLOBm-kmgZI_lWsYPhtyNptzrNc`, descriptions linked.
+- `memory/project_tokyo_cyberpunk_last_train_shipped.md`.
+
+**3. "Lost Worlds" shared-universe saga designed + queued.**
+- 5 albums, interconnected: **Telos(Shasta) → Hollow Earth → Agartha → Atlantis → Gate of
+  Ra.** Yakub proposed + **DROPPED** (racial-conspiracy myth = demonetization risk).
+- Bible: `docs/superpowers/specs/2026-06-06-lost-worlds-saga-design.md`. All 5 queued in
+  `docs/album-backlog.json` (ahead of miami-vice/blade-runner/berlin-wall; tokyo moved to
+  history). `memory/project_lost_worlds_saga.md`.
+
+### Current State
+- Weather system: working + deployed (NOT stubbed).
+- Tokyo: 12/12 final.mp4 on cnc; batch-1 uploaded; batch-2 + public flip scheduled server-side.
+- Fleet: restored + released to openclaw main after each GPU window (inference ×3 + aether ×2 active).
+- `nightdrive-album-drop.timer`: still OFF (unchanged). thumbnail-retry + theme-propose: ON.
+
+### Blocking Issues
+- None hard. Tokyo batch-2 + public flip are scheduled (durable timer + server-side). GCP
+  6/day video.insert cap remains the binding upload constraint — handled by staggering.
+
+### What's Next
+1. **Verify Tokyo batch-2** landed after 06-07 08:24 PDT (timer durable; completes playlist).
+2. **Build Telos (saga launch)** when Matt says "build Telos" + a GPU window is free:
+   (a) `album-composer` spec; (b) ADD a **Siskiyou Co./Shasta US weather region** to
+   `weather.rs` (Mt Shasta City / Weed / Dunsmuir / McCloud — NWS native, Matt's backyard);
+   (c) SDXL covers; (d) ACE-Step render + encode; (e) `publish-staggered` + sync-drop.
+3. Rest of saga: Hollow Earth→Agartha (diptych, reuse built Arctic region) → Atlantis
+   (add mid-Atlantic coords) → Gate of Ra (add Giza coords). Shared-universe motifs +
+   track-12→track-1 sync handoffs per the bible.
+
+### Notes for Next Session
+- **github-uploader auto-commits the nightdrive tree — do NOT manually git commit/push**
+  (`reference_github_uploader_auto_commits`). Clean `git status` is normal.
+- **ACE-Step sidecar reliability:** died near the end of the 12-track ~58-min run (track 12).
+  For long album renders, expect possible sidecar death late; single-track re-render works
+  (`run-album --from-track N --to-track N --dry-run`).
+- **GPU coordination with openclaw main is mandatory** (cnc P100s shared). main gated this
+  session through 3 Gemma-A/B re-runs. Pattern: pause aether-serve+aether-vision too (NOT
+  just openclaw-inference-{embed,scout,workhorse}), restore trap + systemd deadman safety
+  net (8GB host is OOM-prone), ping main GREEN after. main DENYs competitors while you hold.
+- **Cover-gen:** `CUDA_VISIBLE_DEVICES=1 /opt/acestep/.venv/bin/python
+  sidecar/generate_album_covers_native.py --slug X` (16GB card). Script REPO_ROOT=
+  `/opt/nightdrive` → stage spec into `/opt/nightdrive/docs/albums/` + mirror covers to
+  `/opt/nightdrive-ws/assets/covers/albums/` (run-album reads there, WorkingDirectory=
+  `/opt/nightdrive-ws`).
+- The reusable GPU-phase scripts from this session live at `scratch/jp-radar-test/`
+  (`tokyo-drop.sh`, `tokyo-track12.sh`) — good templates for the next album's drop.
+- OAuth token durable (Production app) — no 7-day expiry.
+- Pre-existing harmless warning: `let mut add` at encoder `lib.rs` ~L418 (not from this session).
+
+---
+
+## §35 — Session 2026-06-06 (cont.) — Telos (Lost Worlds #1) RENDERED + uploads armed; Tokyo b2 rescued
+
+### Trigger
+Matt: "build telos." First album of the approved 5-album Lost Worlds saga (bible:
+`docs/superpowers/specs/2026-06-06-lost-worlds-saga-design.md`). Executed the §34
+"Build Telos" runbook end-to-end.
+
+### What got done (in order)
+
+1. **Composed the album spec** via the `album-composer` subagent →
+   `docs/albums/telos-shasta-vol-1.json`. *Telos: Beneath Shasta, Vol.1*, 12 tracks,
+   50 min, **BPM 80–104 (catalog's slowest/most meditative by design)**. Unique arc:
+   the only album that resolves **minor → Lydian radiance** (elegy → refuge →
+   transcendence → descent). Introduces the saga's TWO recurring leitmotifs — the
+   **CRYSTAL ARPEGGIO** (Telos home album) + **INNER-SUN PAD VOICING** (foreshadows
+   Agartha) — documented in `recurring_motifs` with transposition notes for later
+   albums. Track 12 "Where the Floor Opens" (Bb minor) is the **descent-handoff to
+   Hollow Earth Vol.1**: crystal motif fragmented + turned downward, ending on an
+   OPEN downward-leaning F dominant (no closed cadence). Danger-zone clean.
+
+2. **Added a Siskiyou Co. / Mt Shasta NWS weather region** to
+   `crates/nightdrive-encoder/src/weather.rs` (`SHASTA` `RegionDef`: Mt Shasta City /
+   Weed / Dunsmuir / McCloud, radar **KMAX** Medford NEXRAD). NWS-native (US soil,
+   Matt's backyard) so `radar_prestyled=false` (encoder negates the Ridge2 loop, same
+   as other US regions). `region_for` routes on slug substring `shasta`/`telos`/
+   `siskiyou`; added to `THEMED_REGIONS` for `region_by_key`. +1 unit test
+   (`shasta_slug_routes_to_nws_native_region`). 12/12 weather tests green local + cnc.
+   **Confirmed live in the render**: encoder logged `region: MT SHASTA, source: Nws,
+   primary_city: Mt. Shasta City CA, 4 cities, radar present`.
+
+3. **Synced + rebuilt on cnc.** scp'd new weather.rs → `/opt/nightdrive/src/...` (md5
+   baseline matched the committed file first) + album JSON → both
+   `/opt/nightdrive/docs/albums` and `/opt/nightdrive-ws/docs/albums`. Incremental
+   `cargo build -p nightdrive-orchestrator --release` (1m41s), deployed to
+   `/opt/nightdrive/bin/nightdrive-orchestrator` (backup
+   `nightdrive-orchestrator.bak-20260606-0914`). cnc weather test confirmed Shasta
+   routing compiled in.
+
+4. **GPU window — coordinated with openclaw main (APPROVED).** Both P100s were busy
+   with the live openclaw-inference + aether fleet. Matt said "ask main." main granted
+   a ~75-min both-card window + froze GPU competitors. Ran
+   `scratch/telos/telos-drop.sh` (staged on cnc as `/opt/nightdrive/telos-drop.sh`,
+   adapted from `tokyo-drop.sh`) detached: evict fleet → 12×3 SDXL covers (16GB card)
+   → ACE-Step render + master + encode (`run-album --dry-run`, NO upload) → trap-restore
+   + 90-min deadman. **12/12 final.mp4 rendered, rc=0, finished 10:54 PDT inside the
+   window** (no stragglers). Fleet auto-restored 10:55; **verified workhorse serving
+   qwen2.5-14b on :8081 via nvidia-smi** (main's condition) before pinging GREEN; main
+   lifted the freeze. Covers reviewed by Matt — "those look excellent" (no baked text;
+   I spot-checked 01/07/12).
+
+5. **Uploads durably scheduled (3 installed `Persistent=true` timers).** Root-caused
+   the recurring "lost timer" trap: **cnc rebooted 06-06 08:56 PDT** (after Tokyo b1
+   uploaded 07:22, before its transient batch-2 timer could fire) → reboots wipe
+   `/run` transient `systemd-run` units. Fix: real unit files in
+   `/etc/systemd/system` with `Persistent=true`. All upload-only (tracks at
+   `video_encoded` → skip-on-state straight to upload, no GPU):
+   - `nightdrive-tokyo-b2.timer` → **06-07 09:00 PDT** → Tokyo 7–12, publish-at
+     2026-06-09T00:00:00Z (keeps Tokyo's existing 06-09 sync-drop whole).
+   - `nightdrive-telos-b1.timer` → **06-08 09:00 PDT** → Telos 1–6, publish-at
+     2026-06-11T00:00:00Z.
+   - `nightdrive-telos-b2.timer` → **06-09 09:00 PDT** → Telos 7–12, publish-at
+     2026-06-11T00:00:00Z (fires before publish-staggered's own ~10:00 transient
+     continuation, so no race).
+   Each runs `nightdrive-cli album publish-staggered --slug X --publish-at <iso>
+   --per-day 6` (upload + playlist-sync + skip-already-uploaded). Sequencing chosen
+   by Matt: "Tokyo first, Telos 06-11."
+
+### State / what's true now
+- Telos: 12/12 final.mp4 on cnc `/var/lib/nightdrive/tracks/nd-telos-shasta-vol-1-*/`,
+  all tracks `video_encoded`, NOT yet uploaded. Covers in
+  `/opt/nightdrive/assets/covers/albums/telos-shasta-vol-1/` (mirrored to
+  `/opt/nightdrive-ws/...`). 12 base covers pulled to local
+  `scratch/telos/covers/`.
+- Tokyo: 1–6 uploaded (06-06), 7–12 `video_encoded` + armed for 06-07.
+- Fleet restored + GREEN; cnc free; telos-deadman canceled.
+- Local source edits: `crates/nightdrive-encoder/src/weather.rs` (+SHASTA, +test),
+  `docs/albums/telos-shasta-vol-1.json` (new), `scratch/telos/telos-drop.sh` (new).
+  (github-uploader auto-commits — no manual git.)
+
+### What's next
+1. **Verify 06-07 09:00** Tokyo b2 lands (`/var/log/nightdrive/tokyo-b2.log`); Tokyo
+   then 12/12 scheduled → 06-09 public flip whole.
+2. **Verify 06-08 + 06-09 09:00** Telos b1/b2 land (`/var/log/nightdrive/telos-upload.log`).
+   Confirm 12/12 Telos uploaded private + scheduled publishAt 06-11.
+3. **2026-06-11T00:00Z** Telos public sync-drop (server-side flip). Confirm playlist
+   ("Telos…") created + description links present.
+4. Then the saga continues: **Hollow Earth Vol.1** (album #2, descent) — reuse the
+   built Arctic region; open from the Telos t12 handoff (darker, descending BPM arc,
+   pick up the falling crystal-fragment contour). Then Agartha (inner-sun payoff,
+   resolve INTO the inner-sun voicing) → Atlantis (add mid-Atlantic coords) → Gate of
+   Ra (add Giza coords).
+
+### Notes for next session
+- **Reboots kill transient `systemd-run` timers.** For any scheduled nightdrive
+  upload/drop, use installed `/etc/systemd/system` units with `Persistent=true`, not
+  `systemd-run --on-active/--on-calendar`. (This is why §34's Tokyo b2 timer vanished.)
+- **sqlite3 CLI is NOT installed on cnc** — query the DB via `nightdrive-cli tracks
+  list` / `uploads list`, not `sqlite3`.
+- The upload timers are one-shot calendar dates; once elapsed they sit inactive —
+  clean them up (`systemctl disable --now nightdrive-{tokyo-b2,telos-b1,telos-b2}.timer`)
+  after confirming the uploads landed.
+- GPU window protocol worked cleanly: ask main → main grants + freezes competitors →
+  evict → run → restore + verify workhorse on :8081 via nvidia-smi → ping GREEN.

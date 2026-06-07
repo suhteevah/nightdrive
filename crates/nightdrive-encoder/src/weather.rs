@@ -21,6 +21,7 @@
 //! | `soviet`/`sovetskiy` | SOVIET (Moscow/Leningrad/Kyiv/Minsk) | Open-Meteo | RainViewer\* |
 //! | `arctic`/`ice-station` | ARCTIC (Reykjavík/Nuuk/Murmansk/Yellowknife) | Open-Meteo | RainViewer\* |
 //! | `hong-kong`/`kowloon` | HONG KONG | Open-Meteo | RainViewer |
+//! | `shasta`/`telos` | SHASTA (Mt Shasta City/Weed/Dunsmuir/McCloud) | NWS | NWS Ridge2 GIF |
 //!
 //! \* RainViewer is fed by national radar networks. Japan/Iceland/most of
 //! Europe are covered; Russia, Greenland, and high-arctic Canada are NOT —
@@ -223,7 +224,29 @@ static HONGKONG: RegionDef = RegionDef {
     ],
 };
 
-static THEMED_REGIONS: &[&RegionDef] = &[&JAPAN, &SOVIET, &ARCTIC, &HONGKONG];
+/// Siskiyou Co., CA — the "Lost Worlds" saga launch (Telos beneath Mt. Shasta).
+/// Slug-matched like the themed regions, but **NWS-native** (it's US soil —
+/// Matt's backyard), so it uses the same forecast + radar path as `US_REGIONS`
+/// and the encoder negates the Ridge2 loop (`radar_prestyled == false`).
+/// Radar station **KMAX** (Medford, OR NEXRAD) is the NEXRAD covering the
+/// Mt. Shasta area of far-northern California.
+static SHASTA: RegionDef = RegionDef {
+    key: "shasta",
+    label: "MT SHASTA",
+    backend: ForecastBackend::Nws,
+    radar: RadarSource::Nws("KMAX"),
+    cities: &[
+        CityDef { display: "MT SHASTA", full: "Mt. Shasta City, CA", lat: 41.3099, lon: -122.3106 },
+        CityDef { display: "WEED", full: "Weed, CA", lat: 41.4227, lon: -122.3861 },
+        CityDef { display: "DUNSMUIR", full: "Dunsmuir, CA", lat: 41.2082, lon: -122.2722 },
+        CityDef { display: "MCCLOUD", full: "McCloud, CA", lat: 41.2549, lon: -122.1392 },
+    ],
+};
+
+/// Slug-matched regions (matched by album-slug substring in [`region_for`]).
+/// JAPAN/SOVIET/ARCTIC/HONGKONG are non-US (Open-Meteo + RainViewer); SHASTA is
+/// US/NWS. `region_by_key` also searches this list to re-resolve the radar.
+static THEMED_REGIONS: &[&RegionDef] = &[&JAPAN, &SOVIET, &ARCTIC, &HONGKONG, &SHASTA];
 
 /// Resolve the region for a track from the album slug embedded in its id.
 /// Themed albums match by keyword; everything else hash-picks a US region
@@ -242,6 +265,10 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     }
     if id.contains("hong-kong") || id.contains("hongkong") || id.contains("kowloon") {
         return &HONGKONG;
+    }
+    // Lost Worlds saga launch — Telos beneath Mt. Shasta (NWS-native US region).
+    if id.contains("shasta") || id.contains("telos") || id.contains("siskiyou") {
+        return &SHASTA;
     }
     let h = djb2(track_id.as_str());
     &US_REGIONS[(h % US_REGIONS.len() as u64) as usize]
@@ -867,8 +894,22 @@ mod tests {
     }
 
     #[test]
+    fn shasta_slug_routes_to_nws_native_region() {
+        // Lost Worlds saga launch — the slug carries both "telos" and "shasta".
+        let id = TrackId("nd-telos-shasta-vol-1-001".to_string());
+        let region = region_for(&id);
+        assert_eq!(region.key, "shasta");
+        // US soil → NWS forecast + Ridge2 radar the encoder still negates.
+        assert_eq!(region.backend, ForecastBackend::Nws);
+        assert!(!region.radar_prestyled());
+        assert!(matches!(region.radar, RadarSource::Nws("KMAX")));
+        assert_eq!(region.cities[0].display, "MT SHASTA");
+    }
+
+    #[test]
     fn region_by_key_roundtrips() {
         assert_eq!(region_by_key("japan").label, "TOKYO");
+        assert_eq!(region_by_key("shasta").label, "MT SHASTA");
         assert_eq!(region_by_key("us-southeast").label, "SOUTHEAST");
         assert_eq!(region_by_key("nonsense").key, "us-northwest");
     }

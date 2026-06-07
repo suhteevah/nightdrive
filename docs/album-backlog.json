@@ -4,10 +4,34 @@
   "proposed": [],
   "approved": [
     {
-      "slug": "tokyo-cyberpunk-vol-1",
-      "theme": "Tokyo cyberpunk noir — neon Shinjuku rain, lonely salaryman last train, Akira-meets-Blade-Runner mood",
-      "approved_at": "2026-05-24T07:30:00Z",
-      "danger_zone_keys": ["tokyo_cyberpunk", "blade_runner"]
+      "slug": "telos-shasta-vol-1",
+      "theme": "Lemurian refuge under Mt. Shasta — survivors of sunken Lemuria in the crystal city of Telos; alpine vortex, white-robed ascended beings, bell-craft, lenticular clouds over the mountain; elegy bleeding into transcendence. SAGA: Lost Worlds #1 (launch/keystone). Weather anchor: Siskiyou Co. CA (real NWS) — Mt Shasta City / Weed / Dunsmuir / McCloud.",
+      "approved_at": "2026-06-06T07:40:00Z",
+      "danger_zone_keys": ["lemuria", "mt_shasta", "telos"]
+    },
+    {
+      "slug": "hollow-earth-vol-1",
+      "theme": "The descent — Vernian / Admiral-Byrd polar-opening expedition into the inner world; prehistoric megafauna, deeper-and-darker, driving propulsion. SAGA: Lost Worlds #2. Weather anchor: Arctic (polar entrance). Avoid Verne 'Journey to the Center of the Earth' film/score titles.",
+      "approved_at": "2026-06-06T07:40:00Z",
+      "danger_zone_keys": ["hollow_earth"]
+    },
+    {
+      "slug": "agartha-vol-1",
+      "theme": "The inner civilization — luminous Agarthan capital, inner sun, Shambhala spires, telluric/vril warmth, meditative transcendence; the arrival Telos belongs to. SAGA: Lost Worlds #3 (diptych with Hollow Earth). Weather anchor: Arctic / stylized inner-sun.",
+      "approved_at": "2026-06-06T07:40:00Z",
+      "danger_zone_keys": ["agartha", "shambhala"]
+    },
+    {
+      "slug": "atlantis-vol-1",
+      "theme": "The drowned Atlantic motherland — concentric ring-city, orichalcum/crystal tech, Poseidon, the deluge, deep-pressure oceanic majesty, bioluminescence. SAGA: Lost Worlds #4 (Atlantic sibling to Lemuria's Pacific). Weather anchor: mid-Atlantic / Azores. Avoid Disney 'Atlantis: The Lost Empire' names.",
+      "approved_at": "2026-06-06T07:40:00Z",
+      "danger_zone_keys": ["atlantis"]
+    },
+    {
+      "slug": "gate-of-ra-vol-1",
+      "theme": "Ancient-astronaut capstone — the gate/ring portal, Ra & Anubis as star-travelers, Heliopolis-meets-hypertech desert world, propulsive interstellar travel. SAGA: Lost Worlds #5 (cosmic capstone). MYTHOLOGY-GENERIC ONLY: no 'Stargate' literal title, no MGM/SG-1 proper nouns (Goa'uld, chevron lingo). Weather anchor: Giza/Cairo desert.",
+      "approved_at": "2026-06-06T07:40:00Z",
+      "danger_zone_keys": ["stargate", "ancient_astronaut", "gate_of_ra"]
     },
     {
       "slug": "miami-vice-vol-1",
@@ -33,6 +57,7 @@
     { "slug": "neo-tokyo-drive-vol-1",   "dropped_at": "2026-05-21T00:00:00Z" },
     { "slug": "tron-drive-vol-1",        "dropped_at": "2026-05-15T15:00:00Z" },
     { "slug": "sovetskiy-drive-vol-1",   "dropped_at": "2026-05-23T00:00:00Z" },
-    { "slug": "atompunk-drive-vol-1",    "dropped_at": "2026-05-26T00:00:00Z" }
+    { "slug": "atompunk-drive-vol-1",    "dropped_at": "2026-05-26T00:00:00Z" },
+    { "slug": "tokyo-cyberpunk-vol-1",   "dropped_at": "2026-06-09T00:00:00Z" }
   ]
 }
