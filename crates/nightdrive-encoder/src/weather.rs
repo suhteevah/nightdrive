@@ -260,7 +260,10 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     if id.contains("soviet") || id.contains("sovetskiy") || id.contains("sovetsky") {
         return &SOVIET;
     }
-    if id.contains("arctic") || id.contains("ice-station") || id.contains("ice_station") {
+    if id.contains("arctic") || id.contains("ice-station") || id.contains("ice_station")
+        || id.contains("hollow") || id.contains("polar")
+    {
+        // Lost Worlds #2 (Hollow Earth) is the polar-opening descent → Arctic anchor.
         return &ARCTIC;
     }
     if id.contains("hong-kong") || id.contains("hongkong") || id.contains("kowloon") {

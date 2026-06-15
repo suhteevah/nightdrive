@@ -1,14 +1,98 @@
 {
   "version": 1,
   "youtube_strikes": 0,
-  "proposed": [],
-  "approved": [
+  "proposed": [
     {
-      "slug": "telos-shasta-vol-1",
-      "theme": "Lemurian refuge under Mt. Shasta — survivors of sunken Lemuria in the crystal city of Telos; alpine vortex, white-robed ascended beings, bell-craft, lenticular clouds over the mountain; elegy bleeding into transcendence. SAGA: Lost Worlds #1 (launch/keystone). Weather anchor: Siskiyou Co. CA (real NWS) — Mt Shasta City / Weed / Dunsmuir / McCloud.",
-      "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": ["lemuria", "mt_shasta", "telos"]
+      "slug": "abyssal-station-vol-1",
+      "theme": "A lonely deep-sea research outpost two miles down in the Marianas dark, lit only by bioluminescent drift and the cold cyan glow of instrument panels, hull groaning against the pressure as something vast moves past the porthole. Sonically: glacial ambient dub-techno, sub-bass swells like sonar, dripping reverb, sparse FM-bell pings in near-total black-blue silence.",
+      "proposed_at": "2026-05-31T10:04:09.041797283Z",
+      "promote_at": "2026-06-01T10:04:09.041797283Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": []
     },
+    {
+      "slug": "chrome-mirage-vol-1",
+      "theme": "A salt-flat wasteland at high noon, a lone supercharged chrome muscle car tearing across cracked desert hardpan under a bleached white sky, heat-shimmer warping the horizon and rusted refinery towers in the distance. Sonically: dusty desert-rock-meets-synthwave, gated tom grooves, distorted slide-guitar-style saw leads, motorik drive, sun-scorched and arid rather than neon-wet.",
+      "proposed_at": "2026-05-31T10:04:09.041797283Z",
+      "promote_at": "2026-06-01T10:04:09.041797283Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "sunset",
+        "miami_vice"
+      ]
+    },
+    {
+      "slug": "orbital-dacha-vol-1",
+      "theme": "A decaying Soviet-built space station tumbling in low orbit at the edge of dusk, Earth's terminator line glowing amber-blue through frosted cupola glass, dead switch panels and floating debris in zero gravity. Sonically: weightless cosmic-coldwave, Polivoks drones, slow rotating arpeggios, vocoder static like dying telemetry, vast and silent and orbital.",
+      "proposed_at": "2026-05-31T10:04:09.041797283Z",
+      "promote_at": "2026-06-01T10:04:09.041797283Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "atompunk",
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "aurora-icebreaker-vol-1",
+      "theme": "A nuclear icebreaker carves a black channel through a frozen polar sea at midnight, its searchlights and reactor-glow throwing teal and magenta auroras across the ice. Cold, vast, mechanical isolation — groaning hull steel against shimmering sky.",
+      "proposed_at": "2026-06-07T10:02:54.544103324Z",
+      "promote_at": "2026-06-08T10:02:54.544103324Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "dust-radio-vol-1",
+      "theme": "A sun-bleached Dust Bowl plain of cracked earth and skeletal radio towers humming retrofuturist signals into a copper-orange haze. Warm analog static, lonely AM-frequency melodies, atomic-age optimism decaying in the heat.",
+      "proposed_at": "2026-06-07T10:02:54.544103324Z",
+      "promote_at": "2026-06-08T10:02:54.544103324Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "atompunk",
+        "sunset"
+      ]
+    },
+    {
+      "slug": "monsoon-bazaar-vol-1",
+      "theme": "A rain-drowned tropical night market where holographic spice signs bleed into steaming puddles and incense smoke curls under tarp-strung neon. Humid, percussive, organic synthwave — a sweltering crowd-and-rain pulse rather than chrome and skyscrapers.",
+      "proposed_at": "2026-06-07T10:02:54.544103324Z",
+      "promote_at": "2026-06-08T10:02:54.544103324Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "tokyo_cyberpunk",
+        "neo_tokyo",
+        "blade_runner"
+      ]
+    },
+    {
+      "slug": "obsidian-caldera-vol-1",
+      "theme": "A nocturnal descent into an active volcano: rivers of molten magma carving glowing veins through black basalt cliffs, ash drifting against a blood-orange sky. Heavy, percussive darksynth built on subterranean bass and crackling ember textures.",
+      "proposed_at": "2026-06-14T10:08:10.359840506Z",
+      "promote_at": "2026-06-15T10:08:10.359840506Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": []
+    },
+    {
+      "slug": "neon-cathedral-vol-1",
+      "theme": "A vast abandoned gothic cathedral retrofitted with humming neon and laser-lit stained glass, holographic saints flickering above a flooded marble nave. Reverent, hymn-like synthwave with cathedral-organ pads and choral vocoder swells.",
+      "proposed_at": "2026-06-14T10:08:10.359840506Z",
+      "promote_at": "2026-06-15T10:08:10.359840506Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": []
+    },
+    {
+      "slug": "velvet-casino-vol-1",
+      "theme": "A rain-slicked midnight casino strip seen through cigarette smoke: gold-and-crimson neon, velvet interiors, a lone figure at a roulette wheel under flickering signage. Slow, sultry noir-synthwave with lounge saxophone and brushed drum machines.",
+      "proposed_at": "2026-06-14T10:08:10.359840506Z",
+      "promote_at": "2026-06-15T10:08:10.359840506Z",
+      "proposed_by": "openclaw-main",
+      "danger_zone_keys": [
+        "miami_vice"
+      ]
+    }
+  ],
+  "approved": [
     {
       "slug": "hollow-earth-vol-1",
       "theme": "The descent — Vernian / Admiral-Byrd polar-opening expedition into the inner world; prehistoric megafauna, deeper-and-darker, driving propulsion. SAGA: Lost Worlds #2. Weather anchor: Arctic (polar entrance). Avoid Verne 'Journey to the Center of the Earth' film/score titles.",
@@ -58,6 +142,7 @@
     { "slug": "tron-drive-vol-1",        "dropped_at": "2026-05-15T15:00:00Z" },
     { "slug": "sovetskiy-drive-vol-1",   "dropped_at": "2026-05-23T00:00:00Z" },
     { "slug": "atompunk-drive-vol-1",    "dropped_at": "2026-05-26T00:00:00Z" },
-    { "slug": "tokyo-cyberpunk-vol-1",   "dropped_at": "2026-06-09T00:00:00Z" }
+    { "slug": "tokyo-cyberpunk-vol-1",   "dropped_at": "2026-06-09T00:00:00Z" },
+    { "slug": "telos-shasta-vol-1",      "dropped_at": "2026-06-11T00:00:00Z" }
   ]
 }
