@@ -3,69 +3,6 @@
   "youtube_strikes": 0,
   "proposed": [
     {
-      "slug": "abyssal-station-vol-1",
-      "theme": "A lonely deep-sea research outpost two miles down in the Marianas dark, lit only by bioluminescent drift and the cold cyan glow of instrument panels, hull groaning against the pressure as something vast moves past the porthole. Sonically: glacial ambient dub-techno, sub-bass swells like sonar, dripping reverb, sparse FM-bell pings in near-total black-blue silence.",
-      "proposed_at": "2026-05-31T10:04:09.041797283Z",
-      "promote_at": "2026-06-01T10:04:09.041797283Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": []
-    },
-    {
-      "slug": "chrome-mirage-vol-1",
-      "theme": "A salt-flat wasteland at high noon, a lone supercharged chrome muscle car tearing across cracked desert hardpan under a bleached white sky, heat-shimmer warping the horizon and rusted refinery towers in the distance. Sonically: dusty desert-rock-meets-synthwave, gated tom grooves, distorted slide-guitar-style saw leads, motorik drive, sun-scorched and arid rather than neon-wet.",
-      "proposed_at": "2026-05-31T10:04:09.041797283Z",
-      "promote_at": "2026-06-01T10:04:09.041797283Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "sunset",
-        "miami_vice"
-      ]
-    },
-    {
-      "slug": "orbital-dacha-vol-1",
-      "theme": "A decaying Soviet-built space station tumbling in low orbit at the edge of dusk, Earth's terminator line glowing amber-blue through frosted cupola glass, dead switch panels and floating debris in zero gravity. Sonically: weightless cosmic-coldwave, Polivoks drones, slow rotating arpeggios, vocoder static like dying telemetry, vast and silent and orbital.",
-      "proposed_at": "2026-05-31T10:04:09.041797283Z",
-      "promote_at": "2026-06-01T10:04:09.041797283Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "atompunk",
-        "sovetskiy"
-      ]
-    },
-    {
-      "slug": "aurora-icebreaker-vol-1",
-      "theme": "A nuclear icebreaker carves a black channel through a frozen polar sea at midnight, its searchlights and reactor-glow throwing teal and magenta auroras across the ice. Cold, vast, mechanical isolation — groaning hull steel against shimmering sky.",
-      "proposed_at": "2026-06-07T10:02:54.544103324Z",
-      "promote_at": "2026-06-08T10:02:54.544103324Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "sovetskiy"
-      ]
-    },
-    {
-      "slug": "dust-radio-vol-1",
-      "theme": "A sun-bleached Dust Bowl plain of cracked earth and skeletal radio towers humming retrofuturist signals into a copper-orange haze. Warm analog static, lonely AM-frequency melodies, atomic-age optimism decaying in the heat.",
-      "proposed_at": "2026-06-07T10:02:54.544103324Z",
-      "promote_at": "2026-06-08T10:02:54.544103324Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "atompunk",
-        "sunset"
-      ]
-    },
-    {
-      "slug": "monsoon-bazaar-vol-1",
-      "theme": "A rain-drowned tropical night market where holographic spice signs bleed into steaming puddles and incense smoke curls under tarp-strung neon. Humid, percussive, organic synthwave — a sweltering crowd-and-rain pulse rather than chrome and skyscrapers.",
-      "proposed_at": "2026-06-07T10:02:54.544103324Z",
-      "promote_at": "2026-06-08T10:02:54.544103324Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "tokyo_cyberpunk",
-        "neo_tokyo",
-        "blade_runner"
-      ]
-    },
-    {
       "slug": "obsidian-caldera-vol-1",
       "theme": "A nocturnal descent into an active volcano: rivers of molten magma carving glowing veins through black basalt cliffs, ash drifting against a blood-orange sky. Heavy, percussive darksynth built on subterranean bass and crackling ember textures.",
       "proposed_at": "2026-06-14T10:08:10.359840506Z",
@@ -90,59 +27,237 @@
       "danger_zone_keys": [
         "miami_vice"
       ]
+    },
+    {
+      "slug": "orbital-dacha-vol-1",
+      "theme": "[PARKED 2026-06-15: overlaps a Vol.2 lane — review before re-promoting] A decaying Soviet-built space station tumbling in low orbit at the edge of dusk, Earth's terminator line glowing amber-blue through frosted cupola glass, dead switch panels and floating debris in zero gravity. Sonically: weightless cosmic-coldwave, Polivoks drones, slow rotating arpeggios, vocoder static like dying telemetry, vast and silent and orbital.",
+      "proposed_at": "2026-06-15T23:00:00Z",
+      "promote_at": "2026-09-15T00:00:00Z",
+      "proposed_by": "matt-curation",
+      "danger_zone_keys": [
+        "atompunk",
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "dust-radio-vol-1",
+      "theme": "[PARKED 2026-06-15: overlaps a Vol.2 lane — review before re-promoting] A sun-bleached Dust Bowl plain of cracked earth and skeletal radio towers humming retrofuturist signals into a copper-orange haze. Warm analog static, lonely AM-frequency melodies, atomic-age optimism decaying in the heat.",
+      "proposed_at": "2026-06-15T23:00:00Z",
+      "promote_at": "2026-09-15T00:00:00Z",
+      "proposed_by": "matt-curation",
+      "danger_zone_keys": [
+        "atompunk",
+        "sunset"
+      ]
+    },
+    {
+      "slug": "monsoon-bazaar-vol-1",
+      "theme": "[PARKED 2026-06-15: overlaps a Vol.2 lane — review before re-promoting] A rain-drowned tropical night market where holographic spice signs bleed into steaming puddles and incense smoke curls under tarp-strung neon. Humid, percussive, organic synthwave — a sweltering crowd-and-rain pulse rather than chrome and skyscrapers.",
+      "proposed_at": "2026-06-15T23:00:00Z",
+      "promote_at": "2026-09-15T00:00:00Z",
+      "proposed_by": "matt-curation",
+      "danger_zone_keys": [
+        "tokyo_cyberpunk",
+        "neo_tokyo",
+        "blade_runner"
+      ]
     }
   ],
   "approved": [
     {
-      "slug": "hollow-earth-vol-1",
-      "theme": "The descent — Vernian / Admiral-Byrd polar-opening expedition into the inner world; prehistoric megafauna, deeper-and-darker, driving propulsion. SAGA: Lost Worlds #2. Weather anchor: Arctic (polar entrance). Avoid Verne 'Journey to the Center of the Earth' film/score titles.",
-      "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": ["hollow_earth"]
-    },
-    {
       "slug": "agartha-vol-1",
       "theme": "The inner civilization — luminous Agarthan capital, inner sun, Shambhala spires, telluric/vril warmth, meditative transcendence; the arrival Telos belongs to. SAGA: Lost Worlds #3 (diptych with Hollow Earth). Weather anchor: Arctic / stylized inner-sun.",
       "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": ["agartha", "shambhala"]
+      "danger_zone_keys": [
+        "agartha",
+        "shambhala"
+      ]
     },
     {
       "slug": "atlantis-vol-1",
       "theme": "The drowned Atlantic motherland — concentric ring-city, orichalcum/crystal tech, Poseidon, the deluge, deep-pressure oceanic majesty, bioluminescence. SAGA: Lost Worlds #4 (Atlantic sibling to Lemuria's Pacific). Weather anchor: mid-Atlantic / Azores. Avoid Disney 'Atlantis: The Lost Empire' names.",
       "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": ["atlantis"]
+      "danger_zone_keys": [
+        "atlantis"
+      ]
     },
     {
       "slug": "gate-of-ra-vol-1",
       "theme": "Ancient-astronaut capstone — the gate/ring portal, Ra & Anubis as star-travelers, Heliopolis-meets-hypertech desert world, propulsive interstellar travel. SAGA: Lost Worlds #5 (cosmic capstone). MYTHOLOGY-GENERIC ONLY: no 'Stargate' literal title, no MGM/SG-1 proper nouns (Goa'uld, chevron lingo). Weather anchor: Giza/Cairo desert.",
       "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": ["stargate", "ancient_astronaut", "gate_of_ra"]
+      "danger_zone_keys": [
+        "stargate",
+        "ancient_astronaut",
+        "gate_of_ra"
+      ]
     },
     {
       "slug": "miami-vice-vol-1",
       "theme": "Miami Vice / Vapor Coast — pastel coke-era 1986, Ferrari Daytona at sunset, palm shadows, cocaine pink and turquoise",
       "approved_at": "2026-05-24T07:30:00Z",
-      "danger_zone_keys": ["miami_vice"]
+      "danger_zone_keys": [
+        "miami_vice"
+      ]
     },
     {
       "slug": "blade-runner-2049-vol-1",
       "theme": "Blade Runner / LA 2049 — rain, neon Chinatown signage, Vangelis-adjacent pads, Wallace Corporation cold",
       "approved_at": "2026-05-24T07:30:00Z",
-      "danger_zone_keys": ["blade_runner"]
+      "danger_zone_keys": [
+        "blade_runner"
+      ]
     },
     {
       "slug": "berlin-wall-vol-1",
       "theme": "Cold War East — Checkpoint Charlie, Trabants, divided city, brutalist apartment blocks, watchful gray dawn",
       "approved_at": "2026-05-24T07:30:00Z",
-      "danger_zone_keys": ["berlin_wall", "sovetskiy"]
+      "danger_zone_keys": [
+        "berlin_wall",
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "abyssal-station-vol-1",
+      "theme": "A lonely deep-sea research outpost two miles down in the Marianas dark, lit only by bioluminescent drift and the cold cyan glow of instrument panels, hull groaning against the pressure as something vast moves past the porthole. Sonically: glacial ambient dub-techno, sub-bass swells like sonar, dripping reverb, sparse FM-bell pings in near-total black-blue silence.",
+      "approved_at": "2026-06-15T04:34:10.850781346Z",
+      "danger_zone_keys": []
+    },
+    {
+      "slug": "chrome-mirage-vol-1",
+      "theme": "A salt-flat wasteland at high noon, a lone supercharged chrome muscle car tearing across cracked desert hardpan under a bleached white sky, heat-shimmer warping the horizon and rusted refinery towers in the distance. Sonically: dusty desert-rock-meets-synthwave, gated tom grooves, distorted slide-guitar-style saw leads, motorik drive, sun-scorched and arid rather than neon-wet.",
+      "approved_at": "2026-06-15T04:34:10.850781346Z",
+      "danger_zone_keys": [
+        "sunset",
+        "miami_vice"
+      ]
+    },
+    {
+      "slug": "aurora-icebreaker-vol-1",
+      "theme": "A nuclear icebreaker carves a black channel through a frozen polar sea at midnight, its searchlights and reactor-glow throwing teal and magenta auroras across the ice. Cold, vast, mechanical isolation — groaning hull steel against shimmering sky.",
+      "approved_at": "2026-06-15T04:34:10.850781346Z",
+      "danger_zone_keys": [
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "sunset-drive-vol-2",
+      "theme": "Sunset Drive Vol. 2 — the night survived until dawn. Same chrome car as Vol. 1, now driving INLAND through 3 a.m. toward sunrise; sodium-amber + rain-slick asphalt instead of golden coast, an ASCENDING resolution into first light (the sunrise Vol. 1 promised but never showed). Mirror of Vol. 1's dusk-to-dark arc. Weather: inland SoCal. Avoid Drive (2011) OST double-hits.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "sunset"
+      ]
+    },
+    {
+      "slug": "neo-tokyo-drive-vol-2",
+      "theme": "Neo-Tokyo Drive Vol. 2 — Acid Monsoon. Flips Vol. 1's vertical bike-descent into a horizontal typhoon-week perimeter loop of a flooded Neo-Tokyo; wetter, glide-not-chase, the neon-ignition FM-bell motif re-read through rain. Lower/looser BPM than Vol. 1. Distinct from tokyo-cyberpunk (expressway, not last-train). Weather: Japan.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "neo_tokyo_akira",
+        "blade_runner"
+      ]
+    },
+    {
+      "slug": "tron-drive-vol-2",
+      "theme": "Tron Drive Vol. 2 — War for the Grid. The user is dragged back down into the kernel sector against a hostile control-process whose antagonist motif grows -> dominates -> is overwritten; a two-character confrontation arc, half-step darker than Vol. 1's solo Mobius ring. No real geography (hashed weather). Danger: no Tron-franchise nouns or Daft Punk Tron Legacy OST titles (the double-hit that already forced the Derez/Recognizer renames).",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "tron"
+      ]
+    },
+    {
+      "slug": "sovetskiy-drive-vol-2",
+      "theme": "Sovetskiy Drive Vol. 2 — Cosmodrome. Leaves the factory-city for the Baikonur launch steppe: a night countdown cycle, ignition over an empty horizon, telemetry of a craft gone too far to recall. Vast cold awe vs Vol. 1's concrete claustrophobia; tram-bell motif re-voiced as a countdown tone. Distinct from berlin-wall. Weather: Kazakh steppe (Baikonur). Avoid named missions/cosmonauts + space-film OST double-hits.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "atompunk-drive-vol-2",
+      "theme": "Atompunk Drive Vol. 2 — Spaceport Dawn. Flips Vol. 1's civil-defense bunker-paranoia to the optimism side of the atomic dream: a Cape Canaveral launch-day cycle that earns its first major-key lifts at ignition + orbital insertion. Same chamber-orchestral atompunk palette, no-kick discipline. Weather: Space Coast (Cape Canaveral). Avoid named missions + space-film/2001 OST double-hits.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "atompunk"
+      ]
+    },
+    {
+      "slug": "tokyo-cyberpunk-vol-2",
+      "theme": "Tokyo Cyberpunk Vol. 2 — After Hours. The salaryman missed the last train; stranded in Shinjuku until first service, wandering soaked back-streets + all-night counters as the city resets toward dawn. Stillness vs Vol. 1's motion; the platform motif returns resolved at first light. Distinct from neo-tokyo-drive (slow, pedestrian, sub-104 BPM). Weather: Japan.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "tokyo_cyberpunk",
+        "akira",
+        "blade_runner"
+      ]
+    },
+    {
+      "slug": "miami-vice-vol-2",
+      "theme": "Miami Vice Vol. 2 — Vapor Coast: Last Season. The pastel dream curdles: late-'87 hurricane season, the coke empire's last nights, law + cartel closing in. Minor throughout, NO major payoff — the comedown Vol. 1's glamour earned. Weather: Miami SE (storm season fits the dread). Avoid Miami Vice show/Jan Hammer OST double-hits.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "miami_vice"
+      ]
+    },
+    {
+      "slug": "blade-runner-2049-vol-2",
+      "theme": "Blade Runner 2049 Vol. 2 — The Outlands. Leaves the neon rain for the dead California beyond the seawall: irradiated wastes, protein farms, off-world launch corridors. Drier, vaster, more desolate than Vol. 1's glacial rain. Weather: US Southwest. Danger STRICT: no BR/2049 film nouns or Vangelis(1982)/Zimmer-Wallfisch(2049) OST titles.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "blade_runner"
+      ]
+    },
+    {
+      "slug": "berlin-wall-vol-2",
+      "theme": "Berlin Wall Vol. 2 — Nineteen Eighty-Nine. The historical payoff: the Wall comes down. Surveillance-grey gives way to candlelight vigils + crowds on the wall; the album earns the major-key release Vol. 1 austerely withheld. Weather: Germany. Avoid Cold-War film (Lives of Others / Goodbye Lenin / Deutschland 83) OST double-hits.",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "berlin_wall",
+        "sovetskiy"
+      ]
+    },
+    {
+      "slug": "dyson-tomb-vol-1",
+      "theme": "Dyson Tomb — Lost Worlds II #1, saga opener 'The Outer Dark'. The Gate of Ra launched the saga into the cosmos; Lost Worlds II hunts vanished civilizations among the stars (same what-came-before mythos, cosmic scale). #1 arrives at a dead Dyson sphere around a dimming star — the first lost world beyond the gate. Carries the saga crystal + stellar-furnace motifs forward. 5-arc sketch: Dyson Tomb -> rogue dark world -> generation-ship graveyard -> Cydonia/Mars relics -> Galactic Core (capstone). Mythos-generic, NO sci-fi franchise nouns/OST titles. Cosmic geography (hashed/stylized weather).",
+      "approved_at": "2026-06-15T23:00:00Z",
+      "danger_zone_keys": [
+        "ancient_astronaut",
+        "stargate",
+        "gate_of_ra"
+      ]
     }
   ],
   "history": [
-    { "slug": "sunset-drive-vol-1",      "dropped_at": "2026-05-12T00:00:00Z" },
-    { "slug": "neo-tokyo-drive-vol-1",   "dropped_at": "2026-05-21T00:00:00Z" },
-    { "slug": "tron-drive-vol-1",        "dropped_at": "2026-05-15T15:00:00Z" },
-    { "slug": "sovetskiy-drive-vol-1",   "dropped_at": "2026-05-23T00:00:00Z" },
-    { "slug": "atompunk-drive-vol-1",    "dropped_at": "2026-05-26T00:00:00Z" },
-    { "slug": "tokyo-cyberpunk-vol-1",   "dropped_at": "2026-06-09T00:00:00Z" },
-    { "slug": "telos-shasta-vol-1",      "dropped_at": "2026-06-11T00:00:00Z" }
+    {
+      "slug": "sunset-drive-vol-1",
+      "dropped_at": "2026-05-12T00:00:00Z"
+    },
+    {
+      "slug": "neo-tokyo-drive-vol-1",
+      "dropped_at": "2026-05-21T00:00:00Z"
+    },
+    {
+      "slug": "tron-drive-vol-1",
+      "dropped_at": "2026-05-15T15:00:00Z"
+    },
+    {
+      "slug": "sovetskiy-drive-vol-1",
+      "dropped_at": "2026-05-23T00:00:00Z"
+    },
+    {
+      "slug": "atompunk-drive-vol-1",
+      "dropped_at": "2026-05-26T00:00:00Z"
+    },
+    {
+      "slug": "tokyo-cyberpunk-vol-1",
+      "dropped_at": "2026-06-09T00:00:00Z"
+    },
+    {
+      "slug": "telos-shasta-vol-1",
+      "dropped_at": "2026-06-11T00:00:00Z"
+    },
+    {
+      "slug": "hollow-earth-vol-1",
+      "dropped_at": "2026-06-15T04:36:16.228914946Z"
+    }
   ]
 }

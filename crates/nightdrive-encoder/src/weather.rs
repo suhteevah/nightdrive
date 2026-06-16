@@ -243,16 +243,127 @@ static SHASTA: RegionDef = RegionDef {
     ],
 };
 
+/// Lost Worlds #4 (Atlantis) — the drowned Atlantic motherland. RainViewer has
+/// little open-ocean coverage, so the inset usually renders a dark mid-Atlantic
+/// basemap (on-theme: a sunken world). Forecast via Open-Meteo.
+static MID_ATLANTIC: RegionDef = RegionDef {
+    key: "atlantic",
+    label: "AZORES",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 5, x: 14, y: 12 },
+    cities: &[
+        CityDef { display: "PONTA DELGADA", full: "Ponta Delgada, Azores", lat: 37.7412, lon: -25.6756 },
+        CityDef { display: "HORTA", full: "Horta, Azores", lat: 38.5347, lon: -28.6258 },
+        CityDef { display: "ANGRA", full: "Angra do Heroismo, Azores", lat: 38.6553, lon: -27.2161 },
+        CityDef { display: "FUNCHAL", full: "Funchal, Madeira", lat: 32.6669, lon: -16.9241 },
+    ],
+};
+
+/// Lost Worlds #5 (Gate of Ra) — Heliopolis-hypertech desert. RainViewer is
+/// sparse over Egypt; the inset usually renders a dark Nile-delta/desert
+/// basemap. Forecast via Open-Meteo.
+static EGYPT: RegionDef = RegionDef {
+    key: "egypt",
+    label: "CAIRO",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 6, x: 37, y: 26 },
+    cities: &[
+        CityDef { display: "CAIRO", full: "Cairo, EG", lat: 30.0444, lon: 31.2357 },
+        CityDef { display: "GIZA", full: "Giza, EG", lat: 30.0131, lon: 31.2089 },
+        CityDef { display: "LUXOR", full: "Luxor, EG", lat: 25.6872, lon: 32.6396 },
+        CityDef { display: "ALEXANDRIA", full: "Alexandria, EG", lat: 31.2001, lon: 29.9187 },
+    ],
+};
+
+/// Cold-War East Berlin. Germany has dense DWD radar via RainViewer, so this
+/// inset usually shows real echoes. Forecast via Open-Meteo. Berlin/Leipzig/
+/// Dresden/Potsdam per the per-album theme-cities rule.
+static GERMANY: RegionDef = RegionDef {
+    key: "germany",
+    label: "BERLIN",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 6, x: 34, y: 21 },
+    cities: &[
+        CityDef { display: "BERLIN", full: "East Berlin, DDR", lat: 52.5200, lon: 13.4050 },
+        CityDef { display: "LEIPZIG", full: "Leipzig, DDR", lat: 51.3397, lon: 12.3731 },
+        CityDef { display: "DRESDEN", full: "Dresden, DDR", lat: 51.0504, lon: 13.7373 },
+        CityDef { display: "POTSDAM", full: "Potsdam, DDR", lat: 52.3906, lon: 13.0645 },
+    ],
+};
+
+/// sunset-drive Vol. 2 — the inland night-drive toward dawn (Inland Empire /
+/// SoCal valley-and-hills). US/NWS; KSOX covers the Inland Empire.
+static INLAND_CA: RegionDef = RegionDef {
+    key: "inland-ca",
+    label: "INLAND EMPIRE",
+    backend: ForecastBackend::Nws,
+    radar: RadarSource::Nws("KSOX"),
+    cities: &[
+        CityDef { display: "RIVERSIDE", full: "Riverside, CA", lat: 33.9806, lon: -117.3755 },
+        CityDef { display: "SAN BERNARDINO", full: "San Bernardino, CA", lat: 34.1083, lon: -117.2898 },
+        CityDef { display: "ONTARIO", full: "Ontario, CA", lat: 34.0633, lon: -117.6509 },
+        CityDef { display: "PALM SPRINGS", full: "Palm Springs, CA", lat: 33.8303, lon: -116.5453 },
+    ],
+};
+
+/// sovetskiy-drive Vol. 2 — the Baikonur launch steppe (Kazakhstan). Open-Meteo;
+/// RainViewer has no steppe coverage so the inset is a dark basemap (on-theme:
+/// the empty steppe).
+static KAZAKH_STEPPE: RegionDef = RegionDef {
+    key: "kazakh-steppe",
+    label: "BAIKONUR",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 5, x: 21, y: 11 },
+    cities: &[
+        CityDef { display: "BAIKONUR", full: "Baikonur, KZ", lat: 45.9650, lon: 63.3050 },
+        CityDef { display: "KYZYLORDA", full: "Kyzylorda, KZ", lat: 44.8479, lon: 65.4823 },
+        CityDef { display: "ALMATY", full: "Almaty, KZ", lat: 43.2220, lon: 76.8512 },
+        CityDef { display: "ASTANA", full: "Astana, KZ", lat: 51.1694, lon: 71.4491 },
+    ],
+};
+
+/// atompunk-drive Vol. 2 — the Space Coast launch geography (Cape Canaveral /
+/// Brevard Co., FL). US/NWS, KMLB radar (sea-breeze afternoon storms = period
+/// "go/no-go" launch weather).
+static SPACE_COAST: RegionDef = RegionDef {
+    key: "space-coast",
+    label: "SPACE COAST",
+    backend: ForecastBackend::Nws,
+    radar: RadarSource::Nws("KMLB"),
+    cities: &[
+        CityDef { display: "CAPE CANAVERAL", full: "Cape Canaveral, FL", lat: 28.3922, lon: -80.6077 },
+        CityDef { display: "COCOA BEACH", full: "Cocoa Beach, FL", lat: 28.3200, lon: -80.6076 },
+        CityDef { display: "TITUSVILLE", full: "Titusville, FL", lat: 28.6122, lon: -80.8076 },
+        CityDef { display: "MELBOURNE", full: "Melbourne, FL", lat: 28.0836, lon: -80.6081 },
+    ],
+};
+
 /// Slug-matched regions (matched by album-slug substring in [`region_for`]).
-/// JAPAN/SOVIET/ARCTIC/HONGKONG are non-US (Open-Meteo + RainViewer); SHASTA is
-/// US/NWS. `region_by_key` also searches this list to re-resolve the radar.
-static THEMED_REGIONS: &[&RegionDef] = &[&JAPAN, &SOVIET, &ARCTIC, &HONGKONG, &SHASTA];
+/// All non-US use Open-Meteo + RainViewer; the US ones (SHASTA/INLAND_CA/
+/// SPACE_COAST) use NWS. `region_by_key` also searches this list to re-resolve
+/// the radar.
+static THEMED_REGIONS: &[&RegionDef] = &[
+    &JAPAN, &SOVIET, &ARCTIC, &HONGKONG, &SHASTA, &MID_ATLANTIC, &EGYPT, &GERMANY,
+    &INLAND_CA, &KAZAKH_STEPPE, &SPACE_COAST,
+];
 
 /// Resolve the region for a track from the album slug embedded in its id.
 /// Themed albums match by keyword; everything else hash-picks a US region
 /// (the original behavior, preserved for the daily LLM-spec VOD path).
 pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     let id = track_id.as_str().to_ascii_lowercase();
+    // Vol. 2 albums whose geography diverges from their Vol. 1 — matched first,
+    // before the generic theme keywords below (e.g. sovetskiy-drive-vol-2 must
+    // beat the `sovetskiy`→Moscow branch).
+    if id.contains("sunset-drive-vol-2") {
+        return &INLAND_CA;
+    }
+    if id.contains("sovetskiy-drive-vol-2") {
+        return &KAZAKH_STEPPE;
+    }
+    if id.contains("atompunk-drive-vol-2") {
+        return &SPACE_COAST;
+    }
     // Order matters: "neo-tokyo" and "tokyo-cyberpunk" both → JAPAN.
     if id.contains("tokyo") {
         return &JAPAN;
@@ -262,8 +373,10 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     }
     if id.contains("arctic") || id.contains("ice-station") || id.contains("ice_station")
         || id.contains("hollow") || id.contains("polar")
+        || id.contains("agartha") || id.contains("shambhala")
     {
-        // Lost Worlds #2 (Hollow Earth) is the polar-opening descent → Arctic anchor.
+        // Lost Worlds #2 (Hollow Earth) polar-opening descent + #3 (Agartha) inner-sun
+        // — both share the saga's Arctic/inner-earth anchor.
         return &ARCTIC;
     }
     if id.contains("hong-kong") || id.contains("hongkong") || id.contains("kowloon") {
@@ -272,6 +385,27 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     // Lost Worlds saga launch — Telos beneath Mt. Shasta (NWS-native US region).
     if id.contains("shasta") || id.contains("telos") || id.contains("siskiyou") {
         return &SHASTA;
+    }
+    // Lost Worlds #4 (Atlantis) — drowned Atlantic motherland → mid-Atlantic/Azores.
+    if id.contains("atlantis") || id.contains("atlantic") || id.contains("azores") {
+        return &MID_ATLANTIC;
+    }
+    // Lost Worlds #5 (Gate of Ra) — Heliopolis-hypertech desert → Egypt.
+    if id.contains("gate-of-ra") || id.contains("gate_of_ra") || id.contains("egypt")
+        || id.contains("heliopolis")
+    {
+        return &EGYPT;
+    }
+    // Cold-War East Berlin → Germany (DWD radar via RainViewer).
+    if id.contains("berlin") || id.contains("germany") {
+        return &GERMANY;
+    }
+    // US themed albums that want a specific metro rather than a hashed region.
+    if id.contains("miami") {
+        return region_by_key("us-southeast");
+    }
+    if id.contains("blade-runner") || id.contains("blade_runner") || id.contains("2049") {
+        return region_by_key("us-southwest");
     }
     let h = djb2(track_id.as_str());
     &US_REGIONS[(h % US_REGIONS.len() as u64) as usize]

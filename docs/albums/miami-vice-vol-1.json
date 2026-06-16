@@ -1,0 +1,316 @@
+{
+  "album_slug": "miami-vice-vol-1",
+  "title": "Miami Vice Drive, Vol. 1",
+  "theme": "miami_vice_vapor_coast",
+  "track_count": 12,
+  "tonic_progression": "Cm (Aeolian, the threshold) -> Gm (Dorian, the cruise locks in) -> Dm (Aeolian) -> Am (Dorian) -> Em (Aeolian, the deal turns) -> Bm (Phrygian color, tension) -> F#m (Dorian, the run) -> A major (Lydian-bright relative lift, the peak) -> D major (the suspended afterimage of the peak) -> Bm (the cool-down begins) -> Fm (Aeolian, the comedown deepens) -> Cm (Aeolian, the ring closes at the marina before dawn)",
+  "bpm_arc": [90, 94, 98, 102, 106, 110, 114, 110, 106, 100, 94, 88],
+  "narrative_arc": "Twelve tracks read as a single nocturnal cruise through pastel coke-era Miami, dusk to false dawn, with the bright pastel surface laid over a thread of criminal-underworld tension that never quite resolves. Tracks 1-3 are dusk and the ignition of the night: a turquoise-and-coral skyline goes neon as the last of the sun bleeds into the bay (1, C minor, the only drumless track, the glassy DX7 electric-piano pad establishing the album's tonal home and its undercurrent of unease), a chrome Ferrari Daytona kicks over in a marina parking deck and threads onto the causeway between rows of pastel deco hotels (2, G minor Dorian, the pulsing arp ignites and the cruise locks in), and the car merges onto the coastal boulevard at full neon density with palm shadows strobing across the hood (3, D minor). Tracks 4-7 are the deal-and-the-run, the album's tension arc rising under the pastel sheen: a meeting goes sideways in a glass-and-chrome hotel atrium as a sax-flavored lead noses in over the arp (4, A minor Dorian, the criminal undercurrent surfaces), the deal turns and the night sharpens — distant sirens implied in the pad's filter sweeps, the harmony tightening (5, E minor, the deal turns), the tension peaks into Phrygian menace as the Daytona pulls off the boulevard and the pursuit begins through a grid of palm-lined side streets (6, B minor Phrygian color), and track 7 is the RUN — the album's tightest, most propulsive track, the chase across a causeway at full speed, neon streaking, the arp weaponised into a 16th-note ostinato under a screaming sax lead (7, F#m Dorian, the BPM ceiling 114, the propulsive zenith). Tracks 8-9 are the PEAK as release rather than impact: the pursuit breaks clean and the car bursts out onto open water-front road at sunset's last molten band, the harmony lifting for the first time on the album into a bright major key — the pastel surface finally winning over the tension beneath, exhilaration without aggression (8, A major, the Lydian-bright peak, the album's hero moment); and track 9 holds that release suspended, the same brightness glided rather than surged, the Daytona coasting along the shoreline with the top down and the danger behind (9, D major, the suspended afterimage). Tracks 10-12 are the cool-down into false dawn: the major brightness slips back toward minor as the adrenaline drains and the neon begins to read tired rather than electric (10, B minor, the cool-down begins), the comedown deepens into a slow cruise back through emptying streets where the pastel signage flickers and dims (11, F minor, the comedown's darkest and most tender point), and the ring closes at the marina before dawn — the car parked where it started, the engine ticking as it cools, the album's opening glassy-pad motif played one final time on FM electric piano an octave down, the night's tension fully absorbed into the still pre-dawn air (12, C minor, the ring closed at home, the listener arrives at the same tonic from the far side of a long night).",
+  "recurring_motifs": [
+    {
+      "motif": "Vice arp — a pulsing six-note ascending-then-folding arpeggio voiced on a glassy DX7-style FM electric piano (root-5-b3-octave-5-b3, the Jan-Hammer-adjacent pulsing sixteenth feel but its own contour), the album's nocturnal-cruise pulse, always sidechained softly to the kick so it breathes",
+      "introduced_in": 1,
+      "returns_in": [4, 7, 12],
+      "transformation": "Track 1 introduces it SLOW AND FILTERED — the glassy FM electric piano alone, no rhythm, the six notes spread wide and hazy, the album's tonal thesis stated before the cruise begins. Track 4 plays it FULL AND PULSING under the sax-flavored lead — the cruise pulse now locked to the kick, the arp the harmonic engine of the deal-arc as the criminal undercurrent surfaces. Track 7 (the run) plays it WEAPONISED — chopped into a relentless 16th-note ostinato, retriggered hard under the screaming sax lead, the cruise pulse turned chase-engine at the BPM ceiling. Track 12 plays it WHOLE AGAIN but SLOW AND ONE OCTAVE DOWN on FM electric piano with a long pad sustain underneath — the cruise pulse re-read as a wind-down gesture, the same six notes remembered at the marina before dawn, the engine ticking as it cools.",
+      "saga_recurring": false
+    },
+    {
+      "motif": "Sax-noir lead — a long-breathed four-phrase melodic line voiced on a sax-flavored analog lead (breathy filter envelope, slow portamento between phrase peaks, NOT a literal sample of any soundtrack theme), the album's criminal-underworld-tension signature, deliberately withheld from the dusk arc so its first entrance marks the moment the deal surfaces",
+      "introduced_in": 4,
+      "returns_in": [7, 8, 11],
+      "transformation": "Heard NOWHERE in tracks 1-3 (the dusk arc is pure pastel cruise; the tension is implied only in the pad's minor color). Track 4 introduces it NOSING IN — entering low and breathy over the vice arp at the moment the meeting goes sideways, the album's first overt statement of criminal-underworld tension. Track 7 (the run) plays it SCREAMING — pushed to the top of its register with a hard filter-open and fast portamento, the sax-noir lead turned chase-cry at the BPM ceiling. Track 8 (the peak) plays it SOARING AND RESOLVED — the same melodic contour but now in A major, the breathy tension resolved into exhilaration, the lead finally allowed to bloom over the bright Lydian harmony (the pastel surface winning). Track 11 (the comedown's darkest point) plays it ALONE AND TIRED — slow, low, unaccompanied over the Fm pad with the portamento dragged out and the filter rolled off, the night's last word, the sax-noir lead exhausted but still breathing.",
+      "saga_recurring": false
+    },
+    {
+      "motif": "Palm-shadow pulse — a four-note descending glassy-pad figure landing on the and-of-4 (offbeat anchor that pulls each bar forward into the next), voiced on layered DX7 electric-piano pads, the album's visual-rhythm signature mirroring palm shadows strobing across a moving hood",
+      "introduced_in": 3,
+      "returns_in": [6, 10],
+      "transformation": "Track 3 introduces it under the verse as harmonic support — the offbeat pad figure laid beneath the boulevard cruise, the listener locking into the pulse without consciously hearing it. Track 6 brings it into the lead position as the tension peaks — extended to a full 8-bar refrain, sidechained hard, the structural backbone of the Phrygian pursuit-into-the-side-streets, the palm shadows now strobing fast as the car accelerates. Track 10 (the cool-down begins) returns it GHOSTED — same notes, same offbeat rhythm, but heavily filtered with the high end rolled off and the sustain bled out, as if seen through a windshield smeared with the night's salt-fog, the palm shadows now slow and tired.",
+      "saga_recurring": false
+    }
+  ],
+  "tracks": [
+    {
+      "track_number": 1,
+      "title": "Coral Dusk",
+      "role": "opener",
+      "key": "C minor",
+      "bpm": 90,
+      "duration_seconds": 240,
+      "mood_tags": ["nocturnal", "anticipatory", "pastel", "uneasy"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "[Intro - glassy DX7 FM electric-piano pad alone, no rhythm, slow filter sweep opening over 30s]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + vice arp slow and filtered (six-note ascending-then-folding, hazy), soft sub bass on root]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + layered DX7 pad swell, gated reverb snare brushed soft on 2 and 4, mellow analog bass walking root-fifth]"},
+        {"name": "bridge", "bars": 8, "instrumentation": "[Bridge - drop to glassy pad + arp only, breathe, filter half-closed]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - fade pad sustaining C, drums drop out, vice arp once more then near-silence on G (V of Cm)]"}
+      ],
+      "musicgen_prompt": "synthwave 90 BPM C minor, glassy DX7 FM electric-piano pad, slow filtered pulsing six-note arpeggio, soft gated reverb drums entering at 1:00, mellow analog sub bass, lush nocturnal pastel Miami at dusk, turquoise and coral skyline going neon, anticipatory with a faint criminal-underworld unease underneath, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, Miami skyline at dusk going neon, pastel coral and turquoise deco hotels along a calm bay, the last molten band of sun bleeding into the water, palm silhouettes in the foreground, a chrome Ferrari Daytona parked at a marina reflecting the pastel sky, anticipatory mood with faint criminal-noir undertone, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "—",
+      "tempo_relationship_to_prior": "—",
+      "composer_notes": "OPENER. Sets the tonal home (C minor) and the album's signature voice — the glassy DX7 FM electric-piano pad. VICE ARP introduced WHOLE but slow and filtered (the thesis). NO drums until bar 32. The minor color carries the album's criminal-underworld undercurrent; keep it lush and pastel-bright on the surface but let the harmony stay uneasy. Outro ends on G (V of C minor) which is also the tonic of track 2 — earned pivot via parallel-minor reread (the V of Cm is G major, here reread as G minor for track 2). Do not let ACE-Step add a hi-hat shuffle: keep the kit minimal and gated."
+    },
+    {
+      "track_number": 2,
+      "title": "Daytona Ignition",
+      "role": "cruiser",
+      "key": "G minor",
+      "bpm": 94,
+      "duration_seconds": 240,
+      "mood_tags": ["unfolding", "pastel", "steady", "neon"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - glassy pad in Gm, sidechain hint, ignition swell]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + pulsing vice arp on root-third-fifth, soft kick on every beat]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + mellow analog lead melody, gated reverb snare on 2 and 4, sub bass]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - drop lead, layer second DX7 pad an octave up]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full kit + lead doubled in octaves, sidechain locks in]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter sweep down, pad sustains G, primes the cruise]"}
+      ],
+      "musicgen_prompt": "synthwave 94 BPM G minor, lush analog pad, sidechained pulsing arpeggio on glassy FM electric piano, soft kick on every beat, gated reverb snare on 2 and 4, mellow analog lead melody, chrome Ferrari Daytona kicking over and threading onto a neon causeway, steady nocturnal Miami cruise, pastel-bright with tension underneath, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, chrome Ferrari Daytona pulling out of a marina parking deck onto a causeway lined with pastel deco hotels, neon signage reflecting on wet pavement, palm trees in silhouette, deep turquoise-to-coral night sky, the car mid-frame from behind driving away, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Cm to Gm via the V-as-new-tonic pivot (track 1's G outro chord reread as G minor tonic). The cruise locks in; the harmony stays inside the minor mode but brightens slightly toward Dorian.",
+      "tempo_relationship_to_prior": "+4 BPM. First step of the linear ascent.",
+      "composer_notes": "First true cruiser. The pulsing vice arp ignites here as the cruise engine — sidechain on the pad must be obvious but tasteful, this is where the listener locks in. Gm with a raised 6 (E natural in the melody) gives the Dorian brightness. Keep the lead short (4-bar phrase repeated). Outro ends on D (V of Gm, also tonic of track 3) — earned pivot."
+    },
+    {
+      "track_number": 3,
+      "title": "Boulevard Neon",
+      "role": "cruiser",
+      "key": "D minor",
+      "bpm": 98,
+      "duration_seconds": 240,
+      "mood_tags": ["rolling", "saturated", "focused", "neon"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - sub bass on D, kick on every beat]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + palm-shadow pulse motif (4-note descending pad on and-of-4), gated snare]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + mellow analog lead, layered DX7 pads, sidechain]"},
+        {"name": "breakdown", "bars": 8, "instrumentation": "[Breakdown - kick drops, just palm-shadow pulse + glassy pad + reverb tail]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full kit returns, lead doubled]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter close, pad on A (V of Dm)]"}
+      ],
+      "musicgen_prompt": "synthwave 98 BPM D minor, four-note descending pad figure on the offbeat, sidechained glassy DX7 pad, mellow analog lead melody, gated reverb drums, kick on every beat, analog sub bass, full neon density on a coastal boulevard, palm shadows strobing across a chrome hood, focused nocturnal cruise, pastel with criminal undertone, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, coastal boulevard at full neon density at night, palm trees casting strobing shadows across the road, pastel deco storefronts glowing pink and turquoise, a chrome Ferrari Daytona in motion mid-frame, neon reflections on wet asphalt, deep magenta-violet sky, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Gm to Dm via the V-as-new-tonic pivot (track 2's D outro chord reread as D minor tonic). Continuing the cycle-of-fifths-descending ladder strictly inside the minor mode.",
+      "tempo_relationship_to_prior": "+4 BPM. Maintaining linear ascent.",
+      "composer_notes": "FIRST APPEARANCE of the palm-shadow pulse motif — under the verse as harmonic support, not yet in lead position. The breakdown at bar 41 is where the listener should first hear the motif unobstructed. Keep the cruise steady; the tension is still only implied. Outro A (V of Dm) pivots cleanly into Am of track 4."
+    },
+    {
+      "track_number": 4,
+      "title": "Atrium Glass",
+      "role": "cruiser-into-tension",
+      "key": "A minor",
+      "bpm": 102,
+      "duration_seconds": 240,
+      "mood_tags": ["uneasy", "saturated", "noir", "rolling"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - filtered vice arp in Am, building, faint pad unease]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + kick on every beat, sub bass, gated snare]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + sax-noir lead NOSING IN low and breathy over the arp, layered pads]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - sax lead drops, vice arp returns full and pulsing to foreground]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full mix, sax lead returns, sidechain harder]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - sax lead holds E (V of Am), filter close]"}
+      ],
+      "musicgen_prompt": "synthwave 102 BPM A minor, full pulsing glassy arpeggio, hard kick on every beat, gated reverb snare, breathy sax-flavored analog lead nosing in low over the arp, sidechained layered DX7 pads, a deal going sideways in a glass-and-chrome hotel atrium, criminal-underworld tension surfacing under the pastel sheen, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, interior of a glass-and-chrome 1980s hotel atrium at night, towering palm plants and brass railings, pastel pink and turquoise neon accent lighting, a chrome Ferrari Daytona visible through the glass doors in the porte-cochere, tense noir mood, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Dm to Am via the V-as-new-tonic pivot (track 3's A outro chord reread as A minor tonic). Am with a raised 6 (F# in the melody) gives the Dorian brightness even as the tension arc begins.",
+      "tempo_relationship_to_prior": "+4 BPM. Maintaining linear ascent.",
+      "composer_notes": "SAX-NOIR LEAD INTRODUCED — nosing in low and breathy as the meeting goes sideways. This is the album's first overt statement of criminal-underworld tension; it has been deliberately withheld from tracks 1-3. VICE ARP RETURNS FULL AND PULSING under the lead — its second structural appearance, now locked to the kick. Keep the sax-flavored lead breathy and restrained here (it screams later in track 7). Outro E (V of Am, also tonic of track 5) — earned pivot."
+    },
+    {
+      "track_number": 5,
+      "title": "The Deal Turns",
+      "role": "tension",
+      "key": "E minor",
+      "bpm": 106,
+      "duration_seconds": 240,
+      "mood_tags": ["urgent", "noir", "tense", "sharpening"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - filtered arp in Em, pad filter sweeps implying distant sirens, building]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + hard kick on every beat, sub bass, gated snare]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + aggressive analog lead, layered pads, FM bell counter-melody]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - lead drops, vice arp returns to foreground, tension held]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full mix, sidechain harder, harmony tightening]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - lead holds B (V of Em), filter close]"}
+      ],
+      "musicgen_prompt": "synthwave 106 BPM E minor, driving pulsing arpeggio, hard kick on every beat, gated reverb snare, aggressive analog lead, FM bell counter-melody, pad filter sweeps implying distant sirens, sidechained layered DX7 pads, the deal turning and the night sharpening, criminal-noir tension rising under the pastel neon, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a deserted neon-lit Miami side street at night, pastel storefront signage flickering pink and turquoise, a chrome Ferrari Daytona pulling away hard with the taillights smearing, distant blue-and-red police light glow reflected on wet pavement, tense noir mood, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Am to Em via the V-as-new-tonic pivot (track 4's E outro chord reread as E minor tonic). The Dorian brightness of tracks 2-4 drops back to plain Aeolian as the tension sharpens.",
+      "tempo_relationship_to_prior": "+4 BPM. Maintaining linear ascent.",
+      "composer_notes": "TENSION ARC. The deal turns; the harmony tightens to plain Aeolian and the pad's filter sweeps imply distant sirens without literal sound-effects. FM bell counter-melody is a foreshadow of the FM-bell voice that carries the vice arp's final return in track 12. Em is the gravity well between the rolling Am of track 4 and the Phrygian menace of track 6. Outro B (V of Em, also tonic of track 6) — earned pivot."
+    },
+    {
+      "track_number": 6,
+      "title": "Pastel Pursuit",
+      "role": "bridge-into-peak",
+      "key": "B minor",
+      "bpm": 110,
+      "duration_seconds": 270,
+      "mood_tags": ["menacing", "propulsive", "edge-of-peak", "phrygian"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - pad swell + reverse cymbal up to bar 1, Phrygian b2 color]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - kick on every beat, sub bass, pulsing arp with Phrygian b2 edge]"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "[Pre-chorus - build, snare rolls, riser, filter open]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - PALM-SHADOW PULSE MOTIF in lead position, extended 8-bar refrain, hard sidechain, layered pads]"},
+        {"name": "break", "bars": 8, "instrumentation": "[Break - drums drop, just palm-shadow pulse and glassy pad, the pursuit holds its breath]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full return, double-octave lead over the pulse]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter close on F# (V of Bm) holding into the run]"}
+      ],
+      "musicgen_prompt": "synthwave 110 BPM B minor Phrygian, four-note descending offbeat pulse motif in the lead voice, pulsing arpeggio with a Phrygian flat-second edge, wide analog lead, layered atmospheric DX7 pads, gated reverb drums, hard kick, sub bass, reverse cymbal swells, a chrome Daytona pulling off the boulevard into a grid of palm-lined side streets as pursuit begins, menacing pastel-noir, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a grid of palm-lined Miami side streets at night seen from above, a single chrome Ferrari Daytona weaving through with neon reflecting off its chrome, pastel pink and turquoise streetlamps casting long palm shadows, a sense of pursuit and menace under the bright pastel palette, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Em to Bm via the V-as-new-tonic pivot (track 5's B outro chord reread as B minor tonic). Phrygian b2 color (C natural over the Bm) brings the album's harmonic menace to its peak.",
+      "tempo_relationship_to_prior": "+4 BPM. Maintaining linear ascent into the tension peak.",
+      "composer_notes": "BRIDGE INTO THE RUN. PALM-SHADOW PULSE MOTIF MOVES INTO LEAD POSITION — its structural payoff after the foreshadow in track 3, now an extended 8-bar refrain sidechained hard, the palm shadows strobing fast as the car accelerates. Phrygian b2 is the album's harmonic-tension ceiling. 270s (45s longer) — the bridge into the chase deserves the extra room. The break at bar 41 (pulse on solo pad) is the held breath before the run. Outro F# (V of Bm, also tonic of track 7) — earned pivot."
+    },
+    {
+      "track_number": 7,
+      "title": "Causeway Run",
+      "role": "peak",
+      "key": "F# minor",
+      "bpm": 114,
+      "duration_seconds": 300,
+      "mood_tags": ["propulsive", "screaming", "zenith", "chase"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - kick + sub bass + sidechain pad, no melody yet, the run ignites]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + WEAPONISED vice arp as relentless 16th-note ostinato, gated snare, layered pads]"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "[Pre-chorus - build, white-noise riser, snare roll]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - SCREAMING sax-noir lead pushed to the top of its register over the 16th-note ostinato, hard sidechain]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - drop the sax lead, weaponised arp ostinato carries alone under the pad]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - full mix, sax lead doubled an octave up, biggest version]"},
+        {"name": "bridge", "bars": 8, "instrumentation": "[Bridge - drums drop, weaponised arp ostinato solo, the run holds at full speed]"},
+        {"name": "chorus3", "bars": 16, "instrumentation": "[Chorus3 - full return, the chase peak]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - sax lead sustains C# (V of F#m), filter close, drums fade]"}
+      ],
+      "musicgen_prompt": "synthwave 114 BPM F# minor, relentless 16th-note arpeggio ostinato on glassy FM electric piano, hard kick on every beat, screaming sax-flavored analog lead pushed to the top of its register with fast portamento, gated reverb drums, sidechained layered pads, white-noise risers, a full-speed chase across a Miami causeway at night, neon streaking past, propulsive pastel-noir zenith, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, view from behind a chrome Ferrari Daytona at full speed on a causeway over the bay at night, neon streaking past on both sides, the Miami skyline glowing pink and turquoise across the water ahead, motion-blur palm silhouettes, chrome surfaces glowing under neon, propulsive chase mood, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "cover_notes_internal": "This is the album's chase-ceiling hero cover — should read as the iconic high-energy image on the playlist thumbnail grid alongside track 8's peak cover.",
+      "key_relationship_to_prior": "Down a perfect fourth from Bm to F#m via the V-as-new-tonic pivot (track 6's F# outro chord reread as F# minor tonic). F#m with a raised 6 (D# in the ostinato) gives the Dorian propulsion at the chase peak; this is the lowest-sharp minor before the album lifts into major for the peak.",
+      "tempo_relationship_to_prior": "+4 BPM. The album's BPM ceiling (114, validation-safe under 118).",
+      "composer_notes": "THE RUN — peak BPM, most propulsive track. VICE ARP WEAPONISED into a relentless 16th-note ostinato; SAX-NOIR LEAD SCREAMING at the top of its register — both motifs at their most intense. 300s is intentional: the chase should feel like it could outrun the night. The bridge at bar 65 (weaponised arp solo) is the chase held at full speed with the lead gone — give it air, do not pile on. Outro C# (V of F#m) pivots into A major of track 8 via chromatic-mediant lift (C# is the major third of A major) — the tension finally releases into brightness. FLAG FOR HUMAN REVIEW: this F#m-to-A-major lift is the album's single largest mood swing; if the transition does not land in the render, consider a 1-bar A-major pad swell on track 7's final beat to pre-echo the resolution."
+    },
+    {
+      "track_number": 8,
+      "title": "Open Water",
+      "role": "peak",
+      "key": "A major",
+      "bpm": 110,
+      "duration_seconds": 300,
+      "mood_tags": ["exhilarated", "released", "bright", "molten"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - bright A-major glassy pad swell, light kick, the pursuit breaks clean]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + shimmering pulsing arp in A major, sub bass, gated snare on 2 and 4]"},
+        {"name": "pre-chorus", "bars": 8, "instrumentation": "[Pre-chorus - build, Lydian raised-4 color in the pad, riser]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - SOARING sax-noir lead RESOLVED into A major, the tension contour now exhilaration, layered bright pads, full kit]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - sax lead steps aside, shimmering arp + counter-pad foreground]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - sax lead returns doubled an octave up, biggest brightest version]"},
+        {"name": "bridge", "bars": 8, "instrumentation": "[Bridge - drums drop, sax lead floats over a held A-major pad, the peak held]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - lead sustains E (V of A), filter close, drums fade]"}
+      ],
+      "musicgen_prompt": "synthwave 110 BPM A major Lydian, bright shimmering pulsing arpeggio on glassy FM electric piano, soaring sax-flavored analog lead resolved into major-key exhilaration, gated reverb drums, layered bright DX7 pads with a Lydian raised-fourth glow, sub bass, a chrome Daytona bursting onto open water-front road at sunset's last molten band, the pastel surface winning over the night's tension, exhilaration without aggression, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a chrome Ferrari Daytona bursting onto an open water-front road at sunset's last molten band, the bay wide and glowing on the right, the last orange-coral sliver of sun on the horizon, palm silhouettes flanking the frame, sky bright pink to turquoise, exhilarated released mood, the brightest cover of the album, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "cover_notes_internal": "This is the album's emotional-peak hero cover — the brightest image on the playlist thumbnail grid, the pastel-pink-and-turquoise resolution of the chase.",
+      "key_relationship_to_prior": "Chromatic-mediant lift from F#m up to A major (A major is F#m's relative major; they share A, C#, E). The album's first and brightest major key — the structural release of the tension arc, the pastel surface finally winning. Lydian raised-4 (D# in the pad) keeps it from going saccharine.",
+      "tempo_relationship_to_prior": "-4 BPM. First downward step, but the energy reads as release rather than comedown — the BPM drops while the brightness rises.",
+      "composer_notes": "PEAK TRACK 1 of 2 (the peak as RELEASE). SAX-NOIR LEAD SOARING AND RESOLVED — the same melodic contour introduced as tension in track 4, now blooming over bright A-major Lydian harmony. This is the album's hero moment: the pastel surface wins over the criminal undercurrent. Lydian raised-4 keeps the major key adult and noir-adjacent rather than naive. The bridge at bar 57 (sax floating over held pad) is the emotional center — give it air. Outro E (V of A, also tonic of track 9) — earned pivot, the peak held into its afterimage."
+    },
+    {
+      "track_number": 9,
+      "title": "Top Down, Lights Low",
+      "role": "peak-suspended",
+      "key": "D major",
+      "bpm": 106,
+      "duration_seconds": 270,
+      "mood_tags": ["suspended", "glided", "warm", "afterimage"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - continuation feel, glassy pad sustains the brightness from track 8, light kick]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + shimmering arp in D major, sub bass, brushed snare on 2 and 4]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + warm floating analog lead, soft sidechain (softer than track 8), layered pads]"},
+        {"name": "break", "bars": 8, "instrumentation": "[Break - drums drop, just pad + arp + reverb wash, the glide held]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - drums return, lead doubled with a higher-octave FM bell]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter close on A (V of D... reread as the cool-down begins), pad warm fade]"}
+      ],
+      "musicgen_prompt": "synthwave 106 BPM D major, shimmering pulsing arpeggio, warm floating analog lead, brushed gated snare, soft sidechained glassy DX7 pads, sub bass, FM bell octave-doubling, a chrome Daytona coasting along the shoreline with the top down and the danger behind, suspended warm afterimage of the peak, glided rather than surged, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a chrome Ferrari Daytona with the top down coasting along a shoreline boulevard at deep dusk, palm silhouettes against a warm pink-to-violet sky, the bay calm and glowing faintly on the left, neon storefronts soft and low in the background, relaxed suspended mood, cocaine pink and turquoise palette, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from A major to D major (the V-as-new-tonic pivot, track 8's E outro reread as the dominant function leading to D). The brightness is held but the harmony begins its slow descent back toward minor; D major is the suspended afterimage of A major's peak.",
+      "tempo_relationship_to_prior": "-4 BPM. The glide continues; brightness held, energy easing.",
+      "composer_notes": "PEAK TRACK 2 of 2 (the peak as SUSPENSION). Tracks 8 and 9 form a dual-peak plateau in major: track 8 is the burst of release, track 9 is the same brightness glided rather than surged — the Daytona coasting with the danger behind. The FM bell octave-doubling here preps the FM-electric-piano voice that carries the vice arp's final return in track 12. Do not add aggression; the suspension IS the composition. Outro A pivots into Bm of track 10 (A is the bVII of Bm — natural-minor relation), the first slip back toward minor as the cool-down begins."
+    },
+    {
+      "track_number": 10,
+      "title": "Salt-Fog Cruise",
+      "role": "comedown",
+      "key": "B minor",
+      "bpm": 100,
+      "duration_seconds": 240,
+      "mood_tags": ["cooling", "tired", "tender", "low-light"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - soft pad in Bm, light kick, the brightness slips back to minor]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + GHOSTED palm-shadow pulse (high end rolled off, sustain bled out), sub bass, gated snare]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + mellow analog lead, layered pads, soft sidechain]"},
+        {"name": "verse2", "bars": 16, "instrumentation": "[Verse2 - ghosted pulse foreground, lead steps aside]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - lead returns, octave-up doubling, full but tired mix]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter close on F# (V of Bm), pad fade]"}
+      ],
+      "musicgen_prompt": "synthwave 100 BPM B minor, ghosted four-note descending offbeat pulse motif heavily filtered with high end rolled off and short sustain, mellow analog lead, layered glassy pads, soft kick, gated reverb snare, sub bass, a slow cruise back through emptying streets, neon reading tired rather than electric, windshield smeared with salt-fog, cooling pastel-noir, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, an emptying Miami boulevard in the small hours, neon signage flickering and dimming, a chrome Ferrari Daytona cruising slowly with headlights on through a faint salt-fog haze, palm silhouettes nearly black, sky deep violet, tired cooling mood, cocaine pink and turquoise palette muted, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a major sixth / the bVII slip from D major into B minor (D major is B minor's relative major; they share D, F#, A). The brightness of the peak slips back into minor — the adrenaline draining, the album beginning its cool-down.",
+      "tempo_relationship_to_prior": "-6 BPM. The cool-down deepens its descent.",
+      "composer_notes": "COMEDOWN BEGINS. PALM-SHADOW PULSE MOTIF RETURNS, GHOSTED — same notes, same offbeat rhythm as track 6's peak, but heavily filtered with the high end rolled off and sustain bled out, as if seen through a salt-fog-smeared windshield. This is the motif's farewell; the palm shadows are now slow and tired. Outro F# (V of Bm) pivots into Fm of track 11 (chromatic-mediant-down / tritone-adjacent slide — F# to F natural by semitone in the bass, the harmony cooling hard)."
+    },
+    {
+      "track_number": 11,
+      "title": "Flicker and Fade",
+      "role": "comedown",
+      "key": "F minor",
+      "bpm": 94,
+      "duration_seconds": 240,
+      "mood_tags": ["tender", "dimming", "noir", "almost-dawn"],
+      "sections": [
+        {"name": "intro", "bars": 8, "instrumentation": "[Intro - warm pad in Fm, no rhythm, deep reverb]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + soft kick, sub bass, gated snare brushed light, glassy plucked counter-melody]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + sax-noir lead ALONE AND TIRED, slow low portamento, filter rolled off, sidechain pulled way back]"},
+        {"name": "break", "bars": 8, "instrumentation": "[Break - drums drop, sax-noir lead alone with pad reverb tail, the night's last word]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - drums return softly, lead doubled with a glassy pad an octave down]"},
+        {"name": "outro", "bars": 8, "instrumentation": "[Outro - filter close on C (V of Fm), pad fade]"}
+      ],
+      "musicgen_prompt": "synthwave 94 BPM F minor, warm analog pad, sax-flavored analog lead alone and tired with slow dragged-out portamento and the filter rolled off, glassy plucked counter-melody, soft kick, gated reverb snare brushed light, sub bass, deep reverb, emptying streets near false dawn, pastel signage flickering and dimming, tender exhausted pastel-noir, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a near-deserted street in the last hour before dawn, a single pastel neon sign flickering half-dead pink and turquoise, a chrome Ferrari Daytona parked askew at the curb, palm silhouettes against a deep violet sky going grey at the horizon, tender exhausted mood, cocaine pink and turquoise palette muted toward grey, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a major fourth / chromatic slide from Bm into Fm (F#-to-F semitone slip in the bass from track 10's outro). F minor is the album's darkest and most tender tonal space since the home Cm — the comedown's emotional floor.",
+      "tempo_relationship_to_prior": "-6 BPM. The comedown approaches its floor.",
+      "composer_notes": "COMEDOWN'S DARKEST POINT. SAX-NOIR LEAD RETURNS ALONE AND TIRED — slow, low, unaccompanied over the Fm pad with the portamento dragged out and the filter rolled off, the night's last word. The sax-noir lead is exhausted but still breathing — this is its farewell, the criminal-underworld tension dissolving into fatigue rather than resolving. Keep the mix soft; the album should feel like it is winding down without dragging. Outro C (V of Fm, also the dominant of the home Cm) pivots into the closer — the ring begins to close."
+    },
+    {
+      "track_number": 12,
+      "title": "Marina, Before Dawn",
+      "role": "closer",
+      "key": "C minor",
+      "bpm": 88,
+      "duration_seconds": 300,
+      "mood_tags": ["nocturnal", "resolved", "still", "interior"],
+      "sections": [
+        {"name": "intro", "bars": 16, "instrumentation": "[Intro - deep glassy pad in Cm alone, no rhythm, slow filter open over 30s]"},
+        {"name": "verse", "bars": 16, "instrumentation": "[Verse - + VICE ARP on FM electric piano, one octave below original, slow phrasing, sub bass on root]"},
+        {"name": "chorus", "bars": 16, "instrumentation": "[Chorus - + soft kick on 1, gated snare brushed very soft, mellow analog lead, layered pads]"},
+        {"name": "break", "bars": 8, "instrumentation": "[Break - drums drop, FM-electric-piano vice arp alone with deep reverb]"},
+        {"name": "chorus2", "bars": 16, "instrumentation": "[Chorus2 - drums return softly, lead octave-doubled, full but quiet mix]"},
+        {"name": "coda", "bars": 16, "instrumentation": "[Coda - lead drops out, FM-electric-piano vice arp one final time whole, pad fades, drums fade, silence]"}
+      ],
+      "musicgen_prompt": "synthwave 88 BPM C minor, deep warm glassy DX7 pad, vice arpeggio on FM electric piano played slow and full one octave down, soft kick on 1, brushed gated reverb snare, mellow analog lead, sub bass on root, a chrome Daytona parked at the marina before dawn, engine ticking as it cools, the night's tension absorbed into still pre-dawn air, nocturnal resolved pastel-noir, instrumental, no vocals",
+      "cover_prompt": "synthwave 1986 album cover, a chrome Ferrari Daytona parked at a quiet marina in the last blue-grey minutes before dawn, the bay glass-still, pastel deco hotels dark behind, a single dock lamp glowing pink, palm silhouettes against a sky going from violet to pale grey at the horizon, resolved still interior mood, cocaine pink and turquoise palette softened toward dawn-grey, no people, no text, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Fm to Cm via the V-as-new-tonic pivot (track 11's C outro chord reread as C minor tonic) — closes the ring. The album begins and ends in C minor; the listener arrives at the home tonic from the far side of a long night.",
+      "tempo_relationship_to_prior": "-6 BPM. Lowest BPM on the record, slightly below track 1's 90 BPM — the listener arrives more tired than they started, which is honest.",
+      "composer_notes": "CLOSER. VICE ARP RETURNS WHOLE, ONE OCTAVE DOWN, SLOW, ON FM ELECTRIC PIANO — the cruise pulse re-read as a wind-down gesture, the engine ticking as it cools. 300s long to give the coda the air it needs. The final 16-bar coda is the arp alone, then silence; do not let ACE-Step add a fade-up tail or any stinger. The album ends in C minor where it began — the ring closed at the marina, the criminal-underworld tension fully absorbed into the still pre-dawn air. The sax-noir lead does NOT return here (it had its farewell in track 11) — the closer belongs to the cruise pulse alone."
+    }
+  ],
+  "album_notes": {
+    "overall_form": "Nocturnal-cruise ring over 12 tracks with a centered dual-peak in major. The album begins at dusk at a Miami marina (track 1) and ends at the same marina before dawn (track 12) — both in C minor, but the listener arrives at the closing tonic from the far side of a long night. Three arcs: Dusk-and-Ignition (tracks 1-3): the skyline goes neon, the Daytona kicks over, the cruise locks onto the boulevard — Cm -> Gm Dorian -> Dm, BPM climbing 90 -> 94 -> 98, pure pastel surface with the criminal undercurrent only implied in the minor color. Deal-and-the-Run (tracks 4-7): the criminal-underworld tension surfaces as the sax-noir lead noses in (4), the deal turns and the harmony sharpens to Aeolian (5), the tension peaks into Phrygian menace as pursuit begins (6), and the run hits the BPM ceiling in a full-speed causeway chase (7) — Am Dorian -> Em -> Bm Phrygian -> F#m Dorian, BPM 102 -> 106 -> 110 -> 114. Peak-and-Cool-Down (tracks 8-12): the pursuit breaks clean and the album lifts into its first and brightest major key as RELEASE (8, A major), holds that brightness suspended and glided (9, D major), then slips back toward minor as the cool-down begins (10, Bm), deepens into the comedown's tender floor (11, Fm), and closes the ring at the marina before dawn (12, Cm) — BPM 110 -> 106 -> 100 -> 94 -> 88. The dual-peak (tracks 8+9) is centered rather than late, because this album's emotional shape is tension-rising-then-released rather than a symmetric sunset arch — the release IS the peak, and the cool-down gets the album's structural weight (the audience lives in the comedown). The home tonic C minor appears only at tracks 1 and 12, framing the entire night as a single uninterrupted cruise from dusk to false dawn.",
+    "key_strategy": "Home tonic C MINOR — deliberately distinct from Sunset Vol. 1 / Tron Vol. 1 (both A-minor home) and Neo-Tokyo Vol. 1 (D-minor home), establishing miami-vice its own tonal frame a minor third below A. The dusk-and-deal arc (tracks 1-7) runs a strict cycle-of-fifths-DESCENDING ladder inside the minor mode: Cm -> Gm -> Dm -> Am -> Em -> Bm -> F#m, each track's V chord reread as the next track's tonic via the V-as-new-tonic parallel-minor pivot (the V of Cm is G major, reread as G minor for track 2, etc.). Layered over the cycle is a modal-color arc that threads pastel-bright against criminal-noir tension: Aeolian at the home (1, 3), Dorian brightness on the cruise tracks (2, 4) and again at the run (7), plain Aeolian as the deal turns (5), and Phrygian b2 menace at the tension peak (6). The Phrygian b2 at track 6 is the album's harmonic-tension ceiling. The peak then BREAKS THE MINOR-ONLY POSTURE — unlike Tron and Neo-Tokyo, which stayed minor throughout, miami-vice lifts into A major (chromatic-mediant up from F#m, sharing A/C#/E) at track 8, the pastel surface finally winning over the tension; A major is voiced LYDIAN (raised 4) to keep it adult and noir-adjacent rather than naive. Track 9 holds D major as the suspended afterimage. The cool-down slips back toward minor: D major -> Bm (relative-minor slip) -> Fm (chromatic semitone slide, F#-to-F in the bass, the harmony cooling hard) -> Cm (V-as-new-tonic, C from Fm's dominant function closing the ring). The ring closes: C minor opens and closes the record. The two-track major excursion (8-9) is the album's single tonal signature distinguishing it from the all-minor prior volumes, and it earns its place narratively as the chase's release.",
+    "tempo_strategy": "BPM range 88-114 throughout — a cruise band wider than Tron's 96-112 and lower-ceilinged than Neo-Tokyo's 104-120, deliberately keeping the audience (late-night coders) in a focused-cruise pulse rather than a chase-rave. Dusk-and-deal arc: 90 -> 94 -> 98 -> 102 -> 106 -> 110 -> 114 (a clean linear +4 accelerando across the first seven tracks, the tension and BPM rising together to the run's ceiling at track 7). The BPM ceiling 114 appears once (track 7, the causeway run) and sits safely under the 118 validation upper bound. Peak-and-cool-down arc: 110 -> 106 -> 100 -> 94 -> 88 (the deceleration begins immediately at the peak — the BPM drops while the brightness rises at track 8, so the major-key release reads as energy easing rather than building, then the cool-down steepens to -6 increments through tracks 10-12). The descent is asymmetric to the ascent: the ascent is a tight linear +4 ramp across seven tracks; the descent is a steeper five-track easing (-4 -4 -6 -6 -6) that stops two ticks below the opening 90, signaling the listener emerges more tired than they entered — the truth of a long night. The album's BPM curve crosses its midpoint not at the BPM ceiling (track 7) but at the major-key peak (track 8) — the tempo peak and the emotional peak are deliberately offset by one track, the chase ceiling handing off to the release. The range never crosses below 80 or above 118 (validation-safe).",
+    "motif_strategy": "Three motifs, each with three-or-four structural appearances, threaded so the pastel surface (vice arp) and the criminal-noir tension (sax-noir lead) trade dominance across the night while the visual-rhythm signature (palm-shadow pulse) marks the cruise's depth. (1) Vice arp — pulsing six-note glassy FM-electric-piano arpeggio (the Jan-Hammer-ADJACENT cruise pulse, its own contour, never a copy), introduced SLOW AND FILTERED in track 1 (the thesis, no rhythm), returned FULL AND PULSING locked to the kick under the sax lead in track 4 (the cruise engine of the deal arc), returned WEAPONISED as a relentless 16th-note ostinato in track 7 (the chase engine at the BPM ceiling), and returned WHOLE ONE OCTAVE DOWN slow on FM electric piano in track 12 (the cruise pulse re-read as a wind-down, the engine ticking as it cools). (2) Sax-noir lead — long-breathed sax-flavored analog lead (NOT a sample of any soundtrack theme), the criminal-underworld-tension signature, WITHHELD entirely from the dusk arc (tracks 1-3) so its first entrance marks the deal surfacing: introduced NOSING IN low and breathy in track 4, returned SCREAMING at the top of its register in track 7 (the run), returned SOARING AND RESOLVED into A major in track 8 (the tension contour reborn as exhilaration, the pastel surface winning), and returned ALONE AND TIRED unaccompanied over the Fm pad in track 11 (the night's last word, the tension dissolving into fatigue). The sax-noir lead does NOT appear in the closer — the cruise pulse outlives the tension. (3) Palm-shadow pulse — four-note descending glassy-pad figure on the and-of-4, the visual-rhythm signature (palm shadows strobing across a moving hood), introduced as harmonic SUPPORT under the verse in track 3, moved to LEAD POSITION as an extended 8-bar refrain at the tension peak in track 6 (palm shadows strobing fast as the car accelerates), and returned GHOSTED with the high end rolled off in track 10 (palm shadows slow and tired through a salt-fog windshield). The three motifs' appearance points are interleaved so no two land on the same track-pair, and the album-frame motif (vice arp) brackets the whole record (tracks 1 and 12) the way Sunset's sunset-arp and Neo-Tokyo's neon-ignition motif bracketed theirs.",
+    "tracklist_continuity": "Tracks 1-7 each end on the V of the next track's tonic, then the V is reread as the new tonic (parallel-minor pivot trick), continuing the cycle-of-fifths-descending ladder cleanly inside the minor mode; tracks 8-12 use chromatic-mediant / relative / semitone-slide pivots through the major-peak and cool-down. Specifically: 1 ends on G (V of Cm, reread as Gm tonic of track 2). 2 ends on D (V of Gm, reread as Dm tonic of track 3). 3 ends on A (V of Dm, reread as Am tonic of track 4). 4 ends on E (V of Am, reread as Em tonic of track 5). 5 ends on B (V of Em, reread as Bm tonic of track 6). 6 ends on F# (V of Bm, reread as F#m tonic of track 7). 7 ends on C# (V of F#m, also the major third of A major — the chromatic-mediant lift into track 8's peak, the album's single largest mood swing, tension releasing into brightness). 8 ends on E (V of A major, the dominant function leading into track 9's D major). 9 ends on A (the bVII of Bm, the first slip back toward minor into track 10's cool-down). 10 ends on F# (V of Bm, slipping by semitone F#-to-F into track 11's Fm, the harmony cooling hard). 11 ends on C (V of Fm, also the dominant of the home Cm — primes the ring-close into track 12). The architectural rhyme is the cycle-of-fifths descending ladder run strictly inside minor through tracks 1-7 (the dusk-and-deal arc as a single harmonic descent), then the major-peak excursion and chromatic cool-down through tracks 8-12 closing the ring back at the home Cm. The listener will not consciously hear most of these pivots — they will only feel that each transition is inevitable rather than abrupt, and that the F#m-to-A-major lift at the 7-to-8 seam is the night's release.",
+    "visual_continuity_notes": "Twelve covers follow the album's narrative arc as a single nocturnal-cruise journey through pastel coke-era Miami, dusk to false dawn. The aesthetic vocabulary is locked: cocaine pink and turquoise pastel palette throughout (deliberately differentiating from Sunset Vol. 1's magenta-orange, Tron Vol. 1's cold-cyan grid, and Neo-Tokyo Vol. 1's red-orange-violet anime-cyberpunk), 1986 deco-Miami / Vapor-Coast aesthetic, chrome Ferrari Daytona as the recurring subject (a real production car, evocative-generic, NOT a named character/object from any TV series or film), pastel deco hotels and storefront neon, palm silhouettes, wet pavement reflecting pastel signage, a faint criminal-noir undertone under the pastel brightness, no people visible, no faces, no text on any cover, all covers 1024x1024 SDXL-native and described with center-frame subject + foreground/background scene depth that survives reframing to 1344x768 wide and 768x1344 tall for desktop and phone aspect renders. Track 1: marina at dusk, skyline going neon, Daytona parked, anticipatory. Track 2: Daytona pulling onto a causeway lined with deco hotels. Track 3: full neon density on a coastal boulevard, palm shadows strobing. Track 4: glass-and-chrome hotel atrium, tense noir interior, Daytona through the glass. Track 5: deserted neon side street, taillights smearing, distant police-light glow. Track 6: grid of palm-lined side streets from above, the Daytona weaving through pursuit. Track 7: causeway at full speed, neon streaking, skyline across the water — album's chase-ceiling hero cover. Track 8: Daytona bursting onto open water-front road at sunset's last molten band — album's brightest emotional-peak hero cover. Track 9: Daytona top-down coasting the shoreline at deep dusk, relaxed. Track 10: emptying boulevard in the small hours, neon flickering, salt-fog haze. Track 11: near-deserted street before dawn, a single half-dead neon sign, Daytona parked askew. Track 12: quiet marina before dawn, Daytona parked, bay glass-still, sky going violet to dawn-grey. The covers should read as one cohesive 1986 Vapor-Coast work — emphatically cocaine-pink-and-turquoise pastel, distinct from all three prior volumes' palettes. All cover prompts specify center-frame subject + foreground/background scene depth so reframing to 1344x768 and 768x1344 native SDXL buckets preserves the composition without outpainting, per the future-albums-native-aspect-gen memory.",
+    "execution_notes_for_pipeline": "ACE-Step 1.5 turbo is the renderer of record (MusicGen license risk accepted per channel posture). 8 turbo inference steps means prompts must front-load the most important descriptors: BPM + key + signature voice (glassy DX7 FM electric-piano pad + sax-flavored analog lead) + signature groove (soft sidechain on the pulsing arp) appear in the first half of every musicgen_prompt. Every musicgen_prompt explicitly states 'instrumental, no vocals' as the final clause to prevent ACE-Step from vocalizing. Per-track section markers in sections[] are formatted as '[Section name - instrumentation notes]' to act as ACE-Step structural anchors per the engine's lyrics-marker convention. Per-track instrumentation notes specify which synth voice (glassy DX7 FM electric-piano pad vs FM electric-piano arp vs sax-flavored analog lead vs analog sub bass), what filter (slow open / fast open / rolled-off ghost / deep reverb), and rhythmic state (kick on every beat / kick on 1 and 3 / kick on 1 only). Per-track durations sum to 3030 seconds (50.5 minutes) for the canonical 12, with the longest tracks (6 at 270s, 7 and 8 at 300s, 9 at 270s, 12 at 300s) carrying the chase-ceiling, dual-peak, and ring-close structural payloads. All BPMs are within the 80-118 validation range (ceiling 114 at track 7). Cover prompts are SDXL-ready, all specify 1024x1024 and 'no people, no text' to keep SDXL from inserting either; covers are designed to reframe cleanly to 1344x768 and 768x1344 native SDXL buckets per the future-albums-native-aspect-gen memory. Per-album weather: route to US/Miami region (NWS), 4-city rotation should be Miami / Fort Lauderdale / Key West / Naples per the TWC-cities-must-match-album-theme memory — these are the same SE-Florida cities used elsewhere and they match the Miami Vapor-Coast theme directly. Sync-drop publish target: all 12 tracks render private and flip public together at the album's anchor timestamp per the sync-drop-for-future-albums memory; mind the YT channel ~10/day upload cap and the GCP ~6/day video.insert project cap when scheduling the batch (split across two Pacific-midnight resets if needed). No per-track release-week language anywhere in the spec.",
+    "danger_zone_compliance": "danger_zone_keys for this album: ['miami_vice']. Hard rule applied: NO proper nouns from the Miami Vice TV series/film or its canonical soundtrack albums anywhere in titles, prompts, or notes. No character names (no 'Crockett', 'Tubbs', 'Castillo', 'Switek', 'Zito', 'Calderone', 'Lombard'). No soundtrack track titles (no 'Crockett's Theme', no Jan Hammer track names, no named cues from the Miami Vice soundtrack albums). The DOUBLE-HIT rule per the album-title-danger-zone memory was applied to every track title: each title was checked against (a) being a named character/object in Miami Vice AND (b) being a track on its canonical soundtrack — no title hits both, and no title hits even one. All twelve titles are evocative-generic (Coral Dusk, Daytona Ignition, Boulevard Neon, Atrium Glass, The Deal Turns, Pastel Pursuit, Causeway Run, Open Water, Top Down Lights Low, Salt-Fog Cruise, Flicker and Fade, Marina Before Dawn), built from the approved evocative-generic vocabulary (neon, Daytona, pastel, coast, vice, marina, causeway, boulevard). 'Daytona' refers to the Ferrari 365 GTB/4 'Daytona' — a real production sports car and an evocative-generic object, not a named character or a soundtrack track title; it is a single-hit-at-most reference and clears the double-hit rule. The MUSICAL direction is Jan-Hammer-ADJACENT (pulsing FM arps, glassy DX7 electric-piano pads, sax-flavored leads, neon-noir cruise) and emphatically NOT a copy of any Miami Vice cue — every musicgen_prompt describes the texture and feel in original terms, never references a named theme. The sax-noir lead motif is explicitly noted as 'NOT a literal sample of any soundtrack theme' in its motif description.",
+    "differentiation_from_prior_volumes": "Sunset Drive Vol. 1 was an ABA sunset-to-dark arch in warm DX7 pad + FM bell over magenta-orange palette, BPM 82-112, A-minor home, cycle-of-fifths-through-minor-major alternation for the ascent and chromatic-mediant slides for the descent. Tron Drive Vol. 1 was a Mobius-strip ring in PWM saws + aggressive saw leads over cold-blue grid palette, BPM 96-112, A-minor home, all-minor. Neo-Tokyo Drive Vol. 1 was a vertical-descent ring in analog brass pads + FM bell over red-orange-violet anime-cyberpunk palette, BPM 104-120, D-minor home, all-minor. Miami Vice Drive Vol. 1 is a nocturnal-cruise ring with a CENTERED DUAL-PEAK IN MAJOR (the only one of the four volumes to break the all-minor / minor-home-resolution posture — it lifts into A-major Lydian at the chase's release), in glassy DX7 FM-electric-piano pads + pulsing FM-electric-piano arps + sax-flavored analog leads over a cocaine-pink-and-turquoise 1986 Vapor-Coast palette, BPM 88-114 (a focused-cruise band, lower-ceilinged than Neo-Tokyo's chase band), C-MINOR HOME (a minor third below the A-minor of Sunset/Tron and a perfect fourth below the D-minor of Neo-Tokyo, establishing its own tonal frame). The central sonic differentiator is the GLASSY DX7 FM-ELECTRIC-PIANO pad-and-arp voice (Rhodes-meets-DX7 glassy electric-piano timbre, Jan-Hammer-ADJACENT pulsing arps) and the SAX-FLAVORED ANALOG LEAD as the criminal-underworld-tension signature — neither voice was the lead signature of any prior volume (Sunset = DX7 pad, Tron = PWM saw, Neo-Tokyo = analog brass pad). The narrative shape is also distinct: where the prior three were sunset-arch, Mobius-ring, and vertical-descent, miami-vice is a tension-rising-then-released cruise where the pastel surface and the criminal-noir undercurrent wrestle across the night and the brightness wins at the peak before the comedown drains it. The closing C minor is the same pitch class as the opener but voiced one octave lower on FM electric piano with the vice-arp re-read as a wind-down gesture — the ring closes at the marina before dawn, the night's tension absorbed into still pre-dawn air. The four albums sit on the same shelf — same composer, same audience (late-night programmers), same channel — but read as four distinct works with four distinct tonal homes (Am, Am, Dm, Cm), four distinct palettes (warm-pink, cold-blue, red-orange-violet, cocaine-pink-and-turquoise), four distinct voice signatures (DX7 pad, PWM saw, analog brass pad, glassy DX7 electric piano + sax lead), four distinct narrative shapes, and the first of the four to resolve its peak in a major key."
+  }
+}

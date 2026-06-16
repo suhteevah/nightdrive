@@ -1,0 +1,688 @@
+{
+    "album_slug":  "berlin-wall-vol-1",
+    "title":  "The Divided Mile",
+    "theme":  "berlin_wall_cold_war_east",
+    "track_count":  12,
+    "tonic_progression":  "Gm -> Dm -> Am (Phrygian b2) -> Em -> Bm (Dorian raised-6) -> F#m (Phrygian-dominant flavor) -> C#m -> Abm / G#m -> Ebm -> Bbm -> Fm -> Gm",
+    "bpm_arc":  [
+                    80,
+                    82,
+                    84,
+                    86,
+                    88,
+                    90,
+                    92,
+                    88,
+                    86,
+                    84,
+                    82,
+                    80
+                ],
+    "narrative_arc":  "Twelve tracks read as a single night spent inside the divided city circa 1983, one citizen of the East side moving from a watchful gray dawn through the long surveilled day to a watchful gray dawn again, the city split down its own spine by a concrete line they can see but never cross. Tracks 1-3 are the gray waking of the East: a single sodium-amber streetlamp still burns over a wet Plattenbau forecourt at first colorless light as a lone Polivoks-style drone opens on Gm and a faint distant-radio voice bleeds through tape hiss from a Western station the listener is not supposed to receive (1), the citizen rides a near-empty S-Bahn carriage over the elevated track past the back walls of buildings whose windows on the far side face West (2), and they walk the long gray avenue toward the wall-zone where the death-strip raked sand and the watchtower silhouette first enter the frame under a flat pewter sky (3). Tracks 4-6 are the wall itself and the checkpoint: they reach the inner wall and the raked control-strip with its tripwires and dog-runs and the searchlight arm sweeping the sand at intervals (4), they pass the documents-and-mirror-pole inspection at the sector crossing as a Polivoks lead reads the wait in clinical Phrygian over a stamp-and-teletype rhythm (5), and they stand at the actual line at midday where through a gap they can see the bright commercial neon and traffic of the Western sector twenty meters and a whole world away, the album's first long gaze across the divide (6). Tracks 7-9 are the surveillance crisis: a tail picks them up on the homeward avenue and a gray car keeps three doors back as the watch tightens to the album's BPM ceiling (7), they sit in a bare interview room under a single hanging bulb answering questions over twenty-minute pauses while a reel-to-reel turns behind a one-way pane (8), and the questioning lifts as abruptly as it began and they are returned to the street with a folded paper and no explanation, the held breath released (9). Tracks 10-12 are the long walk home and the second dawn: they ride the S-Bahn back over the elevated track as a cold sleet streaks the glass and the Western lights blur across the strip one last time (10), they climb the unlit Plattenbau stairwell to a single room where the contraband Western radio is switched off and its dial-glow dies into tape hiss (11), and at the second gray dawn the same sodium lamp burns over the same wet forecourt as the opening drone returns on Polivoks lead one octave down and unresolved, the divided mile walked once through and waiting to be walked again. The night rings closed on the same tonic that opened it (G minor), but the citizen arrives at the second dawn having seen across the line and carried nothing back across it, and the forecourt is the same forecourt and the wall is still standing.",
+    "recurring_motifs":  [
+                             {
+                                 "motif":  "Crossing-signal cell - a four-note Polivoks-style sawtooth lead figure that climbs a perfect fourth and falls a minor second (1 -> 4 -> b3 -> 1, the reach across and the small failure to land on the way back), voiced slow over a sustained Polivoks-style drone pad with tape-delay feedback trails, the album's divided-city signature: the gesture of looking across the wall and being pulled back. Distinct in shape from any Sovetskiy motif (that album's tram-bell cell was a three-note 1 -> b3 -> 1 with no fourth-reach); this album's signature is the perfect-fourth reach across the line",
+                                 "introduced_in":  1,
+                                 "returns_in":  [
+                                                    6,
+                                                    9,
+                                                    12
+                                                ],
+                                 "transformation":  "Track 1 plays it whole and unhurried, a single Polivoks lead voice over a drone pad with tape-delay trails, the dawn gaze across a city the listener already knows is split. Track 6 plays it bright and foreground at the actual line with the perfect-fourth reach LENGTHENED (1 -> 4 held a full bar) as the citizen gazes through the gap at the Western neon - the reach now literal, the fourth held open as long as the gaze lasts, then the minor-second fall pulls them back. Track 9 plays it fragmented to only the first two notes (1 -> 4) over and over with the return-leg removed entirely as the questioning lifts - the reach with no resolution, the released-but-not-freed gesture. Track 12 plays it whole one final time on Polivoks lead one octave down with the minor-second fall UNRESOLVED holding on the b3 rather than landing on the tonic - the second dawn's gaze across the same line, the divided mile re-read as a held breath that never exhales."
+                             },
+                             {
+                                 "motif":  "Strip-light pulse - a two-note alternating dark-bass ostinato a tritone apart (1 <-> b5) on synth bass with a dry rim-click on each note, the unstable tritone alternation refusing to resolve to either pole, the album's death-strip / surveillance signature (the raked sand, the searchlight arm, the gray car three doors back - all the mechanisms that watch the line and never settle). Distinct from Sovetskiy's boiler-room pulse (that was a stable descending walking-bass 5-4-b3-1); this album's labor-and-watch figure is an unstable tritone oscillation, the sound of a thing that watches but never moves",
+                                 "introduced_in":  3,
+                                 "returns_in":  [
+                                                    5,
+                                                    7,
+                                                    10
+                                                ],
+                                 "transformation":  "Track 3 introduces it clean as the watchtower and death-strip first enter the frame, the tritone bass alternation 1 <-> b5 with a single dry rim-click on each note, the strip beginning to watch. Track 5 makes it the structural backbone of the checkpoint-inspection chorus: the tritone alternation locked in tight with a stamp-and-teletype rhythm and the rim-click stiffened with a dry CR-78-cold drum-machine kick on the downbeat, the bureaucratic machine of the crossing made literal. Track 7 plays the tritone alternation accelerated to eighth notes with the rim-click doubled and a tape-delay smear on every b5 - the tail is on them, the watch has gone mobile and quickened. Track 10 plays only the first note (the tonic pole) of the alternation with the b5 removed entirely and no rim-click - the strip is behind them now, the tritone has finally collapsed to its single stable pole on the homeward train, the watching has stopped."
+                             },
+                             {
+                                 "motif":  "Far-station bleed - a slow descending three-note Polivoks lead phrase (5 -> 4 -> b3) doubled an octave up with heavy tape hiss and a faint AM-radio band-noise wash riding under it, the album's forbidden-Western-signal signature (the contraband radio voice that bleeds through from the far sector, the bright commercial sound the East is not supposed to receive, the descent of the phrase mirroring the unreachable West always sliding back out of grasp). Distinct from Sovetskiy's Iron Curtain flag (that was a chromatic b2 -> 1 -> 7 -> b6 escalation gesture with church-bell strikes); this album's escalation/longing gesture is a diatonic descent drenched in radio bleed, the sound of the West heard but not held",
+                                 "introduced_in":  2,
+                                 "returns_in":  [
+                                                    6,
+                                                    8,
+                                                    11
+                                                ],
+                                 "transformation":  "Track 2 introduces it once on the elevated S-Bahn as a faint descending Polivoks phrase under heavy tape hiss and AM band-noise, the Western station catching for a few bars through the carriage windows that face the far side. Track 6 brings it bright and foreground at the line: the descending phrase doubled an octave up and the AM band-noise wash lifted nearly to the level of the lead as the citizen stands at the gap and the actual Western commercial broadcast pours across the divide - the forbidden signal at its loudest and clearest, paired with the crossing-signal cell's longest reach. Track 8 plays the phrase slowed to half-speed and detuned a quarter-tone flat under the interview-room bulb with the tape hiss swelling - the far station now warped and accusatory, the bright Western sound turned into evidence of what the citizen was caught listening to. Track 11 plays the phrase one final time as the contraband radio is switched off: the descending Polivoks phrase decays into pure tape hiss and the AM band-noise collapses to a dead-carrier hum, the far station silenced by a hand on a dial, the West gone dark in the single room."
+                             }
+                         ],
+    "tracks":  [
+                   {
+                       "track_number":  1,
+                       "title":  "Sodium Dawn, Forecourt",
+                       "role":  "opener",
+                       "key":  "G minor",
+                       "bpm":  80,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "gray-dawn",
+                                         "watchful",
+                                         "wet-concrete",
+                                         "divided"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - sustained Polivoks-style sawtooth drone pad on G with tape-delay feedback trails, no rhythm, faint distant-radio voice bleeding through heavy tape hiss at very low level, single dry rim-click every 4 bars on the tonic at low level]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + CROSSING-SIGNAL CELL whole on Polivoks-style sawtooth lead with tape-delay trails played once per 8 bars over the drone pad, dark synth bass on quarter notes root-fifth, no kick yet, no snare yet, the rim-click continues every 4 bars]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + dry mechanical CR-78-cold drum machine enters with sparse rim-shot on 4 only and no kick, closed hi-hat on the and-of-2 and and-of-4, drone pad swells on the downbeat of each bar, Polivoks crossing-signal cell repeats on every 4-bar phrase, dark bass thickens to chromatic motion]"
+                                        },
+                                        {
+                                            "name":  "bridge",
+                                            "bars":  8,
+                                            "instrumentation":  "[Bridge - drums drop, just drone pad and Polivoks crossing-signal cell over dark bass, the forecourt is waking and the city is split]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - drone pad sustains G, Polivoks crossing-signal cell plays whole one final time and resolves down to the tonic, fades to tape-hiss floor with the faint distant-radio bleed]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 80 BPM G minor, sustained Polivoks-style sawtooth drone pad with tape-delay feedback trails, Polivoks-style sawtooth lead playing a slow four-note crossing-signal cell that climbs a perfect fourth and falls a minor second, dark synth bass on quarter notes root and fifth, dry mechanical CR-78-cold drum machine with sparse rim-shot on 4 only and closed hi-hat on the and-of-2 and and-of-4, no kick drum, no four-on-the-floor, no sidechain pumping, faint distant-radio voice bleeding through heavy tape hiss at very low level, single dry rim-click every 4 bars, sense of a single sodium-amber streetlamp burning over a wet brutalist Plattenbau forecourt at a watchful gray dawn in the divided city of 1983, anticipatory and patient and cold, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior view of the rain-wet concrete forecourt of a tall gray brutalist Plattenbau apartment slab at a colorless gray dawn, a single sodium-amber streetlamp still burning on a thin steel post in the foreground casting a small warm pool on the wet pavement, the immense flat prefab-panel facade of the apartment slab rising into a flat pewter overcast sky, a low concrete planter with a leafless shrub, puddles reflecting the gray sky, no neon, no palm trees, no warm sunset magenta, no cyan-blue cyberpunk, no Tang-orange suburb, cold pewter-gray and wet-concrete palette with a single sodium-amber lamp accent, brutalist East-side retrofuture 1983, scene depth foreground lamp midground forecourt background apartment slab survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "—",
+                       "tempo_relationship_to_prior":  "—",
+                       "composer_notes":  "Sets the tonic (G minor) - a whole tone above Sovetskiy Vol. 1's F minor home, claiming its own harmonic home base distinct from the prior Eastern-Bloc volume so the two Cold-War-East albums never share a tonic. CROSSING-SIGNAL CELL introduced whole and clean on Polivoks-style lead over a drone pad with tape-delay trails - this is the album's thesis statement, the divided-city gesture of looking across the line. Its shape (1 -> 4 -> b3 -> 1, a perfect-fourth reach and a minor-second fall) is deliberately distinct from Sovetskiy's three-note tram-bell cell (1 -> b3 -> 1, no fourth-reach) so the two albums do not share a primary motif. NO KICK ANYWHERE on this track - the rhythmic engine is dry mechanical CR-78-cold drum machine with sparse rim-shot and closed hi-hat plus dark bass, never a synthwave four-on-the-floor and never a warm 808 boom. The faint distant-radio bleed under tape hiss is the album's atmospheric thesis - the forbidden Western signal that recurs as the far-station-bleed motif. Outro ends on G tonic (not the dominant) - the day begins on stillness. Track 2 takes the V (D) of G minor and reroots it as Dm for the S-Bahn scene."
+                   },
+                   {
+                       "track_number":  2,
+                       "title":  "Elevated Line, Westward Windows",
+                       "role":  "cruiser",
+                       "key":  "D minor",
+                       "bpm":  82,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "transit-gray",
+                                         "longing",
+                                         "tape-hiss",
+                                         "near-empty"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Dm, dry mechanical rim-shot on 2 and 4 only no kick, AM-radio band-noise wash at low level, a steady carriage-on-elevated-track rhythmic clack texture at eighth-note rate]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks sawtooth lead playing a four-bar chord-tone melody root-third-fifth-third on quarter notes voiced dry with short room reverb, drone pad sustaining underneath with tape-delay trails, dry closed hi-hat on the and-of-2 and and-of-4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + FAR-STATION BLEED introduced once: a faint descending three-note Polivoks phrase (5 -> 4 -> b3) doubled an octave up under heavy tape hiss and a faint AM band-noise wash, the Western station catching for a few bars through the carriage windows that face the far side, rim-shot tightens to 2 and 4 plus the and-of-4, dark bass walks more melodically]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - far-station bleed drops back to atmosphere, single Polivoks takes center playing a slightly more chromatic line that hints at the album's underlying unease, AM band-noise wash rises slightly in the mix, carriage-clack texture continues]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full mix returns, far-station bleed phrase returns and the AM band-noise wash lifts slightly, drone pad with tape-delay trails continues through the full 16 bars]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper lead drops, lone Polivoks holds A (V of Dm), rim-shot fades, dark bass walks down to root, carriage-clack texture slows and fades]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 82 BPM D minor, dark synth bass on quarter notes, dry mechanical CR-78-cold rim-shot on 2 and 4 with closed hi-hat on the and-of-2 and and-of-4, Polivoks-style sawtooth lead playing a four-bar chord-tone melody, a faint descending three-note far-station-bleed phrase doubled an octave up under heavy tape hiss and a faint AM-radio band-noise wash, sustained Polivoks-style drone pad with tape-delay trails underneath, a steady carriage-on-elevated-track clack texture at eighth-note rate, no kick drum, no sidechain pumping, sense of a citizen riding a near-empty S-Bahn carriage over an elevated track past the back walls of buildings whose windows face the Western sector in the divided city of 1983, transit-gray and quietly longing, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, interior view of a near-empty elevated commuter rail carriage with rows of worn pale-green vinyl bench seats and steel grab-poles, large rain-flecked windows along the left side showing a blurred gray cityscape of prefab apartment slabs passing outside, a flat pewter dawn sky beyond the rooftops, cool fluorescent strip-light along the carriage ceiling, scuffed gray linoleum floor, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and pale-green-vinyl and wet-window palette, brutalist East-side retrofuture 1983 transit interior, scene depth foreground seats midground aisle background windows survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Gm to Dm. The album's first lift uses cycle-of-fifths-ascending logic strictly inside the minor mode. The brightening is harmonic only, not textural - Molchat Doma coldwave dryness with tape-hiss atmosphere is maintained.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The album moves in small +2 increments through the morning hours, deliberately slow - the citizen is riding a near-empty pre-dawn train, not commuting at rush hour. One tick above Sovetskiy's opener pace but in the same dragging coldwave tempo territory.",
+                       "composer_notes":  "First true cruiser. FIRST APPEARANCE of the far-station-bleed motif - a faint descending three-note Polivoks phrase (5 -> 4 -> b3) under heavy tape hiss and AM band-noise, the contraband Western station catching through the carriage windows. Its shape (a diatonic descent drenched in radio bleed) is deliberately distinct from Sovetskiy's chromatic Iron Curtain flag escalation gesture - this album's longing/forbidden-signal motif is diatonic-descending and radio-soaked, not chromatic-falling with church bells. NEVER let MusicGen substitute a Theremin, a church bell, or a muted-brass section - the album's genre marker is Polivoks lead plus drone pad plus tape-delay plus radio bleed, against both synthwave and Sovetskiy's church-bell-and-walking-bass palette. NO KICK ANYWHERE. Outro A (V of Dm) pivots cleanly to Am of track 3."
+                   },
+                   {
+                       "track_number":  3,
+                       "title":  "Toward the Strip",
+                       "role":  "cruiser",
+                       "key":  "A minor (Phrygian b2)",
+                       "bpm":  84,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "approach",
+                                         "pewter-sky",
+                                         "watchtower-silhouette",
+                                         "unease"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Am, dry mechanical rim-shot on 2 and 4, sustained Polivoks drone pad on A with a Phrygian Bb natural b2 as passing color, no melody yet, distant wind-over-open-ground and far-off dog-bark noise floor]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + STRIP-LIGHT PULSE introduced clean: a two-note alternating dark-bass ostinato a tritone apart (A <-> Eb, 1 <-> b5) with a single dry rim-click on each note, drone pad sustains the Phrygian b2, dry closed hi-hat on the and-of-2 and and-of-4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + Polivoks sawtooth lead playing a four-bar melody that leans on the Phrygian b2 (Bb natural) at the phrase-peak, second Polivoks voice an octave below shadowing the lead, the strip-light tritone pulse continues underneath, rim-shot adds the and-of-4 for forward motion]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - Polivoks lead drops, strip-light tritone pulse foreground, a second dark bass an octave up shadows the tritone alternation on every other repetition, the watchtower silhouette entering the frame]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full mix returns, Polivoks lead doubled with a second sawtooth voice an octave up, drone pad with tape-delay trails continues through the full 16 bars]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - Polivoks lead drops, dark bass holds E (V of Am), rim-shot fades, the strip-light tritone pulse collapses to the tonic pole and holds, wind-over-ground texture lifts slightly]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 84 BPM A minor Phrygian with Bb natural b2 as passing color, dark synth bass on quarter notes, dry mechanical CR-78-cold rim-shot on 2 and 4 with the and-of-4 added, a two-note alternating dark-bass strip-light pulse a tritone apart with a dry rim-click on each note, Polivoks-style sawtooth lead playing a four-bar melody leaning on the Phrygian b2 at the phrase-peak, sustained Polivoks-style drone pad with tape-delay trails, distant wind-over-open-ground and far-off dog-bark noise floor, no kick drum, no sidechain pumping, sense of a citizen walking the long gray avenue toward the wall-zone as the death-strip raked sand and a watchtower silhouette first enter the frame under a flat pewter sky in the divided city of 1983, approaching and uneasy, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior wide view down a long empty gray avenue ending at the wall-zone on the horizon, a single tall slender concrete watchtower silhouette with a small glass observation cabin rising against a flat pewter overcast sky in the midground, a band of raked pale sand control-strip across the far distance, low gray prefab apartment slabs lining the avenue on the left, wet asphalt in the foreground reflecting the pewter sky, a single dark steel lamppost, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and wet-asphalt and raked-sand palette, brutalist East-side retrofuture 1983, scene depth foreground asphalt midground avenue background watchtower survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Dm to Am. Second step of the cycle-of-fifths ascending ladder, with the Phrygian b2 (Bb natural) added as the modal color - the first modal shading on the album, the wall-zone's clinical-cold harmonic tension entering as the strip comes into view.",
+                       "tempo_relationship_to_prior":  "+2 BPM. Maintaining the small-increment morning accelerando. The walk toward the wall quickens slightly with the unease of the approach.",
+                       "composer_notes":  "FIRST APPEARANCE of the strip-light pulse - a two-note tritone-apart dark-bass ostinato (1 <-> b5) with a dry rim-click, the unstable tritone refusing to resolve to either pole, the death-strip/surveillance signature. Its shape (an unstable tritone oscillation) is deliberately distinct from Sovetskiy's stable descending walking-bass boiler-room pulse (5-4-b3-1) - this album's watch figure never settles. The Phrygian b2 (Bb natural) is the wall-zone's harmonic tension; the listener should feel the avenue narrowing toward the line. Outro E (V of Am) pivots cleanly to Em of track 4 - the approach reaches the inner wall."
+                   },
+                   {
+                       "track_number":  4,
+                       "title":  "Control-Strip, Searchlight Arm",
+                       "role":  "bridge-into-peak",
+                       "key":  "E minor",
+                       "bpm":  86,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "raked-sand",
+                                         "searchlight",
+                                         "tense",
+                                         "watched"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Em, dry mechanical rim-shot tight on 2 and 4 with closed hi-hat on the and-of-2 and and-of-4, drone pad swell on A, a slow sweeping filtered-noise texture rising and falling once per 8 bars as the searchlight arm sweeps the sand, single rim-click on each bar 1]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks sawtooth lead playing a tight three-bar repeating phrase that locks in with the dark bass on the downbeats, second Polivoks voice an octave below shadowing on every other phrase, the searchlight-sweep noise texture continues, rim-shot adds the and-of-4]"
+                                        },
+                                        {
+                                            "name":  "pre-chorus",
+                                            "bars":  8,
+                                            "instrumentation":  "[Pre-chorus - build: rim-shot rolls tighten into a single dry mechanical drum-line crescendo, drone pad opens its filter, the searchlight-sweep texture brightens toward a peak]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a wide four-bar chord progression Em - C - Am - B, second Polivoks an octave up playing chord-tone melody on quarter notes, dry rim-shot hits 2 and 4 tight with the and-of-4, dark bass walks chromatically, the searchlight-sweep noise texture peaks at the chorus midpoint as the arm crosses the strip]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - drums drop, just drone pad and Polivoks lead, the strip is raked and silent between sweeps]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, third Polivoks voice an octave up, the searchlight-sweep texture peaks once more at the chorus midpoint]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains B (V of Em), upper voice holds the high tonic, rim-shot fades, dark bass walks down to root, the searchlight-sweep texture fades into a low wind]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 86 BPM E minor, dark synth bass on quarter notes chromatic, tight dry mechanical CR-78-cold rim-shot on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a wide four-bar chord progression E minor C major A minor B major, second Polivoks playing a three-bar locked-in phrase on the downbeats, third Polivoks an octave up playing chord-tone melody on quarter notes, sustained Polivoks-style drone pad with tape-delay trails, a slow sweeping filtered-noise texture rising and falling once per 8 bars like a searchlight arm crossing raked sand, no kick drum, no sidechain pumping, sense of reaching the inner wall and the raked control-strip with its tripwires and dog-runs and a searchlight arm sweeping the sand at intervals in the divided city of 1983, tense and watched, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior view of the inner death-strip control-zone: a wide band of raked pale sand stretching across the lower frame between an inner concrete wall in the foreground and a far smooth concrete barrier wall on the horizon, a tall slender watchtower with a single bright searchlight beam sweeping low across the sand from the midground, thin diagonal tripwire lines and a low anti-vehicle ditch crossing the strip, a flat pewter overcast sky going to dusk, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and raked-sand-pale and a single hard white searchlight-beam accent palette, brutalist East-side retrofuture 1983, scene depth foreground inner-wall midground sand background barrier survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Am to Em. Third step of the cycle-of-fifths ascending ladder, returning to plain minor as the chord progression widens for the bridge-into-peak. The Phrygian shading of track 3 resolves back to a cleaner Aeolian frame here at the control-strip - the harmony tightens like the inspection ahead.",
+                       "tempo_relationship_to_prior":  "+2 BPM. Maintaining the small-increment accelerando toward the checkpoint crisis.",
+                       "composer_notes":  "BRIDGE-INTO-PEAK. The searchlight-sweep filtered-noise texture is the diegetic anchor here - a slow rising-and-falling noise band once per 8 bars, peaking at each chorus midpoint as the arm crosses the strip. This is the album's death-strip set-piece. 270s long because the control-strip scene needs room to lay out the wide chord progression and establish the tension that runs through the checkpoint (track 5) and the surveillance peak (track 7). The widening Em - C - Am - B progression is the album's first big harmonic gesture - keep it austere, never let MusicGen warm it into anthemic synthwave. Outro B (V of Em) pivots cleanly to Bm of track 5 - the cycle continues to the checkpoint inspection."
+                   },
+                   {
+                       "track_number":  5,
+                       "title":  "Documents, Mirror-Pole",
+                       "role":  "cruiser-into-peak",
+                       "key":  "B minor (Dorian raised-6)",
+                       "bpm":  88,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "clinical",
+                                         "checkpoint",
+                                         "stamp-and-teletype",
+                                         "waiting"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Bm, dry mechanical rim-shot tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, drone pad on B with a Dorian raised-6 (G# natural) as passing color, a stamp-and-teletype rhythm texture (a heavy rubber-stamp thud and mechanical teletype clicks at 16th-note rate) at low level]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + STRIP-LIGHT PULSE as structural backbone, the tritone alternation (B <-> F, 1 <-> b5) locked in tight with the stamp-and-teletype rhythm and the rim-click stiffened with a dry CR-78-cold drum-machine kick on the downbeat, Polivoks lead on a sparse two-bar response phrase reaching to the Dorian raised-6, dark bass walks chromatically]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a four-bar chord progression Bm - G#dim (Dorian raised-6) - Em - F#, strip-light tritone pulse locked with stamp-and-teletype rhythm and stiffened kick, dry rim-shot tight, teletype clicks rise in the mix as the documents are checked]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered Polivoks section drops, strip-light tritone pulse foreground, stamp-and-teletype rhythm at full volume, the line waiting at the inspection booth]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, Polivoks section doubled an octave up, strip-light tritone pulse continues lockstep with stamp-and-teletype rhythm]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - Polivoks section holds F# (V of Bm), upper voice holds the high tonic, teletype clicks fade, rim-shot fades, dark bass walks down to root and the tritone pulse collapses to the tonic pole]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 88 BPM B minor Dorian with G-sharp natural raised-6 as passing color, dark synth bass on quarter notes chromatic, tight dry mechanical CR-78-cold rim-shot on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4 and a stiffened dry kick on the downbeat, layered Polivoks-style sawtooth lead section on a four-bar chord progression B minor G-sharp diminished E minor F-sharp major, a two-note alternating dark-bass strip-light pulse a tritone apart locked in with a stamp-and-teletype rhythm texture of a heavy rubber-stamp thud and mechanical teletype clicks at 16th-note rate, sustained Polivoks-style drone pad with tape-delay trails, no four-on-the-floor kick, no sidechain pumping, sense of passing the documents-and-mirror-pole inspection at the sector crossing as a clinical wait drags out under harsh light in the divided city of 1983, clinical and waiting, Molchat Doma coldwave dryness, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, close exterior view of a sector-crossing inspection lane: a striped horizontal barrier arm lowered across a narrow concrete lane, a small glass control booth on the right with a single fluorescent tube glowing cold inside, a long-handled inspection mirror on a wheeled pole leaning against the booth, a low concrete bollard line, harsh white floodlights on tall poles overhead casting hard shadows on the wet concrete lane, a flat dark dusk sky, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and hard-white-floodlight and wet-concrete palette, brutalist East-side retrofuture 1983, scene depth foreground barrier-arm midground lane background booth survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Em to Bm. Fourth step of the cycle-of-fifths ascending ladder, with the Dorian raised-6 (G# natural) added as the modal color - the album's second modal shading, a small clinical brightness that reads as the fluorescent glare of the inspection booth rather than as warmth, voiced through a G#-diminished pivot chord in the progression.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The accelerando continues toward the surveillance peak. The checkpoint inspection is the album's first sustained mechanical-rhythm section.",
+                       "composer_notes":  "STRIP-LIGHT PULSE moves to STRUCTURAL BACKBONE - the tritone alternation (B <-> F) locked in with the stamp-and-teletype rhythm and a stiffened dry kick on the downbeat, the figure's payoff after its clean debut in track 3. The stamp-and-teletype rhythm texture is critical and period-specific - a heavy rubber-stamp thud plus mechanical teletype clicks, NOT a synthwave hi-hat or PWM arp. The Dorian raised-6 (G# natural) and the G#-diminished pivot chord are the checkpoint's clinical harmonic glare. Note this is the one track with a dry kick on the downbeat (never four-on-the-floor) - the bureaucratic machine of the crossing needs that single mechanical thud; everywhere else on the album there is NO kick. 270s long to give the inspection its full clinical patience. Outro F# (V of Bm) pivots cleanly to F#m of track 6 - the cycle continues to the line itself."
+                   },
+                   {
+                       "track_number":  6,
+                       "title":  "The Gap, Western Neon",
+                       "role":  "peak",
+                       "key":  "F# minor (Phrygian-dominant flavor)",
+                       "bpm":  90,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "long-gaze",
+                                         "neon-across-the-line",
+                                         "longing-peak",
+                                         "twenty-meters-away"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in F#m, dry mechanical rim-shot tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, drone pad on F# with a Phrygian-dominant G natural b2 and A# major-3 flavor as passing color, CROSSING-SIGNAL CELL returns BRIGHT AND FOREGROUND on Polivoks lead with the perfect-fourth reach LENGTHENED (1 -> 4 held a full bar) at the very top of the intro, the citizen at the gap gazing across the line]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + layered Polivoks lead section playing a tight three-bar phrase that locks in with the dark bass on the downbeats, second Polivoks voice an octave up shadowing, FAR-STATION BLEED brought bright and foreground: the descending phrase (5 -> 4 -> b3) doubled an octave up with the AM band-noise wash lifted nearly to the level of the lead, the actual Western commercial broadcast pouring across the divide]"
+                                        },
+                                        {
+                                            "name":  "pre-chorus",
+                                            "bars":  8,
+                                            "instrumentation":  "[Pre-chorus - build: rim-shot rolls tighten into a single dry mechanical drum-line crescendo, drone pad opens its filter, the far-station bleed swells, the gaze lengthening across the strip]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a wide four-bar chord progression F#m - D - Bm - C# (Phrygian-dominant flavor), CROSSING-SIGNAL CELL with the perfect-fourth reach held open a full bar paired with the far-station bleed at full volume, dry rim-shot hits 2 and 4 tight, dark bass walks chromatically with the Phrygian-dominant b2, the album's first long gaze across the divide]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - drums drop, just drone pad and the far-station bleed pouring across the line, the citizen holding the gaze at the gap]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, third Polivoks voice an octave up, the crossing-signal cell reach held open and the far-station bleed at full volume one final time]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains C# (V of F#m), upper voice holds the high tonic, the crossing-signal cell's minor-second fall pulls the gaze back, rim-shot fades, the far-station bleed decays into tape hiss, dark bass walks down to root]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 90 BPM F-sharp minor Phrygian-dominant with G natural b2 and A-sharp major-3 flavor, dark synth bass on quarter notes chromatic with the Phrygian-dominant b2, tight dry mechanical CR-78-cold rim-shot on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a wide four-bar chord progression F-sharp minor D major B minor C-sharp major Phrygian-dominant, Polivoks lead playing a four-note crossing-signal cell with the perfect-fourth reach held open a full bar, a bright descending far-station-bleed phrase doubled an octave up with an AM-radio band-noise wash lifted nearly to the level of the lead, sustained Polivoks-style drone pad with tape-delay trails, no kick drum, no four-on-the-floor, no sidechain pumping, sense of standing at the actual line at midday and seeing through a gap the bright commercial neon and traffic of the Western sector twenty meters and a whole world away in the divided city of 1983, the album's longing-peak and first long gaze across the divide, Molchat Doma coldwave dryness with an aching brightness bleeding across the line, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, view from the gray East side looking through a narrow gap between concrete wall segments toward the bright Western sector: in the foreground the cold pewter-gray smooth concrete barrier wall, through the gap a glimpse of a warm-lit Western street with abstract glowing commercial neon signs in amber and pink and the soft glow of car headlights and shop windows blurred in the distance, the contrast of cold gray near and warm glowing far, a flat overcast midday sky above the wall, no readable signage, no palm trees, no full cyberpunk cyan flood, no Tang-orange suburb, cold pewter-gray near-side and warm-amber-and-soft-pink distant-neon glow seen only through the gap, brutalist East-side retrofuture 1983, scene depth foreground wall midground gap background distant-neon-glow survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from Bm to F#m. Fifth step of the cycle-of-fifths ascending ladder, with Phrygian-dominant flavor (b2 with raised-3) as the modal color - the album's brightest harmonic gesture at the longing-peak, the aching brightness that reads as the Western neon seen across the line layered over the East-side coldwave dryness.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The accelerando reaches a longing-peak shelf at 90 BPM at the gaze across the divide - not the album's BPM ceiling (track 7's surveillance crisis takes that at 92) but the emotional peak. The peak here is harmonic and emotional, not maximal tempo, which is honest for a moment of standing still and looking.",
+                       "composer_notes":  "PEAK (emotional/harmonic, not BPM-ceiling). CROSSING-SIGNAL CELL returns BRIGHT AND FOREGROUND with the perfect-fourth reach LENGTHENED to a full held bar - the reach now literal, the fourth held open as long as the gaze across the gap lasts, then the minor-second fall pulls the citizen back. FAR-STATION BLEED brought to full volume here paired with the crossing-signal cell - the two motifs collide at the line, the gesture of looking across and the forbidden signal pouring through. This is the album's central image: twenty meters and a whole world away. 300s long to give the long gaze its full duration. Phrygian-dominant flavor must read as aching brightness bleeding across the line, NOT as Phrygian metal. The cover is the album's hero image and the one place warm neon is permitted - but only seen through the gap, never on the near side. Outro C# (V of F#m) pivots cleanly to C#m of track 7 - the gaze ends and the homeward walk begins under a tail."
+                   },
+                   {
+                       "track_number":  7,
+                       "title":  "Three Doors Back",
+                       "role":  "peak-ceiling",
+                       "key":  "C# minor",
+                       "bpm":  92,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "tailed",
+                                         "crisis",
+                                         "gray-car",
+                                         "quickened"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in C#m, dry mechanical rim-shot tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, drone pad on C#, STRIP-LIGHT PULSE returns ACCELERATED to eighth notes with the rim-click doubled and a tape-delay smear on every b5, the watch has gone mobile and quickened]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + layered Polivoks lead section playing a tight three-bar repeating phrase that locks in with the accelerated strip-light pulse, second Polivoks voice an octave up shadowing, dry rim-shot tight, the gray car keeping three doors back]"
+                                        },
+                                        {
+                                            "name":  "pre-chorus",
+                                            "bars":  8,
+                                            "instrumentation":  "[Pre-chorus - build: rim-shot rolls tighten into a single dry mechanical drum-line crescendo, drone pad opens its filter, the accelerated strip-light pulse doubles in density]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a wide four-bar chord progression C#m - A - F#m - G#, the accelerated strip-light tritone pulse at eighth notes throughout with tape-delay smear on every b5, dry rim-shot hits 2 and 4 tight, dark bass walks chromatically, the tail tightening into the album's BPM ceiling]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - drums drop, just drone pad and the accelerated strip-light pulse smearing through tape-delay, the citizen quickening their step]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, third Polivoks voice an octave up, the accelerated strip-light pulse continues at eighth notes with tape-delay smear]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains G# (V of C#m), upper voice holds the high tonic, rim-shot fades, the accelerated strip-light pulse decelerates back to quarter notes and dark bass walks down to root]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 92 BPM C-sharp minor, dark synth bass on quarter notes chromatic, tight dry mechanical CR-78-cold rim-shot on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a wide four-bar chord progression C-sharp minor A major F-sharp minor G-sharp major, a two-note alternating dark-bass strip-light pulse a tritone apart accelerated to eighth notes with the rim-click doubled and a tape-delay smear on every flat-fifth, sustained Polivoks-style drone pad with tape-delay trails, no kick drum, no four-on-the-floor, no sidechain pumping, sense of a tail picking the citizen up on the homeward avenue as a gray car keeps three doors back and the watch tightens and quickens in the divided city of 1983, the album's BPM ceiling and surveillance crisis, Molchat Doma coldwave dryness with paranoid forward pressure, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior view down a long gray avenue at dusk seen as if from a moving point of view: a single boxy gray two-stroke compact car following three car-lengths back under wet asphalt reflections, its small round headlamps glowing dim amber in the gathering dark, low gray prefab apartment slabs lining both sides receding to a vanishing point, a flat dark pewter dusk sky, a single sodium streetlamp casting a thin pool ahead, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and wet-asphalt and dim-amber-headlamp palette, brutalist East-side retrofuture 1983, scene depth foreground asphalt midground gray-car background avenue survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Up a perfect fifth from F#m to C#m. Sixth step of the cycle-of-fifths ascending ladder, returning to plain minor - the harmony tightens to a stark Aeolian frame as the tail closes in, the modal brightness of the gaze-peak stripped away by the surveillance crisis.",
+                       "tempo_relationship_to_prior":  "+2 BPM. The album's BPM ceiling at 92 BPM - the single highest tempo, reached at the surveillance crisis rather than at the emotional gaze-peak. This is the deliberate split between the album's emotional peak (track 6) and its tempo peak (track 7): the long gaze is slower and the paranoid tail is faster, which is honest for the two kinds of intensity.",
+                       "composer_notes":  "PEAK-CEILING (BPM ceiling). STRIP-LIGHT PULSE returns ACCELERATED to eighth notes with the rim-click doubled and a tape-delay smear on every b5 - the watch has gone mobile and quickened, the tritone now oscillating twice as fast and bleeding through tape-delay. This is the album's crisis set-piece: the death-strip's stationary tritone-watch from track 3 has become the mobile tail's quickened tritone-watch. 300s long to give the crisis its full forward pressure. Keep it austere and paranoid, never let MusicGen warm it into driving synthwave - the tension is the unstable tritone refusing to resolve at speed, not a four-on-the-floor groove. Outro G# (V of C#m) pivots cleanly to C#m... no - pivots to the flat-side: G# is reread enharmonically as Ab tonic of track 8 (Abm / G#m enharmonic pivot) - the flat-side pivot that begins the night descent at the interview room. See track 8 key_relationship_to_prior."
+                   },
+                   {
+                       "track_number":  8,
+                       "title":  "Bulb and Reel",
+                       "role":  "peak-shoulder",
+                       "key":  "A-flat minor (G# minor enharmonic)",
+                       "bpm":  88,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "interview-room",
+                                         "single-bulb",
+                                         "reel-to-reel",
+                                         "accusatory"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Abm, dry mechanical rim-shot tight on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, drone pad on Ab, a slow reel-to-reel tape-wow texture turning behind a one-way pane at low level, single rim-click marking the top of each 8-bar phrase]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + FAR-STATION BLEED returns SLOWED to half-speed and detuned a quarter-tone flat with the tape hiss swelling, the far station now warped and accusatory, the bright Western sound turned into evidence, Polivoks lead on a sparse two-bar response phrase, dark bass walks chromatically]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks lead section playing a four-bar chord progression Abm - Fb (Cb major) - Ebm - Bb, the half-speed detuned far-station bleed continues underneath, dry rim-shot tight, the reel-to-reel tape-wow rises in the mix during the questions over twenty-minute pauses]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered Polivoks section drops, the half-speed detuned far-station bleed foreground, reel-to-reel tape-wow at full volume, the single hanging bulb and the long pauses]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, second Polivoks voice an octave up, the half-speed detuned far-station bleed continues warped]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - layered Polivoks section sustains Eb (V of Abm), upper voice holds the high tonic, rim-shot fades, dark bass walks down to root, the reel-to-reel tape-wow slows and stops]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 88 BPM A-flat minor, dark synth bass on quarter notes chromatic, tight dry mechanical CR-78-cold rim-shot on 2 and 4 plus and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section on a four-bar chord progression A-flat minor C-flat major E-flat minor B-flat major, a descending far-station-bleed phrase slowed to half-speed and detuned a quarter-tone flat with the tape hiss swelling, sustained Polivoks-style drone pad with tape-delay trails, a slow reel-to-reel tape-wow texture turning behind a one-way pane, no kick drum, no sidechain pumping, sense of sitting in a bare interview room under a single hanging bulb answering questions over twenty-minute pauses while a reel-to-reel turns behind a one-way pane in the divided city of 1983, the bright Western sound warped into accusatory evidence, Molchat Doma coldwave dryness at the peak-shoulder, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, interior view of a bare interrogation room: a single empty steel-frame chair on one side of a plain wooden table, a single naked incandescent bulb hanging on a cord casting a hard pool of warm light directly over the table and deep shadows into the corners, a large dark rectangular one-way mirror set into the gray-painted concrete wall, the faint reel shape of a reel-to-reel tape machine just visible through the dim glass behind it, a closed steel door, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold gray-painted-concrete and deep-shadow palette with a single hard naked-bulb warm-white accent, brutalist East-side retrofuture 1983, scene depth foreground chair midground table background one-way-mirror survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from C#m to Abm via enharmonic pivot - G# (the V that closed track 7) is reread as the Ab tonic of track 8, beginning the flat-side cycle-of-fifths-descending ladder. This is the album's pivot point: the sharp-side ascent (Gm through C#m, six perfect-fifth steps) flips here to the flat-side descent (Abm through Fm to Gm). The enharmonic Abm / G#m pivot is the harmonic hinge of the whole record - the moment the night turns toward home.",
+                       "tempo_relationship_to_prior":  "-4 BPM. The first large descent step from the BPM ceiling, dropping to 88 BPM for the interview-room peak-shoulder - the crisis is past its tempo peak but the tension holds at the questioning. The detuned, half-speed far-station bleed deepens the unease even as the BPM eases.",
+                       "composer_notes":  "PEAK-SHOULDER. FAR-STATION BLEED returns SLOWED to half-speed and DETUNED a quarter-tone flat with the tape hiss swelling - the far station now warped and accusatory, the bright Western sound the citizen was caught receiving turned into evidence against them. This is the album's darkest transformation of the radio-bleed motif: the thing they loved across the line is now the thing they are questioned for. The reel-to-reel tape-wow turning behind the one-way pane is the diegetic anchor. The Abm / G#m enharmonic pivot is the harmonic hinge of the whole album - flag for orchestrator: the chord progression uses Cb-major (Fb) and double-flats notation; render as the enharmonic equivalents (B major for Cb) if the synth engine prefers - the pitches are what matter, not the spelling. 270s long. Outro Eb (V of Abm) pivots cleanly to Ebm of track 9 - the flat-side descent continues to the release."
+                   },
+                   {
+                       "track_number":  9,
+                       "title":  "Returned to the Street",
+                       "role":  "release",
+                       "key":  "E-flat minor",
+                       "bpm":  86,
+                       "duration_seconds":  270,
+                       "mood_tags":  [
+                                         "release",
+                                         "exhale",
+                                         "no-explanation",
+                                         "cold-street"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Ebm, dry mechanical rim-shot softening to 2 and 4 only no and-of-4, closed hi-hat on the and-of-2 and and-of-4, drone pad on Eb opens slowly with tape-delay trails, distant street-ambient and a single steel-door-closing reverb tail at the top]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks lead playing a soft four-bar phrase that descends across the four bars, layered Polivoks an octave up shadows softly, dark bass walks more melodically, rim-shot maintains soft 2 and 4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks section playing a four-bar chord progression Ebm - Cb (B major) - Abm - Bb, CROSSING-SIGNAL CELL returns FRAGMENTED to only the first two notes (1 -> 4) repeated with the return-leg removed entirely, the reach with no resolution, the released-but-not-freed gesture as the citizen is put back on the street with a folded paper and no explanation]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops to lone Polivoks, dark bass walks softly, the fragmented crossing-signal reach echoing without resolving, the street cold and empty]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return, Polivoks doubled an octave up, the fragmented crossing-signal cell (1 -> 4) repeated once more as a final unresolved-reach echo]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper Polivoks drops, lone Polivoks holds Bb (V of Ebm), rim-shot fades, dark bass walks down to root, drone pad sustains and fades slowly with the distant street-ambient]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 86 BPM E-flat minor, dark synth bass on quarter notes, soft dry mechanical CR-78-cold rim-shot on 2 and 4 only no and-of-4 with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a four-bar chord progression E-flat minor B major A-flat minor B-flat major, a fragmented crossing-signal cell of only the first two notes climbing a perfect fourth repeated with the return-leg removed and no resolution, sustained Polivoks-style drone pad with tape-delay trails, distant cold-street ambient and a single steel-door-closing reverb tail, no kick drum, no sidechain pumping, sense of the questioning lifting as abruptly as it began and the citizen returned to the street with a folded paper and no explanation in the divided city of 1983, the held breath released but not freed, Molchat Doma coldwave dryness with release rather than tension, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior view of a narrow empty gray side street at night just outside a plain heavy steel building door slightly ajar spilling a thin wedge of cold interior light onto the wet cobblestones, the gray prefab-and-stucco building facade rising into a dark sky, a single dim sodium streetlamp at the far end of the street, puddles on the cobblestones reflecting the lamp, a sense of having just been let out, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold gray-stone and wet-cobblestone palette with a thin cold-white door-light wedge and a dim sodium-lamp accent, brutalist East-side retrofuture 1983, scene depth foreground cobblestones midground steel-door background street survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Abm to Ebm. Second step of the flat-side cycle-of-fifths-descending ladder. The night descent's harmonic logic reverses the day's ascent by direction of cycle-of-fifths motion - the album is walking back down the ladder it climbed.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Maintaining the small-increment night descent, returning toward the album's slower coldwave floor for the exhale.",
+                       "composer_notes":  "RELEASE. CROSSING-SIGNAL CELL returns FRAGMENTED to only its first two notes (1 -> 4, the reach) with the return-leg removed entirely - the reach with no resolution, the released-but-not-freed gesture. The citizen is back on the street but carries the questioning with them; the motif's missing return-leg is the missing explanation. The chord progression's Cb-major is rendered as its enharmonic B major. The single steel-door-closing reverb tail at the top is the diegetic release. The street is cold and empty - the room and the album exhale together but neither is free. 270s long. Outro Bb (V of Ebm) primes the perfect-fifth descent into Bbm of track 10 via the flat-side ladder."
+                   },
+                   {
+                       "track_number":  10,
+                       "title":  "Sleet on the Elevated Line",
+                       "role":  "comedown",
+                       "key":  "B-flat minor",
+                       "bpm":  84,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "homeward",
+                                         "sleet-streaked",
+                                         "blurred-lights",
+                                         "tram-sway"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on quarter notes in Bbm, soft dry mechanical rim-shot on 2 and 4 only no kick, the carriage-on-elevated-track clack texture returns at eighth-note rate but slower and softer, sleet-on-glass texture at low level]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + STRIP-LIGHT PULSE returns COLLAPSED to only the tonic pole (the b5 removed entirely and no rim-click), the tritone has finally settled to its single stable pole on the homeward train, Polivoks lead playing a soft four-bar phrase, drone pad sustains with tape-delay trails]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + layered Polivoks lead section playing a soft four-bar melodic line, a faint blurred ghost of the far-station bleed catching one last time through the sleet-streaked windows as the Western lights blur across the strip below, rim-shot stays soft on 2 and 4]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops, lone Polivoks over the collapsed-tonic strip-light pulse and the carriage clack, the city sliding past the glass]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full mix returns soft, Polivoks lead doubled an octave up, drone pad sustains through the full 16 bars]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper lead drops, lone Polivoks holds F (V of Bbm), rim-shot fades, dark bass walks down to root, the carriage clack and sleet-on-glass texture slow and fade]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 84 BPM B-flat minor, dark synth bass on quarter notes, soft dry mechanical CR-78-cold rim-shot on 2 and 4 only no kick with closed hi-hat on the and-of-2 and and-of-4, a strip-light pulse collapsed to only its single tonic pole with the tritone removed, Polivoks-style sawtooth lead playing a soft four-bar melodic line, a faint blurred ghost of the descending far-station-bleed phrase catching through sleet-streaked windows, sustained Polivoks-style drone pad with tape-delay trails, a slow soft carriage-on-elevated-track clack texture and sleet-on-glass texture, no kick drum, no sidechain pumping, sense of riding the S-Bahn back over the elevated track as cold sleet streaks the glass and the Western lights blur across the strip one last time in the divided city of 1983, homeward and spent, Molchat Doma coldwave dryness at the comedown, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, interior view of the same near-empty elevated rail carriage as track 2 now at night with the large side windows heavily streaked with sleet and condensation, beyond the glass the blurred smeared glow of distant Western lights in soft amber and pink dissolving into the wet dark across the city, the worn pale-green vinyl seats now dim under a single flickering fluorescent strip, scuffed gray linoleum floor, no readable signage, no palm trees, no warm sunset, no full cyberpunk cyan, no Tang-orange, cold pewter-gray carriage interior with blurred-distant-amber-and-pink light smear through sleet-streaked glass, brutalist East-side retrofuture 1983 transit interior at night, scene depth foreground seats midground aisle background sleet-windows survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Ebm to Bbm. Third step of the flat-side cycle-of-fifths-descending ladder. The night descent continues to walk back down the ladder the day climbed, mirroring track 2's elevated-line scene now in the flat-side dark.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Maintaining the small-increment night descent. The homeward train is slower and quieter than the dawn train of track 2.",
+                       "composer_notes":  "COMEDOWN. STRIP-LIGHT PULSE returns COLLAPSED to only its single tonic pole - the b5 removed entirely, no rim-click, the unstable tritone that watched the citizen all day has finally settled to one stable note now that the strip and the tail are behind them. This is the resolution of the surveillance motif: the watching has stopped. This track is the deliberate night-side mirror of track 2's elevated-line scene - same carriage-clack texture, same far-station-bleed glimpse through the windows, but now at night through sleet with the motif collapsed and spent rather than introduced. The far-station bleed appears only as a faint blurred ghost here, one last catch before track 11 silences it. 240s long. Outro F (V of Bbm) primes the perfect-fifth descent into Fm of track 11 via the flat-side ladder."
+                   },
+                   {
+                       "track_number":  11,
+                       "title":  "Dial-Glow Dies",
+                       "role":  "comedown",
+                       "key":  "F minor",
+                       "bpm":  82,
+                       "duration_seconds":  240,
+                       "mood_tags":  [
+                                         "single-room",
+                                         "radio-off",
+                                         "tape-hiss",
+                                         "unlit-stairwell"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Intro - dark synth bass on very slow quarter notes in Fm, soft dry mechanical rim-shot on 2 and 4 only no kick, drone pad on F with tape-delay trails, a single stairwell-footstep-and-door texture at the top, AM-radio band-noise wash at low level still alive]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + Polivoks lead playing a soft four-bar phrase that descends, layered Polivoks an octave up shadows softly, the AM band-noise wash holding under, drone pad sustains, the single room and the contraband radio still glowing on the windowsill]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - layered Polivoks section playing a soft four-bar chord progression Fm - Db - Bbm - C, FAR-STATION BLEED plays one final time: the descending phrase (5 -> 4 -> b3) over the AM band-noise wash, then at the phrase end the radio is switched off and the phrase DECAYS into pure tape hiss as the AM band-noise collapses to a dead-carrier hum, the West gone dark in the single room]"
+                                        },
+                                        {
+                                            "name":  "verse2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse2 - layered section drops to lone Polivoks over the dead-carrier hum and drone pad, the dial-glow gone, only tape hiss where the far station was]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - full return soft, Polivoks doubled an octave up, no far-station bleed now (it has been switched off), only the drone pad and dark bass and the dead-carrier hum]"
+                                        },
+                                        {
+                                            "name":  "outro",
+                                            "bars":  8,
+                                            "instrumentation":  "[Outro - upper Polivoks drops, lone Polivoks holds C (V of Fm), rim-shot fades, dark bass walks down to root, the dead-carrier hum fades last into silence]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 82 BPM F minor, dark synth bass on very slow quarter notes, soft dry mechanical CR-78-cold rim-shot on 2 and 4 only no kick with closed hi-hat on the and-of-2 and and-of-4, layered Polivoks-style sawtooth lead section playing a soft four-bar chord progression F minor D-flat major B-flat minor C major, a descending far-station-bleed phrase over an AM-radio band-noise wash that decays into pure tape hiss and a dead-carrier hum as the radio is switched off, sustained Polivoks-style drone pad with tape-delay trails, a single stairwell-footstep-and-door texture, no kick drum, no sidechain pumping, sense of climbing an unlit brutalist stairwell to a single room where the contraband Western radio is switched off and its dial-glow dies into tape hiss in the divided city of 1983, spent and quiet, Molchat Doma coldwave dryness at late night, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, interior view of a single small spare room at late night: a worn boxy tabletop radio set on a windowsill with its illuminated tuning dial just going dark, a narrow iron-frame bed against a gray-painted wall, a single bare window above the radio showing a dark gray cityscape of distant prefab slabs with a few faint lit windows, a chair, peeling gray-green wallpaper, the only light the dying amber dial-glow and faint gray nightlight from the window, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold gray-green-wallpaper and dark-room palette with a single dying amber radio-dial-glow accent, brutalist East-side retrofuture 1983 domestic late night, scene depth foreground bed midground radio background window survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Bbm to Fm. Fourth step of the flat-side cycle-of-fifths-descending ladder. One perfect-fifth step short of the home tonic Gm - the night descent has nearly walked the full ladder back.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Maintaining the small-increment night descent toward the second dawn.",
+                       "composer_notes":  "COMEDOWN. FAR-STATION BLEED plays one FINAL time and then is SWITCHED OFF mid-phrase - the descending Polivoks phrase decays into pure tape hiss and the AM band-noise collapses to a dead-carrier hum, the far station silenced by a hand on a dial, the West gone dark in the single room. This is the resolution of the radio-bleed motif: the forbidden signal that opened the album as a faint dawn bleed is extinguished here at late night. After the switch-off, chorus2 and the outro carry only the dead-carrier hum where the far station was - do not let MusicGen re-introduce the bleed after the switch-off; its absence is the point. 240s long. Outro C (V of Fm) primes the perfect-fifth descent into Gm of track 12, closing the ring on the home tonic."
+                   },
+                   {
+                       "track_number":  12,
+                       "title":  "Second Gray Dawn",
+                       "role":  "closer",
+                       "key":  "G minor",
+                       "bpm":  80,
+                       "duration_seconds":  300,
+                       "mood_tags":  [
+                                         "resolved-but-changed",
+                                         "second-dawn",
+                                         "same-forecourt",
+                                         "held-breath"
+                                     ],
+                       "sections":  [
+                                        {
+                                            "name":  "intro",
+                                            "bars":  16,
+                                            "instrumentation":  "[Intro - sustained Polivoks-style drone pad on G with slow filter open over 16 bars and long tape-delay trails, dark synth bass on very slow quarter notes, soft dry mechanical rim-shot on 2 and 4 only no kick, single rim-click on each bar 1 ringing out fully, the faint distant-radio voice of track 1 NOT returning (the radio was switched off in track 11) - only tape hiss and a dead-carrier hum where it was]"
+                                        },
+                                        {
+                                            "name":  "verse",
+                                            "bars":  16,
+                                            "instrumentation":  "[Verse - + CROSSING-SIGNAL CELL whole on Polivoks-style sawtooth lead ONE OCTAVE DOWN with the perfect-fourth reach unhurried and the minor-second fall UNRESOLVED (holding on the b3 rather than landing on the tonic), the second dawn's gaze across the same line, dark bass walks more melodically, rim-shot maintains soft 2 and 4]"
+                                        },
+                                        {
+                                            "name":  "chorus",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus - + layered Polivoks lead section playing a soft four-bar closer-melody that descends a perfect fifth across the phrase (G - D - C - Gm resolving on the tonic), drone pad sustains underneath, no hi-hat emphasis, no rim-click]"
+                                        },
+                                        {
+                                            "name":  "break",
+                                            "bars":  8,
+                                            "instrumentation":  "[Break - layered Polivoks section drops, lone Polivoks plays the crossing-signal cell one octave down alone with dark bass and the dead-carrier hum, the same forecourt and the same sodium lamp at the second dawn]"
+                                        },
+                                        {
+                                            "name":  "chorus2",
+                                            "bars":  16,
+                                            "instrumentation":  "[Chorus2 - layered Polivoks section returns soft, closer-melody octave-doubled an octave up on a second Polivoks voice, drone pad sustains]"
+                                        },
+                                        {
+                                            "name":  "coda",
+                                            "bars":  16,
+                                            "instrumentation":  "[Coda - layered section drops, CROSSING-SIGNAL CELL on Polivoks lead one octave down whole one final time with the minor-second fall UNRESOLVED holding on the b3 rather than resolving to the tonic, drone pad fades slowly to silence over the 16 bars, rim-shot fades, dark bass walks down to root and holds, the dead-carrier hum fades last - the forecourt, the sodium lamp, the wall still standing]"
+                                        }
+                                    ],
+                       "musicgen_prompt":  "berlin coldwave 80 BPM G minor, sustained Polivoks-style drone pad with slow filter open and long tape-delay trails, dark synth bass on very slow quarter notes, soft dry mechanical CR-78-cold rim-shot on 2 and 4 only no kick, Polivoks-style sawtooth lead playing a four-note crossing-signal cell one octave below the original with the minor-second fall unresolved holding on the flat-third, layered Polivoks playing a soft closer-melody descending a perfect fifth across the four-bar phrase, single dry rim-click on each bar 1 ringing out fully, only tape hiss and a dead-carrier hum where the far-station bleed was, no kick drum, no sidechain pumping, sense of a second watchful gray dawn over the same wet brutalist Plattenbau forecourt with the same sodium-amber lamp burning as the opening drone returns one octave down and unresolved in the divided city of 1983, the divided mile walked once through and waiting to be walked again, resolved but changed, Molchat Doma coldwave dryness at the closing of the night, instrumental, no vocals",
+                       "cover_prompt":  "no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces. Cold War East album cover 1983, exterior view of the same rain-wet concrete Plattenbau forecourt as track 1 now at a second gray dawn, the same single sodium-amber streetlamp still burning on its thin steel post in the foreground but the puddles now skinned with the first thin ice, the immense flat prefab-panel apartment slab rising into a flat colorless dawn sky, a faint pale band of cold light just lifting behind the slab, one or two distant amber lit windows high on the facade, no neon, no palm trees, no warm sunset, no cyan-blue cyberpunk, no Tang-orange, cold pewter-gray and wet-concrete and thin-ice palette with a single sodium-amber lamp accent and a faint cold dawn-band, brutalist East-side retrofuture 1983 nocturnal-into-dawn closing, scene depth foreground lamp midground forecourt background apartment slab survives reframing across 1024x1024 1344x768 768x1344",
+                       "key_relationship_to_prior":  "Down a perfect fifth from Fm to Gm... no - the fifth step would be Cm; instead the album closes the ring by stepping the flat-side descent's final move to the home tonic: C (the V that closed track 11) resolves directly to its own tonic-of-the-key reading as the dominant of nothing and the album simply lands on Gm, the home tonic that opened the record. Twelve tracks have traversed a sharp-side cycle-of-fifths-ascending ladder through the day (Gm to C#m, six perfect-fifth steps) and a flat-side cycle-of-fifths-descending ladder through the night (Abm to Ebm to Bbm to Fm, four perfect-fifth steps), and the closer lands the ring on the opening Gm. The listener arrives at the second dawn from the flat side of the loop, having descended the ladder the day climbed.",
+                       "tempo_relationship_to_prior":  "-2 BPM. Returns exactly to the opener's 80 BPM - the second gray dawn at the same tempo as the first, the ring closed on tempo as well as on tonic. Unlike Sovetskiy (which ended one tick below its opener), this album lands exactly on its opening tempo: the divided mile is walked again at the same pace, the loop is exact.",
+                       "composer_notes":  "CLOSER. CROSSING-SIGNAL CELL RETURNS WHOLE ONE OCTAVE DOWN ON POLIVOKS LEAD with the minor-second fall UNRESOLVED holding on the b3 rather than landing on the tonic - the second dawn's gaze across the same line, the divided mile re-read as a held breath that never exhales. The crucial detail at the closer's open: the faint distant-radio bleed that opened track 1 does NOT return here - the radio was switched off in track 11, and its absence (only tape hiss and a dead-carrier hum remain) is the one thing that changed across the night. The forecourt is the same, the sodium lamp is the same, the wall is still standing - but the West is silent now. 300s long to give the coda its full held-breath time. The final 16-bar coda is the crossing-signal cell alone over fading drone pad and dark bass with the dead-carrier hum fading last - do not let MusicGen add a fade-up tail, a stinger, a re-introduced radio bleed, or any rhythmic figure in the final 16 bars; the unresolved Polivoks b3 over the fading pad to silence IS the composition. The album ends on Gm - the same tonic that opened it - but the fall is unresolved, signaling the next night's crossing is already coming. The ring is closed; the citizen is not. Do not let MusicGen substitute a kick drum or a PWM synthwave lead anywhere - the closer must remain in the album's coldwave voice palette of Polivoks sawtooth drone and lead, tape-delay trails, dark synth bass, dry mechanical CR-78-cold rim-shot, rim-click, and tape hiss."
+                   }
+               ],
+    "album_notes":  {
+                        "overall_form":  "Single night-and-day through the divided city over 12 tracks - gray dawn to second gray dawn - one citizen of the East side moving across and back from a concrete line they can see but never cross, circa 1983. This is a STANDALONE album, NOT part of the Lost Worlds saga and carrying NO saga leitmotifs. Three arcs: Gray waking (tracks 1-3): sodium-lamp dawn over a wet Plattenbau forecourt with a faint forbidden Western radio bleed, a near-empty S-Bahn over the elevated track past Westward-facing windows, the long avenue toward the wall-zone as the death-strip and watchtower enter the frame. Tempo climbs in small +2 BPM increments from 80 to 84 BPM. The wall and the checkpoint (tracks 4-6): the inner control-strip with its searchlight arm sweeping raked sand, the documents-and-mirror-pole inspection at the sector crossing over a stamp-and-teletype rhythm, the long gaze through a gap at the bright Western neon twenty meters away. Tempo climbs to the emotional/harmonic peak at 90 BPM (track 6, the gaze across the divide). Surveillance crisis and the long walk home (tracks 7-12): a tail picks the citizen up and a gray car keeps three doors back at the album's BPM ceiling (track 7, 92 BPM), a bare interview room under a single bulb with a reel-to-reel turning behind a one-way pane (track 8, 88 BPM, the flat-side enharmonic pivot), returned to the street with no explanation (track 9, 86 BPM exhale), the S-Bahn home through sleet (track 10, 84 BPM), the contraband radio switched off in a single room (track 11, 82 BPM), the second gray dawn over the same forecourt (track 12, 80 BPM, ring closed on opener tempo and tonic). The album splits its two peaks deliberately: the EMOTIONAL/HARMONIC peak is track 6 (the long gaze across the line, 90 BPM, Phrygian-dominant brightness) and the TEMPO/BPM ceiling is track 7 (the surveillance tail, 92 BPM, stark Aeolian), because looking across the wall and being followed are two different kinds of intensity and the slower-but-brighter gaze must not be the fastest moment. The album ends on Gm - the same tonic and the same tempo that opened it - but the crossing-signal cell's minor-second fall is left unresolved and the Western radio that opened the record has been switched off, signaling the next night's crossing is already coming. The ring is closed on tonic and tempo; the citizen is not closed on resolution.",
+                        "key_strategy":  "Sharp-side cycle-of-fifths ascending through six perfect-fifth steps for the day hours: Gm -> Dm -> Am (Phrygian b2) -> Em -> Bm (Dorian raised-6) -> F#m (Phrygian-dominant flavor). Modal shadings progress from plain minor (Gm, Dm, Em) through the wall-zone's clinical Phrygian (Am) and the checkpoint's Dorian raised-6 clinical glare (Bm) into the gaze-peak's aching Phrygian-dominant brightness (F#m). The Phrygian-dominant flavor in F#m at the gaze-peak (track 6) is the album's brightest harmonic gesture and reads as the Western neon seen across the line layered over East-side coldwave dryness, not as Phrygian metal. The crisis peak (track 7, C#m) strips the modal brightness away to stark Aeolian as the tail closes in. The descent flips to flat-side cycle-of-fifths descending through four perfect-fifth steps for the night hours: C#m -> Abm (enharmonic G#m pivot, the harmonic hinge of the whole record) -> Ebm -> Bbm -> Fm, and the closer lands the ring on the home tonic Gm. NO MAJOR TONICS appear on the album - this music lives in minor and modal-minor, never in plain major. The home tonic G minor is a WHOLE TONE above Sovetskiy Vol. 1's F minor home, deliberately claiming its own harmonic home base so the two Cold-War-East albums in the catalog never share a tonic. Where Sovetskiy ascended eight fifths and descended three (a sharp-heavy 24-hour kombinat loop), this album ascends six and descends four (a more balanced day-out-and-night-back arc with its hinge-pivot at the dead center), so the two albums read as distinct journeys through superficially adjacent aesthetics. The album never resolves to a comfortable harmonic frame; the closer's unresolved Polivoks b3 over Gm is the final harmonic gesture.",
+                        "tempo_strategy":  "Coldwave tempo range 80-92 BPM, sitting in the same dragging post-punk-coldwave territory as Sovetskiy (78-92) but with its floor raised two ticks to 80 so EVERY track is safely inside the nightdrive-llm::validate_spec 80-118 bound (Sovetskiy's track 12 at 78 needed a relaxed lower bound; this album needs none). Day accelerando: 80 -> 82 -> 84 -> 86 -> 88 -> 90 in strict +2 increments across tracks 1-6, the citizen moving from the pre-dawn forecourt through the train and the avenue to the wall and the checkpoint and the long gaze. Emotional/harmonic peak: 90 BPM (track 6, the gaze across the divide). BPM ceiling: 92 BPM (track 7, the surveillance tail) - a single +2 step above the gaze-peak, the album's only track at 92 and its highest tempo, reached at the paranoid crisis rather than the emotional peak. Night descent: 88 -> 86 -> 84 -> 82 -> 80 in strict -2 increments across tracks 8-12 (with the single -4 jump at track 7-to-8 from 92 to 88 marking the crisis breaking into the interview-room shoulder), mirroring the day accelerando step size in reverse. Ends EXACTLY on the opener's 80 BPM - the ring closed on tempo as well as tonic, the second dawn walked at the same pace as the first. The mechanical sidechain-pumping BPM range of synthwave (104+ BPM with hard-kick four-on-the-floor) is absent - this album lives below it, in coldwave / post-punk-coldwave tempo territory, the same shelf as Sovetskiy. The one dry kick on the whole album is the single downbeat thud in track 5's checkpoint inspection (never four-on-the-floor); every other track has NO kick.",
+                        "motif_strategy":  "Three motifs, each with four structural appearances, each deliberately distinct in SHAPE from Sovetskiy's three motifs so the two Cold-War-East albums share no melodic DNA. (1) Crossing-signal cell - a four-note Polivoks lead figure (1 -> 4 -> b3 -> 1, a perfect-fourth reach across the line and a minor-second fall pulling back), introduced WHOLE in track 1 (thesis, the dawn gaze across the split city), returned BRIGHT AND FOREGROUND with the perfect-fourth reach LENGTHENED to a full held bar in track 6 (the gaze through the gap at the Western neon, the reach made literal), played FRAGMENTED to only the first two notes (1 -> 4) with the return-leg removed in track 9 (the questioning lifts, the reach with no resolution), and played WHOLE ONE OCTAVE DOWN WITH THE FALL UNRESOLVED holding on the b3 in track 12 (closer, the second dawn's gaze, the held breath that never exhales). The four appearances mark the album's phase transitions: dawn (1), the line (6), release (9), second dawn (12). Its perfect-fourth-reach shape is deliberately distinct from Sovetskiy's three-note tram-bell cell (1 -> b3 -> 1, no fourth-reach). (2) Strip-light pulse - a two-note alternating dark-bass tritone ostinato (1 <-> b5) with a dry rim-click, the unstable tritone refusing to resolve, the death-strip/surveillance signature, introduced CLEAN in track 3 (the watchtower and strip enter the frame), moved to STRUCTURAL BACKBONE locked with the stamp-and-teletype rhythm and a stiffened kick in track 5 (the checkpoint inspection), played ACCELERATED to eighth notes with a tape-delay smear on every b5 in track 7 (the tail, the watch gone mobile), and COLLAPSED to only its single tonic pole with the tritone removed in track 10 (the homeward train, the watching stopped). Its unstable-tritone-oscillation shape is deliberately distinct from Sovetskiy's stable descending walking-bass boiler-room pulse (5-4-b3-1). (3) Far-station bleed - a descending three-note Polivoks phrase (5 -> 4 -> b3) doubled an octave up under tape hiss and AM band-noise, the forbidden-Western-signal signature, introduced once on the S-Bahn in track 2 (the station catches through the Westward windows), brought BRIGHT AND FOREGROUND at full volume in track 6 (the actual Western broadcast pouring across the gap, paired with the crossing-signal cell's longest reach), returned SLOWED to half-speed and DETUNED a quarter-tone flat in track 8 (the interview room, the bright sound warped into accusatory evidence), and SWITCHED OFF mid-phrase decaying into a dead-carrier hum in track 11 (the contraband radio silenced by a hand on a dial). Its diatonic-descent-drenched-in-radio-bleed shape is deliberately distinct from Sovetskiy's chromatic Iron Curtain flag escalation (b2 -> 1 -> 7 -> b6 with church bells). The far-station bleed's switch-off in track 11 is the album's quietest and most important transformation: the forbidden signal that opened the record is extinguished, and its ABSENCE at the track-12 closer (where track 1 had it present) is the one thing that changed across the divided mile.",
+                        "tracklist_continuity":  "Each track ends on a pitch that primes the next track's tonic via dominant relationship (V of next tonic), with one enharmonic pivot move at the crisis-to-night boundary (track 7 to 8). Specifically: 1 ends on Gm tonic (no V - the album begins on stillness; primes the perfect-fifth ascent to Dm). 2 ends on A (V of Dm, also tonic of track 3 reread as Am). 3 ends on E (V of Am, also tonic of track 4 reread as Em). 4 ends on B (V of Em, also tonic of track 5 reread as Bm). 5 ends on F# (V of Bm, also tonic of track 6 reread as F#m). 6 ends on C# (V of F#m, also tonic of track 7 reread as C#m). 7 ends on G# (V of C#m, reread enharmonically as Ab tonic of track 8 - the flat-side pivot that begins the night descent at the interview room, the harmonic hinge of the whole album). 8 ends on Eb (V of Abm, also tonic of track 9 reread as Ebm). 9 ends on Bb (V of Ebm, also tonic of track 10 reread as Bbm). 10 ends on F (V of Bbm, also tonic of track 11 reread as Fm). 11 ends on C (V of Fm, primes the perfect-fifth descent into Gm of track 12 closing the ring on the home tonic). The listener will not consciously hear most of these pivots - they will only feel that each transition is inevitable, and that the night descent's harmonic logic reverses the day's ascent by direction of cycle-of-fifths motion. The single enharmonic pivot (G# = Ab) at track 7-to-8 is the structural hinge where the day's sharp-side ascent flips to the night's flat-side descent, placed at the dead center of the record at the interview-room crisis-break.",
+                        "visual_continuity_notes":  "Twelve covers follow the album's narrative arc as a single night-and-day through the divided city, gray dawn to second gray dawn, circa 1983. The aesthetic vocabulary is locked and distinct from Sovetskiy's Soviet-kombinat palette: cold pewter-gray concrete and wet asphalt and prefab-panel facades, sodium-amber streetlamp accents, hard-white floodlight and searchlight accents at the wall-zone, and CRUCIALLY the warm-amber-and-soft-pink Western neon glow seen ONLY across the line (only through the gap in track 6 and only as a blurred smear through sleet-streaked glass in track 10 - never on the near East side, which stays cold gray). No full cyberpunk cyan flood (Tron / Neo-Tokyo territory), no warm sunset magenta (Sunset territory), no Tang-orange suburb (Atompunk-West territory), no red-star emblems (those were Sovetskiy's Soviet markers - this divided-city album avoids them to stay distinct), no people visible, no faces, no legible text or signage of any kind (no German lettering, no graffiti text - SDXL would render it garbled and the album avoids legible language entirely). Track 1: wet Plattenbau forecourt at gray dawn with a single sodium lamp (exterior). Track 2: near-empty elevated S-Bahn carriage with Westward-facing rain-flecked windows (interior). Track 3: long gray avenue toward the wall-zone with watchtower silhouette and raked-sand strip on the horizon (exterior wide). Track 4: the inner death-strip control-zone with raked sand and a sweeping searchlight beam (exterior, hero cover 1). Track 5: sector-crossing inspection lane with barrier arm and mirror-pole and control booth (exterior close). Track 6: the view through a gap in the wall toward distant warm Western neon glow (exterior, hero cover 2, the one cover where warm neon appears). Track 7: a gray two-stroke car following three doors back down a dusk avenue (exterior, point-of-view). Track 8: a bare interrogation room with a single hanging bulb and a one-way mirror with a reel-to-reel behind it (interior). Track 9: a narrow gray side street outside a steel door just ajar (exterior). Track 10: the same elevated carriage as track 2 now at night with sleet-streaked windows and blurred distant Western lights (interior). Track 11: a single spare room with a contraband radio whose dial-glow is dying (interior). Track 12: the same Plattenbau forecourt as track 1 at a second gray dawn with the same sodium lamp and the puddles skinned with thin ice (exterior). The architectural rhyme of tracks 1 and 12 (same forecourt, same lamp, second dawn - the puddles now iced), tracks 2 and 10 (same elevated carriage, dawn vs night-through-sleet), and the wall-zone cluster of tracks 3-4-5-6 (avenue, strip, checkpoint, gap) is the album's visual structure. All cover prompts front-load aggressive SDXL text-suppression in the first 50 words: 'no text, no words, no lettering, no typography, no font, no characters, no labels, no signage with readable words, no propaganda text, no graffiti text, no people visible, no faces' - placed BEFORE the scene description because CLIP truncates at 77 tokens and tail-positioned negatives are dropped. All cover prompts are written for SDXL native generation at 1024x1024, 1344x768, and 768x1344 - scene depth (foreground + midground + background) survives reframing across all three aspect ratios, no pose-locked compositions.",
+                        "execution_notes_for_pipeline":  "ACE-Step 1.5 turbo or XL is the renderer of record (8 turbo inference steps, cnc P100 split-GPU per project_acestep_kokonoe_vram_wall memory - kokonoe 3070 Ti 8GB does not fit; put VAE on cuda:1 16GB and DiT+LM on cuda:0 12GB per project_split_gpu_vae_acestep, and check nvidia-smi --query-compute-apps for openclaw before booting the sidecar per project_cnc_shared_with_openclaw). Every section's instrumentation field uses [Section - notes] ACE-Step bracket markers as structural anchors; the prompt-formatter strips instrumentation hints from the lyrics field and emits only [Section] names plus [Instrumental] cue, so the section instrumentation text feeds the caption/musicgen_prompt path only. Every musicgen_prompt is explicit about instrumental + no vocals + no kick drum + no sidechain pumping - do not relax these in any per-track override (the lone exception is track 5, which specifies a single dry kick on the downbeat only, never four-on-the-floor). ACE-Step prompts are tight and front-loaded (BPM and key in the first 12 words, instrumentation in the next 40 words, scene/mood at the tail where truncation is acceptable). Per-track durations sum to 3120 seconds (52 minutes) for the canonical 12 - five 240s tracks (1, 2, 3, 10, 11), four 270s tracks (4, 5, 8, 9), three 300s tracks (6, 7, 12) reflecting the album's denser narrative payload at the gaze-peak, surveillance-crisis, and closer. ALL BPMS within 80-92 and safely inside the nightdrive-llm::validate_spec 80-118 bound - no relaxed lower bound needed for this album (unlike Sovetskiy's track 12 at 78). Cover prompts are SDXL-ready for all three native aspects (1024x1024, 1344x768, 768x1344) per feedback_future_albums_native_aspect_gen and front-load 'no text, no people, no faces, no graffiti text' per feedback_sdxl_bakes_text_despite_negative_prompt. WEATHER OVERLAY: per feedback_twc_cities_must_match_album_theme this Cold-War-East-Berlin album should use a divided-Germany / Central-European city set rather than default US cities - suggested 4-city rotation East-bloc-adjacent: East Berlin, Leipzig, Dresden, Potsdam (or a Berlin/Leipzig/Dresden/Magdeburg set); route weather to the Open-Meteo + RainViewer-over-OSM-night-map path per reference_nightdrive_per_album_weather (Germany has RainViewer coverage, unlike Russia) - flag for orchestrator to add a per-album city override before render. Track 8's chord progression is notated with Cb-major (Fb) and double-flat spellings; render as enharmonic equivalents (B major for Cb) if the synth engine prefers - the pitches matter, not the spelling. Sync-drop publish: per feedback_sync_drop_for_future_albums all 12 tracks should publish at a single anchor timestamp using run-album --publish-at, NOT trickle; respect the ~10/day YouTube channel upload cap and the 6/day GCP video.insert project cap per feedback_yt_channel_daily_upload_cap and feedback_gcp_youtube_video_insert_project_quota (split the 12-track upload across two days or two projects, and set the public sync-drop anchor to span the Pacific-midnight reset). Suggested anchor: a Friday afternoon UTC slot consistent with prior sync-drops.",
+                        "differentiation_from_prior_albums":  "The Divided Mile is a STANDALONE Cold-War-East-Berlin album (NOT part of the Lost Worlds saga, NO saga leitmotifs) that shares only the broad Eastern-Bloc / Cold-War era and coldwave tempo shelf with Sovetskiy Vol. 1 and is otherwise deliberately distinct from it and from every prior volume. Sunset Vol. 1 was warm Miami coastal-drive in synthwave palette (A minor, 82-112 BPM, sidechain four-on-the-floor). Tron Vol. 1 was cold Tron grid in cyan-magenta cyberpunk (A minor, 96-112 BPM, PWM saws). Neo-Tokyo Vol. 1 was Akira-coded vertical descent in red-orange-violet anime palette (D minor, 104-120 BPM, hard kick). Atompunk Vol. 1 was mid-century WESTERN Cold War 24-hour cycle in steel-grey/Tang-orange retrofuture (C minor, 84-98 BPM, Theremin + muted brass + vibraphone). Sovetskiy Vol. 1 was the EAST-SIDE Soviet 24-hour kombinat-courtyard loop in red-star/ice-blue palette (F minor, 78-92 BPM, Polivoks lead + Juno pad + TR-606-cold drum + walking bass + church bell). The Divided Mile is set NOT in a Soviet kombinat loop but in the DIVIDED CITY OF BERLIN circa 1983: a day-out-and-night-back crossing of a city split by a concrete line, with the death-strip, the watchtower, the checkpoint with its mirror-pole, the gaze across the gap at Western neon, the surveillance tail, the interview room, and the contraband Western radio as its specific imagery. Home tonic G minor is a WHOLE TONE above Sovetskiy's F minor, so the two Cold-War-East albums never share a tonic. The voice palette is COLDWAVE-BERLIN distinct from Sovetskiy's Soviet-ensemble palette: POLIVOKS-STYLE SAWTOOTH DRONE PAD AND LEAD with heavy TAPE-DELAY FEEDBACK TRAILS (where Sovetskiy used Juno-60 pad with long PLATE reverb - tape-delay vs plate reverb is the deliberate textural fork), DARK SYNTH BASS, DRY MECHANICAL CR-78-COLD DRUM MACHINE with sparse RIM-SHOT and closed hi-hat and NO KICK (where Sovetskiy used TR-606-cold with snare on 2-and-4 - CR-78 rim-shot vs TR-606 snare is the deliberate drum-machine fork), RIM-CLICK accents (where Sovetskiy used WOOD-BLOCK knocks), and HEAVY TAPE HISS plus AM-RADIO BAND-NOISE WASH as the album's atmospheric signature (where Sovetskiy used a deep dry CHURCH-BELL tone). NO kick drum anywhere except the single dry downbeat thud in track 5's checkpoint inspection (never four-on-the-floor). NO sidechain compression. NO PWM saws (Tron territory), no FM-bell synthwave accents (Sunset territory), no Theremin / muted brass / vibraphone / timpani (Atompunk-West territory), no church-bell tone or wood-block knock or Juno-plate-reverb (Sovetskiy territory), no red-star visual markers (Sovetskiy territory). The three motifs (crossing-signal cell, strip-light pulse, far-station bleed) are ALL distinct in melodic shape from Sovetskiy's three motifs (tram-bell cell, boiler-room pulse, Iron Curtain flag): a perfect-fourth-reach cell vs a no-reach three-note cell, an unstable-tritone oscillation vs a stable descending walking-bass, and a diatonic radio-bleed descent vs a chromatic church-bell escalation - so the two Cold-War-East albums share NO melodic DNA. Structurally the albums diverge too: Sovetskiy ascended eight fifths and descended three in a sharp-heavy 24-hour kombinat loop, while The Divided Mile ascends six and descends four in a more balanced day-out-night-back arc with its enharmonic hinge-pivot at the dead center (track 7-to-8). The album sits on the same shelf as the prior five volumes - same composer, same channel, same audience (late-night programmers, coders debugging, 2am study sessions: introspective, focused, never frantic) - but reads as its own distinct Cold-War-Berlin coldwave night, in cold pewter-gray and sodium-amber and forbidden-Western-neon-glimpsed-across-the-line palette. DANGER ZONE respected (danger_zone_keys berlin_wall + sovetskiy): NO proper nouns or track titles lifted from specific Cold-War films or their soundtrack albums - no 'Lives of Others' / 'Sonata for a Good Man' / 'Goodbye Lenin' / 'Deutschland 83' / 'Sterben fuer Berlin' / 'Wind of Change' / named Stasi-film cues; no Sovetskiy overlap (no 'Stalker' / 'Solaris' / 'Sputnik' / 'Vostok' / 'Chernobyl' / 'Pripyat' / 'Lenin' / 'Kremlin'); no real named checkpoints used as track titles (the literal name 'Checkpoint Charlie' from the theme brief is referenced only in the THEME field, never as a track title - track titles are generic-evocative: Sodium Dawn Forecourt, Elevated Line Westward Windows, Toward the Strip, Control-Strip Searchlight Arm, Documents Mirror-Pole, The Gap Western Neon, Three Doors Back, Bulb and Reel, Returned to the Street, Sleet on the Elevated Line, Dial-Glow Dies, Second Gray Dawn). Double-hit rule satisfied: no title is both a named object/dialogue in a specific Cold-War film AND a track on that film's canonical soundtrack album."
+                    }
+}
