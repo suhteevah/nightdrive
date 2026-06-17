@@ -2,8 +2,44 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** 🟢 **Lost Worlds #1 "Telos: Beneath Shasta, Vol.1" RENDERED 12/12** (covers approved, new Siskiyou Co./Mt Shasta NWS weather region live) + uploads durably scheduled (Telos b1 06-08, b2 06-09; public sync-drop 2026-06-11T00:00Z). Same pass caught + rescued **Tokyo Vol.1 batch-2** (lost transient timer killed by a 06-06 reboot → re-armed durable, fires 06-07, keeps Tokyo's 06-09 drop whole). Per-album/global weather system shipped (Japan/Soviet/Arctic Open-Meteo+RainViewer; US/Shasta NWS). **See §35 for the 2026-06-06 (cont.) Telos build session.**
-**Last updated:** 2026-06-06 (PDT)
+**Status:** 🟢 **Autonomous album queue LIVE and validated end-to-end.** The nightly album-drop timer now drives the whole pipeline hands-off: compose-skip (pre-composed JSON) → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore. Hollow Earth (Lost Worlds #2) shipped 12/12; **Agartha (#3) dropped fully autonomously 2026-06-16 with zero human intervention** — first time the loop ran start-to-finish unattended. Full catalog roadmap composed/approved (Lost Worlds saga complete + 9 standalone vol-1s + 10 vol-2/LW-II themes); 21-deep approved backlog. **See the 2026-06-16 session below.**
+**Last updated:** 2026-06-16 (PDT)
+
+---
+
+## 2026-06-16 — Queue revival + autonomous loop validated + full-catalog roadmap
+
+Took nightdrive from "armed but had never completed a real autonomous drop" to "running hands-off."
+
+### What was done
+- **Revived the dead queue.** `nightdrive-album-drop.timer` on cnc was `disabled` — every prior album (Telos/Tokyo) had been dropped by hand. Enabled+started it durably (every 3 days, 02:00 PDT, `Persistent=true`). NOTE: `Persistent=true` catches up a missed slot on enable → it fired Hollow Earth immediately the moment the timer was enabled.
+- **Fixed 2 latent production bugs** (never hit before because the timer had never completed a real drop):
+  1. **ACE-Step readiness race** — service did `systemctl start nightdrive-acestep` then a fixed `sleep 10`, but ACE-Step needs ~30-35s to open :8083. Every track fast-failed at stage-2 audio (cover+spec written, no raw.wav), teardown then killed acestep mid-load, and drop-next STALL-returned Ok → wrongly moved the album to history. Fix: `/opt/nightdrive/tools/wait-acestep.sh N` polls `/health`||`:8083` (replaced the sleep).
+  2. **Continuation render-gap** — the +25h staggered-upload timer (`schedule_stagger_continuation`) is a bare `publish-staggered` with NO eviction/ACE-Step, so it could never RENDER tracks 7-12 (only the first per_day=6 batch ever rendered). Fix: `/opt/nightdrive/tools/drop-render-all.sh` (new ExecStartPre after wait-acestep) renders ALL 12 dry-run while ACE-Step is up; the continuation then only UPLOADS (skip-on-state, no sidecar needed).
+- **Drop service hardening:** now evicts/restores **aether** (aether-serve, aether-vision) alongside openclaw-inference; added `/opt/nightdrive/tools/drop-deadman.sh` (5.5h transient deadman that restores the fleet if the service is SIGKILLed and ExecStopPost never runs).
+- **Composed 6 new vol-1 album JSONs** (album-composer subagent, with saga leitmotif continuity): agartha/atlantis/gate-of-ra (completing the Lost Worlds saga), miami-vice, blade-runner-2049, berlin-wall. Staged to cnc — no album cold-composes at drop time anymore.
+- **Weather routing built for the whole catalog** — `crates/nightdrive-encoder/src/weather.rs` now has 11 themed regions. Added ARCTIC for hollow/agartha; new MID_ATLANTIC (Azores), EGYPT (Cairo), GERMANY (Berlin); metro-mapped miami→SE, blade-runner→SW; new INLAND_CA, KAZAKH_STEPPE (Baikonur), SPACE_COAST (Cape Canaveral) for the vol-2s. Orchestrator rebuilt+redeployed each pass.
+- **Brainstormed + approved the full vol-2 catalog** — 9 series vol-2 concepts + Lost Worlds II saga opener (`dyson-tomb`). All 10 added to backlog `approved`. Parked 3 openclaw auto-proposals overlapping vol-2 lanes (orbital-dacha/dust-radio/monsoon-bazaar → proposed, promote_at 2026-09-15).
+- **Reconciled the diverged backlog** — cnc's authoritative copy had drifted from the git repo; merged + kept synced both ways.
+
+### Current state (verified 2026-06-16 09:12 PDT)
+- **Autonomous loop WORKING:** timer → evict(openclaw+aether) → SDXL covers → render-all-12 → upload 6 → arm +25h continuation for 7-12 → restore fleet. Agartha dropped 06-16 02:06 PDT: 12/12 rendered, **weather=ARCTIC ✓**, 1-6 uploaded, 7-12 continuation armed Wed 06-17 04:55 PDT, public 06-19T00:00Z.
+- Hollow Earth: 12/12 uploaded (7-12 via continuation). Public sync-drop 06-18T00:00Z.
+- Fleet healthy (5 active), acestep down. Next drop **Fri 06-19 02:00 PDT → atlantis** (Azores weather wired). Backlog 21 approved deep (~57 days).
+
+### Blocking / risks
+- **YT OAuth 7-day expiry (Matt's action):** if the GCP OAuth app is still in "Testing", the refresh token dies every ~7 days (silent `invalid_grant` — caused the 05-26→05-31 dark spell). Valid as of 06-16. FIX = publish the OAuth app to Production. Highest silent-failure risk.
+- **Continuation timers are transient** (`systemd-run --on-active=25h`) → wiped on reboot; a reboot between a drop and its +25h continuation strands that album at 6/12. Durable-timer conversion is a deferred code change.
+
+### What's next
+- Nothing required — the loop runs unattended.
+- Optional/recommended: publish OAuth app to Production; convert the staggered continuation to a durable installed timer.
+- The 10 approved vol-2/LW-II entries are backlog THEMES, not composed JSONs — pre-compose them before they near drop (same footgun-dodge as the vol-1s). `tron-drive-vol-2` + `dyson-tomb` have no real geography (hashed weather).
+
+### Notes for next session
+- cnc `/opt/nightdrive-ws/docs/album-backlog.json` is AUTHORITATIVE (what the drop reads); the repo copy is NOT auto-synced — edit cnc + mirror to repo (memory `reference_cnc_backlog_authoritative`).
+- Every new album slug needs a `region_for` branch in weather.rs (+ orchestrator rebuild) or it hash-falls to a wrong region (memory `project_nightdrive_queue_autodrain_live`).
+- Don't manually `git commit` — github-uploader auto-commits the working tree.
 
 ---
 
