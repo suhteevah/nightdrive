@@ -1,0 +1,681 @@
+{
+  "album_slug": "tokyo-cyberpunk-vol-1",
+  "title": "Last Train",
+  "theme": "neon_shinjuku_noir",
+  "track_count": 12,
+  "tonic_progression": "C#m -> G#m -> D#m -> A#m / Bbm -> Fm (Phrygian) -> Cm (Dorian) -> Gm (Phrygian-dominant flavor) -> Dm -> Am -> Em -> Bm -> C#m",
+  "bpm_arc": [
+    82,
+    86,
+    90,
+    94,
+    98,
+    96,
+    112,
+    104,
+    96,
+    90,
+    86,
+    80
+  ],
+  "narrative_arc": "Twelve tracks read as a single rain-soaked Shinjuku night, a salaryman leaving a glass office tower at the last whistle through the neon core to the final train and the long quiet ride home, the lonely Akira-meets-noir mirror of a city that never stops glowing while one man slows down. The ring closes on the same C# minor it opened on, but the listener arrives at the empty platform from the far side of the night, and the rain has washed the neon off the street.",
+  "recurring_motifs": [
+    {
+      "introduced_in": 1,
+      "motif": "Rain cell - a four-note descending detuned-FM-bell figure (b6-5-4-3) doubled by tape-saturated rain foley, the album's weather signature",
+      "returns_in": [
+        6,
+        11,
+        12
+      ],
+      "transformation": "Track 1 states it whole and dry as the office doors open onto the rain. Track 6 inverts it ascending under the neon-core lull. Track 11 stretches it to half-time pads on the empty platform. Track 12 returns it whole and dry one octave down on FM bell as the last sound before silence."
+    },
+    {
+      "introduced_in": 2,
+      "motif": "Last-train pulse - a muted sidechained 16th-note square-wave arpeggio evoking rail clatter and a countdown clock",
+      "returns_in": [
+        3,
+        7,
+        10
+      ],
+      "transformation": "Track 2 introduces it as distant station ambience. Track 3 doubles its density on the wet street. Track 7 drives it into a frantic 32nd ostinato at the dash for the train. Track 10 decays it to a single repeated note as the carriage thins out."
+    },
+    {
+      "introduced_in": 4,
+      "motif": "Salaryman lament - a weary five-note vocal-formant lead phrased like a sigh, always landing on the minor third",
+      "returns_in": [
+        8,
+        12
+      ],
+      "transformation": "Track 4 plays it solo over a Rhodes. Track 8 harmonizes it in parallel fourths at the near-miss. Track 12 plays it solo and unaccompanied as the figure walks the last block home."
+    },
+    {
+      "introduced_in": 5,
+      "motif": "Platform chime - a two-note major-second departure-jingle deliberately too bright for the key, like an announcement bleeding through",
+      "returns_in": [
+        9,
+        12
+      ],
+      "transformation": "Track 5 states it at true pitch in the neon arcade. Track 9 pitches it down a tritone and drowns it in reverb into menace at the closing doors. Track 12 restores it to true pitch as the final station jingle fading into rain."
+    }
+  ],
+  "tracks": [
+    {
+      "track_number": 1,
+      "title": "Last Whistle, Floor 31",
+      "role": "opener",
+      "key": "C# minor",
+      "bpm": 82,
+      "duration_seconds": 228,
+      "mood_tags": [
+        "rain",
+        "fluorescent",
+        "weary",
+        "descent"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 16,
+          "instrumentation": "detuned FM bell pings over deep sub drone on C#, tape-saturated rain foley, distant elevator-hum noise floor, no rhythm"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ RAIN CELL whole and dry on FM bell, soft sub bass on root, gated reverb snare on 4 only"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ wide PWM pad, soft kick on 1, brushed gated snare on 2 and 4, mellow saw counter-line"
+        },
+        {
+          "name": "bridge",
+          "bars": 8,
+          "instrumentation": "drums drop, rain cell alone over pad, the office empties"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "pad sustains C#, rain cell once more, fade to rain"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir downtempo 82 BPM C# minor, detuned FM bell melody descending four-note figure, deep sub bass, tape-saturated rain ambience, distant city hum, gated reverb snare, soft kick, wide PWM pad, lonely fluorescent late-night office mood, Akira meets Blade Runner, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no people faces visible. cyberpunk noir album cover, lone silhouette in a long coat stepping out of a glass office tower lobby into heavy neon-lit rain at night, magenta and cyan signage reflected on wet black asphalt, anamorphic cinematic, deep shadow, no warm sunset, 1024x1024",
+      "key_relationship_to_prior": "—",
+      "tempo_relationship_to_prior": "—",
+      "composer_notes": "Sets the tonic C# minor and the rain palette. RAIN CELL stated dry and clear so its later transformations read. No four-on-the-floor; keep the kit gated and minimal. Outro on tonic, the night begins on stillness. Theme key 'neon_shinjuku_noir' chosen to avoid the danger-zone keys."
+    },
+    {
+      "track_number": 2,
+      "title": "Underpass, Platform B",
+      "role": "cruiser",
+      "key": "G# minor",
+      "bpm": 86,
+      "duration_seconds": 240,
+      "mood_tags": [
+        "motion",
+        "neon",
+        "anticipation",
+        "wet-concrete"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "muted square-wave 16th arp distant in G#, soft kick, station-ambience noise floor"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ LAST-TRAIN PULSE arp foreground, warm analog bass, gated snare on 2 and 4"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ thin PWM lead on a four-bar phrase, layered cold pads, soft sidechain"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "lead drops, arp center, second arp voice an octave up"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full mix, lead doubled with FM bell counter-line"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on D# (V of G#m), pad sustains"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir synthwave 86 BPM G# minor, muted 16th-note square-wave arpeggio like distant rail clatter, warm analog bass, brushed electronic drums, thin PWM lead, layered cold pads, FM bell counter-line, neon-soaked subway underpass mood, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, neon-lit subway underpass with wet concrete steps descending, magenta and cyan tube signage glowing, blurred commuters with umbrellas in shallow depth of field, cinematic anamorphic, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from C#m to G#m, cycle-of-fifths ascending strictly inside the minor mode.",
+      "tempo_relationship_to_prior": "+4 BPM, gentle acceleration into the night.",
+      "composer_notes": "Introduces LAST-TRAIN PULSE motif as distant station ambience. Keep the arp tight and cold. Outro D# (V of G#m) pivots to D#m of track 3."
+    },
+    {
+      "track_number": 3,
+      "title": "Wet Street, Code Three",
+      "role": "cruiser",
+      "key": "D# minor",
+      "bpm": 90,
+      "duration_seconds": 240,
+      "mood_tags": [
+        "rolling",
+        "saturated",
+        "electric",
+        "forward"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "kick + hard-square sub on D#, no melody, white-noise riser at bar 8"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ doubled LAST-TRAIN PULSE arp, gated snare, layered pads"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ saw lead on a two-bar phrase, hard sidechain, FM bell counter"
+        },
+        {
+          "name": "breakdown",
+          "bars": 8,
+          "instrumentation": "kick drops, arp + pad + single sustained FM bell"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full kit, lead saws stacked two deep"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on A# (V of D#m), pad sustains, white-noise tail"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir synthwave 90 BPM D# minor, dense doubled 16th-note arpeggio, punchy gated drums, stacked saw lead, hard sidechained cold pads, FM bell counter-melody, white-noise risers, neon crowd-energy wet-street mood, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, packed neon crossing at night in the rain, towering glowing billboards in magenta and cyan, motion blur of umbrellas, reflections on wet black asphalt, vivid cinematic anamorphic, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from G#m to D#m, continuing the descending-into-the-core ladder.",
+      "tempo_relationship_to_prior": "+4 BPM, the street pulls forward.",
+      "composer_notes": "LAST-TRAIN PULSE doubles in density. Keep the lead phrase short and looping. Outro A# (V of D#m) pivots deceptively to A#m/Bbm of track 4."
+    },
+    {
+      "track_number": 4,
+      "title": "Counter Seat, Whisky Neat",
+      "role": "bridge",
+      "key": "A# minor (Bb minor)",
+      "bpm": 94,
+      "duration_seconds": 252,
+      "mood_tags": [
+        "interior",
+        "longing",
+        "amber-on-blue",
+        "pause"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "Rhodes chords in Bbm, soft kick, bar-ambience noise floor"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ SALARYMAN LAMENT solo on vocal-formant lead over Rhodes, sub bass, brushed snare"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ layered cold pads, gated snare on 2 and 4, mellow saw doubling the lament"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "lead drops, Rhodes center, FM bell shadow"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full but soft mix, lament octave-doubled"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on F (V of Bbm), Rhodes sustains"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir downtempo 94 BPM B-flat minor, weary vocal-formant lead phrased like a sigh landing on the minor third, mellow Rhodes, soft sub bass, brushed gated drums, layered cold pads, rain through the window, melancholic and intimate bar interior, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, close interior of a tiny standing bar with a single amber pendant lamp, a whisky glass on a worn counter, neon signage glowing cyan through a rain-streaked window behind, warm amber against cold blue, cinematic shallow focus, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from D#m to A#m/Bbm, the night's harmonic descent reaching its quietest interior.",
+      "tempo_relationship_to_prior": "+4 BPM tempo, but the energy turns inward, a held breath before the core.",
+      "composer_notes": "Introduces SALARYMAN LAMENT motif solo over Rhodes. Bridge track, the only true interior pause. Outro F (V of Bbm) pivots to Fm Phrygian of track 5."
+    },
+    {
+      "track_number": 5,
+      "title": "Arcade, Floor Minus One",
+      "role": "cruiser",
+      "key": "F minor (Phrygian)",
+      "bpm": 98,
+      "duration_seconds": 234,
+      "mood_tags": [
+        "temptation",
+        "phrygian",
+        "glitch",
+        "overbright"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "Phrygian pad on F with a passing Gb (b2), soft kick, arcade-bleep ambience"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ PLATFORM CHIME at true pitch over modal bassline, glitch percussion, gated snare"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ bright PWM lead in F Phrygian (Gb b2 in the phrase), layered pads, hard sidechain"
+        },
+        {
+          "name": "break",
+          "bars": 8,
+          "instrumentation": "drums drop, chime + pad, the arcade flickers"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full return, double-octave lead, chime articulated twice"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on C (V of Fm), pad holds"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir synthwave 98 BPM F minor Phrygian with flat-two G-flat passing tone, bright too-cheerful two-note chime motif, dark modal bassline, glitchy 8-bit-tinged percussion, bright PWM lead, hard sidechained pads, neon arcade-basement temptation mood, uneasy, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, narrow neon arcade corridor in a basement floor, rows of glowing cabinets in cyan and magenta, steam and reflective wet tile, a too-bright sign glowing at the far end, ominous noir, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Bbm to Fm, voiced Phrygian for temptation and the album's first 'wrong-feeling-right' flat-two.",
+      "tempo_relationship_to_prior": "+4 BPM, stepping up toward the peak.",
+      "composer_notes": "Introduces PLATFORM CHIME motif at true pitch, deliberately too bright for the modal frame. The Gb b2 is the album's mark of the neon core. Outro C (V of Fm) pivots to Cm Dorian of track 6."
+    },
+    {
+      "track_number": 6,
+      "title": "Neon Lull, 23:48",
+      "role": "cruiser",
+      "key": "C minor (Dorian)",
+      "bpm": 96,
+      "duration_seconds": 252,
+      "mood_tags": [
+        "lull",
+        "weightless",
+        "violet",
+        "suspended"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 16,
+          "instrumentation": "sustained pad on C with Dorian A natural passing color, single FM bell pings spaced 4 bars, no rhythm"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ INVERTED RAIN CELL ascending on FM bell, half-tempo kick on 1 and 3, brushed snare on 4"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ mellow saw lead floating on long notes, layered pads at front of mix, soft sidechain"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "lead drops, sustained pad, FM bell pings clustering"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on G (V of Cm), pad sustains, drums drop"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir downtempo 96 BPM C minor Dorian with raised-sixth A natural passing tone, ascending four-note FM bell figure, half-tempo kick on one and three, brushed snare on beat four, floating saw lead on long sustained notes, layered cold pads, distant rain, weightless violet neon-lull mood, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, near-empty neon plaza at midnight under fine rain, vast glowing billboards reflected in deep puddles, a lone figure small in the frame, violet and cyan palette, cinematic anamorphic stillness, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fourth from Fm to Cm with a Dorian raised sixth, modal interchange replacing the cycle-of-fifths for the lull.",
+      "tempo_relationship_to_prior": "-2 BPM, the only dip before the peak, the city briefly quiet.",
+      "composer_notes": "RAIN CELL returns inverted ascending under the neon-core lull. Keep internal motion slow and spacious; do not let the kick go four-on-the-floor. Outro G (V of Cm) pivots to Gm Phrygian-dominant of track 7."
+    },
+    {
+      "track_number": 7,
+      "title": "Run For It",
+      "role": "peak",
+      "key": "G minor (Phrygian-dominant flavor)",
+      "bpm": 112,
+      "duration_seconds": 228,
+      "mood_tags": [
+        "frantic",
+        "sprint",
+        "euphoric",
+        "white-flash"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "hard kick on every beat, hard-square sub on G, white-noise riser"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ frantic LAST-TRAIN PULSE as 32nd ostinato, gated snare on 2 and 4, layered pads"
+        },
+        {
+          "name": "pre-chorus",
+          "bars": 8,
+          "instrumentation": "build: snare rolls, riser, filter open"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ stacked saw lead in G Phrygian-dominant (Ab b2, B natural raised-3), hard sidechain every quarter, FM bell counter"
+        },
+        {
+          "name": "break",
+          "bars": 8,
+          "instrumentation": "drums drop, 32nd ostinato solo over pad, a breath at full speed"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "biggest version of the mix, lead doubled in octaves"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "lead sustains D (V of Gm), filter close, drums fade"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir peak synthwave 112 BPM G minor Phrygian-dominant with A-flat flat-two and B-natural raised-third, frantic 32nd-note ostinato, hard kick on every beat, gated reverb snare, stacked saw lead, hard sidechain pumping, white-noise risers, FM bell counter, breathless dash through neon rain for the last train, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, motion-blur sprint down a rain-wet station stairway, glowing magenta departure board overhead, streaking neon, urgent cinematic, white-hot light at the top of the stairs, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Cm to Gm with Phrygian-dominant flavor, the album's brightest harmonic gesture at the peak.",
+      "tempo_relationship_to_prior": "+16 BPM, the album's only large jump, the dash for the train.",
+      "composer_notes": "PEAK. LAST-TRAIN PULSE driven into a frantic 32nd ostinato, the structural climax of the countdown. The Phrygian-dominant flavor reads as thriller pressure, not metal. Outro D (V of Gm) pivots to Dm of track 8."
+    },
+    {
+      "track_number": 8,
+      "title": "Doors Closing",
+      "role": "bridge",
+      "key": "D minor",
+      "bpm": 104,
+      "duration_seconds": 234,
+      "mood_tags": [
+        "near-miss",
+        "breathless",
+        "menace",
+        "relief"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "hard kick easing in Dm, hard-square sub, sparse arp"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ SALARYMAN LAMENT harmonized in parallel fourths, gated snare, layered pads"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ saw lead resolving the lament upward, hard sidechain softening, FM bell counter"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "lead drops, arp center, FM bell shadow"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full mix, lament octave-doubled"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on A (V of Dm), pad sustains, kick fades"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir synthwave 104 BPM D minor, weary lament melody harmonized in parallel fourths, propulsive bass, gated drums easing from the sprint, layered cold pads, FM bell counter, the relief of just catching the last train, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, a figure just inside closing train doors, cold blue carriage light, neon platform receding through the glass, breathless cinematic noir, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Gm to Dm, the energy beginning to recede after the peak.",
+      "tempo_relationship_to_prior": "-8 BPM, the comedown begins.",
+      "composer_notes": "Bridge from peak to night. SALARYMAN LAMENT harmonized in parallel fourths at the near-miss. Outro A (V of Dm) pivots to Am of track 9."
+    },
+    {
+      "track_number": 9,
+      "title": "Carriage, Window Seat",
+      "role": "cruiser",
+      "key": "A minor",
+      "bpm": 96,
+      "duration_seconds": 258,
+      "mood_tags": [
+        "exhaustion",
+        "window-gazing",
+        "cooling",
+        "quiet"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "pad on Am, soft kick, rail-clatter percussion at low level"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ settled groove, warm bass, gated snare, mellow pads"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ PLATFORM CHIME pitched down a tritone, reverb-drenched into menace, saw pad counter"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "chime drops, groove center, FM bell shadow"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full but soft mix"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on E (V of Am), pad sustains"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir downtempo 96 BPM A minor, two-note chime pitched down a tritone and drenched in reverb into menace, settled groove, soft rail-clatter percussion, warm pads, exhausted window-gazing mood on a late-night train, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, interior of a near-empty late-night train carriage, cold fluorescent light, a tired passenger silhouette by a rain-streaked window watching neon recede, warm dim reflection, cinematic, 1024x1024",
+      "key_relationship_to_prior": "Down a perfect fourth from Dm to Am, the home-pitch region of the night descent.",
+      "tempo_relationship_to_prior": "-8 BPM, the carriage settles.",
+      "composer_notes": "PLATFORM CHIME pitched down a tritone, reverbed into menace as the doors closed behind. Keep it spacious and tired. Outro E (V of Am) pivots to Em of track 10."
+    },
+    {
+      "track_number": 10,
+      "title": "Three Stops to Go",
+      "role": "cruiser",
+      "key": "E minor",
+      "bpm": 90,
+      "duration_seconds": 264,
+      "mood_tags": [
+        "thinning",
+        "suburban",
+        "sleet",
+        "drift"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 8,
+          "instrumentation": "sparse pad on Em, soft kick, distant rail rumble"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ LAST-TRAIN PULSE decayed to a single repeated note, deep pads, brushed snare"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ mellow saw lead descending a fifth, layered pads, soft sidechain"
+        },
+        {
+          "name": "verse2",
+          "bars": 16,
+          "instrumentation": "lead drops, single-note pulse alone, sleet texture rises"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "full but soft return"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on B (V of Em), pad sustains, rumble fades"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir downtempo 90 BPM E minor, sparse arrangement, the rail pulse decayed to a single repeated note, deep pads, distant sleet and rail rumble, the city thinning to dark suburbs, melancholy drift, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, view from a train window of sparse suburban lights and dark fields passing in fine sleet, faint reflection of a face in the glass, calm cold-blue melancholy, cinematic, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Am to Em, the descent's quiet outer stretch.",
+      "tempo_relationship_to_prior": "-6 BPM, returning toward the opening tempo shelf.",
+      "composer_notes": "LAST-TRAIN PULSE decayed to a single repeated note as the carriage empties. Outro B (V of Em) pivots to Bm of track 11."
+    },
+    {
+      "track_number": 11,
+      "title": "Empty Platform",
+      "role": "cruiser",
+      "key": "B minor",
+      "bpm": 86,
+      "duration_seconds": 270,
+      "mood_tags": [
+        "stillness",
+        "fatigue",
+        "ambient",
+        "rain"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 16,
+          "instrumentation": "deep sub drone on B, single FM bell ping every 8 bars, no rhythm, rain foley"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ RAIN CELL stretched to slow half-time pads, soft kick on 1, sub bass"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ mellow saw lead on long notes, brushed snare on 4, layered pads"
+        },
+        {
+          "name": "break",
+          "bars": 8,
+          "instrumentation": "drums drop, rain cell pads alone, the platform empty"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "soft return, lead octave-doubled"
+        },
+        {
+          "name": "outro",
+          "bars": 8,
+          "instrumentation": "filter close on F# (V of Bm), pad sustains into silence"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir ambient downtempo 86 BPM B minor, rain-cell figure stretched into slow half-time pads, deep sub drones, single FM bell pings spaced wide, near-silence, late-night fatigue on an empty platform, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, an empty rain-wet suburban station platform at night, one flickering fluorescent light, a single distant neon sign, no people, lonely ambient noir, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Em to Bm, the album's quietest harmonic shelf before the close.",
+      "tempo_relationship_to_prior": "-4 BPM, slowest approach to the closer.",
+      "composer_notes": "RAIN CELL stretched to half-time pads on the empty platform. No rhythmic figure beyond the soft kick. Outro F# (V of Bm) pivots to C#m of track 12, closing the ring."
+    },
+    {
+      "track_number": 12,
+      "title": "The Long Way Home",
+      "role": "closer",
+      "key": "C# minor",
+      "bpm": 80,
+      "duration_seconds": 300,
+      "mood_tags": [
+        "home",
+        "resolution",
+        "solitude",
+        "rain"
+      ],
+      "sections": [
+        {
+          "name": "intro",
+          "bars": 16,
+          "instrumentation": "deep pad on C#, slow filter open over 30s, single FM bell pings every 4 bars, rain foley"
+        },
+        {
+          "name": "verse",
+          "bars": 16,
+          "instrumentation": "+ RAIN CELL whole and dry on FM bell one octave below the opener, soft kick on 1, sub bass"
+        },
+        {
+          "name": "chorus",
+          "bars": 16,
+          "instrumentation": "+ SALARYMAN LAMENT solo and unaccompanied over pad, brushed snare very soft, layered pads"
+        },
+        {
+          "name": "break",
+          "bars": 8,
+          "instrumentation": "drums drop, lament alone with deep reverb, pad sustains"
+        },
+        {
+          "name": "chorus2",
+          "bars": 16,
+          "instrumentation": "drums return softly, lament octave-doubled, full but quiet mix"
+        },
+        {
+          "name": "coda",
+          "bars": 16,
+          "instrumentation": "lead drops, PLATFORM CHIME restored to true pitch as the final station jingle, RAIN CELL once more on FM bell, slow filter close to silence, pad and drums fade, the last ping holds into rain"
+        }
+      ],
+      "musicgen_prompt": "cyberpunk noir closing downtempo 80 BPM C# minor, dry undisturbed rain-cell motif on FM bell one octave low, weary lament played solo and unaccompanied, a single bright station chime at its true pitch as the last sound, fading rain, deep pad, soft kick, resolved but changed, instrumental, no vocals",
+      "cover_prompt": "no text, no words, no lettering, no faces visible. cyberpunk noir album cover, a lone figure walking away down a quiet rain-wet residential street toward a single lit window, faint dawn hinting at the horizon, last neon glow behind, resolved cinematic noir, 1024x1024",
+      "key_relationship_to_prior": "Up a perfect fifth from Bm to C#m, closing the ring back to the C# minor home tonic that opened the album.",
+      "tempo_relationship_to_prior": "-6 BPM, the album's slowest and final tempo.",
+      "composer_notes": "CLOSER. RAIN CELL returns whole and dry one octave down; SALARYMAN LAMENT solo and unaccompanied; PLATFORM CHIME restored to true pitch as the final sound, with a long filter close to silence over the coda. Do not let the renderer add a fade-up tail or stinger; the filter close to silence is the composition. The ring is closed; the listener is not."
+    }
+  ],
+  "album_notes": {
+    "execution_notes_for_pipeline": "All BPMs within 80-118 and durations within 180-360s; instrumental MusicGen prompts with explicit no-vocals; SDXL cover prompts scene-specific with aggressive no-text front-loading. Per-track durations sum to 3000 seconds.",
+    "key_strategy": "Cycle-of-fifths ascending strictly inside the minor mode for the descent into the neon core (C#m -> G#m -> D#m -> Bbm), modal interchange through the core and dash (Fm Phrygian -> Cm Dorian -> Gm Phrygian-dominant), then a retrace home (Dm -> Am -> Em -> Bm -> C#m) closing on the home tonic. No major tonics; the night never resolves to comfort.",
+    "motif_strategy": "Four motifs (Rain cell, Last-train pulse, Salaryman lament, Platform chime) introduced across the first five tracks, transformed across the peak and comedown, and resolved in the closer, where the rain cell returns dry, the lament plays unaccompanied, and the chime is restored to true pitch.",
+    "overall_form": "A descending-into-the-core then climbing-home ring of twelve keys over a single rain-soaked Shinjuku night, departing from and returning to C# minor, mirroring one salaryman's round trip from the office tower to the last train and the long way home.",
+    "tempo_strategy": "BPM arcs up from 82 through a single 112 peak at the dash for the train (track 7), then recedes to an 80 close, tracing the energy of the night. The lone dip at the neon lull (96, track 6) precedes the peak; never crosses below 80 or above 118.",
+    "title_safety_notes": "All track titles are generic noir-scene descriptors; theme key 'neon_shinjuku_noir' avoids the danger-zone keys 'tokyo_cyberpunk' and 'blade_runner'; no track title doubles as a soundtrack-known film object or line of dialogue.",
+    "tracklist_continuity": "Each track ends on the dominant of the next track's tonic (or a common-tone modal pivot), so transitions read as inevitable rather than abrupt; sections are crossfade-friendly so the album plays as one continuous journey.",
+    "visual_continuity_notes": "Consistent magenta/cyan neon-and-rain palette, anamorphic cinematic framing, lone salaryman protagonist throughout, deep wet-asphalt reflections, no warm sunsets; all cover prompts front-load text and face suppression."
+  }
+}

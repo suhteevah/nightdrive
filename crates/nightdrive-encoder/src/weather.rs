@@ -22,6 +22,7 @@
 //! | `arctic`/`ice-station` | ARCTIC (Reykjavík/Nuuk/Murmansk/Yellowknife) | Open-Meteo | RainViewer\* |
 //! | `hong-kong`/`kowloon` | HONG KONG | Open-Meteo | RainViewer |
 //! | `shasta`/`telos` | SHASTA (Mt Shasta City/Weed/Dunsmuir/McCloud) | NWS | NWS Ridge2 GIF |
+//! | `abyssal` | MARIANAS (Guam/Saipan/Koror/Yap) | Open-Meteo | RainViewer\* |
 //!
 //! \* RainViewer is fed by national radar networks. Japan/Iceland/most of
 //! Europe are covered; Russia, Greenland, and high-arctic Canada are NOT —
@@ -338,13 +339,31 @@ static SPACE_COAST: RegionDef = RegionDef {
     ],
 };
 
+/// abyssal-station Vol. 1 — deep-sea outpost in the Marianas / West Pacific.
+/// Open-Meteo (global) for the forecast; RainViewer has no open-Pacific radar
+/// network, so the inset renders a dark West-Pacific ocean basemap with no
+/// echoes — on-theme for a two-miles-down abyssal album. Guam/Saipan/Koror/Yap
+/// per the per-album theme-cities rule.
+static MARIANAS: RegionDef = RegionDef {
+    key: "marianas",
+    label: "MARIANAS",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 6, x: 56, y: 30 },
+    cities: &[
+        CityDef { display: "GUAM", full: "Hagatna, Guam", lat: 13.4757, lon: 144.7489 },
+        CityDef { display: "SAIPAN", full: "Saipan, CNMI", lat: 15.2123, lon: 145.7545 },
+        CityDef { display: "KOROR", full: "Koror, Palau", lat: 7.3419, lon: 134.4790 },
+        CityDef { display: "YAP", full: "Colonia, Yap (FSM)", lat: 9.5140, lon: 138.1300 },
+    ],
+};
+
 /// Slug-matched regions (matched by album-slug substring in [`region_for`]).
 /// All non-US use Open-Meteo + RainViewer; the US ones (SHASTA/INLAND_CA/
 /// SPACE_COAST) use NWS. `region_by_key` also searches this list to re-resolve
 /// the radar.
 static THEMED_REGIONS: &[&RegionDef] = &[
     &JAPAN, &SOVIET, &ARCTIC, &HONGKONG, &SHASTA, &MID_ATLANTIC, &EGYPT, &GERMANY,
-    &INLAND_CA, &KAZAKH_STEPPE, &SPACE_COAST,
+    &INLAND_CA, &KAZAKH_STEPPE, &SPACE_COAST, &MARIANAS,
 ];
 
 /// Resolve the region for a track from the album slug embedded in its id.
@@ -374,9 +393,11 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     if id.contains("arctic") || id.contains("ice-station") || id.contains("ice_station")
         || id.contains("hollow") || id.contains("polar")
         || id.contains("agartha") || id.contains("shambhala")
+        || id.contains("aurora") || id.contains("icebreaker")
     {
         // Lost Worlds #2 (Hollow Earth) polar-opening descent + #3 (Agartha) inner-sun
-        // — both share the saga's Arctic/inner-earth anchor.
+        // — both share the saga's Arctic/inner-earth anchor. aurora-icebreaker
+        // (a polar-sea album) rides the same Arctic region.
         return &ARCTIC;
     }
     if id.contains("hong-kong") || id.contains("hongkong") || id.contains("kowloon") {
@@ -389,6 +410,10 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     // Lost Worlds #4 (Atlantis) — drowned Atlantic motherland → mid-Atlantic/Azores.
     if id.contains("atlantis") || id.contains("atlantic") || id.contains("azores") {
         return &MID_ATLANTIC;
+    }
+    // abyssal-station — deep-sea outpost in the Marianas / West Pacific.
+    if id.contains("abyssal") {
+        return &MARIANAS;
     }
     // Lost Worlds #5 (Gate of Ra) — Heliopolis-hypertech desert → Egypt.
     if id.contains("gate-of-ra") || id.contains("gate_of_ra") || id.contains("egypt")
@@ -405,6 +430,10 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
         return region_by_key("us-southeast");
     }
     if id.contains("blade-runner") || id.contains("blade_runner") || id.contains("2049") {
+        return region_by_key("us-southwest");
+    }
+    // chrome-mirage — salt-flat desert run → SoCal / SW desert (NWS).
+    if id.contains("chrome-mirage") {
         return region_by_key("us-southwest");
     }
     let h = djb2(track_id.as_str());
@@ -1028,6 +1057,22 @@ mod tests {
         assert_eq!(region_for(&s).key, "soviet");
         let a = TrackId("nd-arctic-ice-station-vol-1-002".to_string());
         assert_eq!(region_for(&a).key, "arctic");
+    }
+
+    #[test]
+    fn standalone_vol1_slugs_route() {
+        // abyssal-station → new West-Pacific / Marianas region (Open-Meteo).
+        let ab = TrackId("nd-abyssal-station-vol-1-001".to_string());
+        let r = region_for(&ab);
+        assert_eq!(r.key, "marianas");
+        assert_eq!(r.backend, ForecastBackend::OpenMeteo);
+        assert_eq!(r.cities[0].display, "GUAM");
+        // chrome-mirage → SoCal / SW desert (NWS).
+        let cm = TrackId("nd-chrome-mirage-vol-1-005".to_string());
+        assert_eq!(region_for(&cm).key, "us-southwest");
+        // aurora-icebreaker → ARCTIC.
+        let ai = TrackId("nd-aurora-icebreaker-vol-1-007".to_string());
+        assert_eq!(region_for(&ai).key, "arctic");
     }
 
     #[test]

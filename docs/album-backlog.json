@@ -3,32 +3,6 @@
   "youtube_strikes": 0,
   "proposed": [
     {
-      "slug": "obsidian-caldera-vol-1",
-      "theme": "A nocturnal descent into an active volcano: rivers of molten magma carving glowing veins through black basalt cliffs, ash drifting against a blood-orange sky. Heavy, percussive darksynth built on subterranean bass and crackling ember textures.",
-      "proposed_at": "2026-06-14T10:08:10.359840506Z",
-      "promote_at": "2026-06-15T10:08:10.359840506Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": []
-    },
-    {
-      "slug": "neon-cathedral-vol-1",
-      "theme": "A vast abandoned gothic cathedral retrofitted with humming neon and laser-lit stained glass, holographic saints flickering above a flooded marble nave. Reverent, hymn-like synthwave with cathedral-organ pads and choral vocoder swells.",
-      "proposed_at": "2026-06-14T10:08:10.359840506Z",
-      "promote_at": "2026-06-15T10:08:10.359840506Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": []
-    },
-    {
-      "slug": "velvet-casino-vol-1",
-      "theme": "A rain-slicked midnight casino strip seen through cigarette smoke: gold-and-crimson neon, velvet interiors, a lone figure at a roulette wheel under flickering signage. Slow, sultry noir-synthwave with lounge saxophone and brushed drum machines.",
-      "proposed_at": "2026-06-14T10:08:10.359840506Z",
-      "promote_at": "2026-06-15T10:08:10.359840506Z",
-      "proposed_by": "openclaw-main",
-      "danger_zone_keys": [
-        "miami_vice"
-      ]
-    },
-    {
       "slug": "orbital-dacha-vol-1",
       "theme": "[PARKED 2026-06-15: overlaps a Vol.2 lane — review before re-promoting] A decaying Soviet-built space station tumbling in low orbit at the edge of dusk, Earth's terminator line glowing amber-blue through frosted cupola glass, dead switch panels and floating debris in zero gravity. Sonically: weightless cosmic-coldwave, Polivoks drones, slow rotating arpeggios, vocoder static like dying telemetry, vast and silent and orbital.",
       "proposed_at": "2026-06-15T23:00:00Z",
@@ -64,15 +38,6 @@
     }
   ],
   "approved": [
-    {
-      "slug": "agartha-vol-1",
-      "theme": "The inner civilization — luminous Agarthan capital, inner sun, Shambhala spires, telluric/vril warmth, meditative transcendence; the arrival Telos belongs to. SAGA: Lost Worlds #3 (diptych with Hollow Earth). Weather anchor: Arctic / stylized inner-sun.",
-      "approved_at": "2026-06-06T07:40:00Z",
-      "danger_zone_keys": [
-        "agartha",
-        "shambhala"
-      ]
-    },
     {
       "slug": "atlantis-vol-1",
       "theme": "The drowned Atlantic motherland — concentric ring-city, orichalcum/crystal tech, Poseidon, the deluge, deep-pressure oceanic majesty, bioluminescence. SAGA: Lost Worlds #4 (Atlantic sibling to Lemuria's Pacific). Weather anchor: mid-Atlantic / Azores. Avoid Disney 'Atlantis: The Lost Empire' names.",
@@ -224,6 +189,26 @@
         "stargate",
         "gate_of_ra"
       ]
+    },
+    {
+      "slug": "obsidian-caldera-vol-1",
+      "theme": "A nocturnal descent into an active volcano: rivers of molten magma carving glowing veins through black basalt cliffs, ash drifting against a blood-orange sky. Heavy, percussive darksynth built on subterranean bass and crackling ember textures.",
+      "approved_at": "2026-06-16T09:06:12.620902267Z",
+      "danger_zone_keys": []
+    },
+    {
+      "slug": "neon-cathedral-vol-1",
+      "theme": "A vast abandoned gothic cathedral retrofitted with humming neon and laser-lit stained glass, holographic saints flickering above a flooded marble nave. Reverent, hymn-like synthwave with cathedral-organ pads and choral vocoder swells.",
+      "approved_at": "2026-06-16T09:06:12.620902267Z",
+      "danger_zone_keys": []
+    },
+    {
+      "slug": "velvet-casino-vol-1",
+      "theme": "A rain-slicked midnight casino strip seen through cigarette smoke: gold-and-crimson neon, velvet interiors, a lone figure at a roulette wheel under flickering signage. Slow, sultry noir-synthwave with lounge saxophone and brushed drum machines.",
+      "approved_at": "2026-06-16T09:06:12.620902267Z",
+      "danger_zone_keys": [
+        "miami_vice"
+      ]
     }
   ],
   "history": [
@@ -258,6 +243,10 @@
     {
       "slug": "hollow-earth-vol-1",
       "dropped_at": "2026-06-15T04:36:16.228914946Z"
+    },
+    {
+      "slug": "agartha-vol-1",
+      "dropped_at": "2026-06-16T10:52:59.922723130Z"
     }
   ]
 }

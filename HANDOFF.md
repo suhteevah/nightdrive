@@ -3,7 +3,44 @@
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
 **Status:** 🟢 **Autonomous album queue LIVE and validated end-to-end.** The nightly album-drop timer now drives the whole pipeline hands-off: compose-skip (pre-composed JSON) → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore. Hollow Earth (Lost Worlds #2) shipped 12/12; **Agartha (#3) dropped fully autonomously 2026-06-16 with zero human intervention** — first time the loop ran start-to-finish unattended. Full catalog roadmap composed/approved (Lost Worlds saga complete + 9 standalone vol-1s + 10 vol-2/LW-II themes); 21-deep approved backlog. **See the 2026-06-16 session below.**
-**Last updated:** 2026-06-16 (PDT)
+**Last updated:** 2026-06-17 (PDT)
+
+---
+
+## 2026-06-17 — OAuth verified prod · reboot-durable continuation timers · 13 albums pre-composed
+
+Hardened the two latent risks behind the now-working autonomous loop and pre-composed the near-term catalog so nothing cold-composes at drop time. **No change to the live drop schedule** (next drop still atlantis, Fri 06-19 02:09 PDT).
+
+### #1 — YT OAuth expiry risk: VERIFIED ALREADY RESOLVED (no-op)
+Checked GCP Google Auth Platform → Audience (project `nightdrive-youtube`, authuser=3 / mmichels88) via Chrome MCP. Publishing status = **In production** (only a "Back to testing" button offered; user type External; OAuth user cap 2/100). The 7-day refresh-token expiry is a *Testing*-status behavior only, so it's already mitigated — and has been since 2026-05-31 (memory `reference_yt_oauth_testing_token_7day_expiry`, now stamped re-verified 06-17). The 06-16 "if still in Testing" hedge below is stale; **do not re-flag this as the top risk.** (App is still *unverified* — that only caps users at 100 + shows the consent warning; it does NOT affect token longevity.)
+
+### #2 — Continuation timers now REBOOT-DURABLE (shipped + deployed + verified)
+`schedule_stagger_continuation` (crates/nightdrive-cli/src/main.rs) was arming a **transient** `systemd-run --on-active=25h --collect` unit — lives in /run (wiped on reboot), and `--on-active` restarts its clock from each boot. A reboot between a drop and its +25h batch-2 stranded the album at 6/12. (Its own doc-comment even falsely claimed "durable".)
+- Rewrote it to install `/etc/systemd/system/nightdrive-stagger-<slug>.{service,timer}` with an **absolute `OnCalendar=<now+25h> UTC` + `Persistent=true`** → fires at the real wall-clock time, or immediately on next boot if the box was down when it elapsed. `enable` = boot-persistence symlink; `restart` = (re)load the OnCalendar for both first-arm and re-arm.
+- Added `cleanup_stagger_continuation(slug)` (called on the COMPLETE branch) so per-slug units don't accumulate; no-ops if nothing was armed.
+- Built clean on cnc (`cargo build --release -p nightdrive-cli`, 3m32s), deployed to `/opt/nightdrive/bin/nightdrive-cli` (prior binary saved `.bak-20260617`).
+- **Verified on cnc's real systemd**: installed a sample unit mirroring the generated output → `list-timers` scheduled it ~25h out, `is-enabled`=enabled, file in /etc (not /run), `Persistent=true` present; cleanup path then removed it clean.
+- Effective at the next drop. Blast radius if wrong is still bounded + recoverable (1-6 upload + render-all-12 happen in the drop service regardless; only the 7-12 upload rides the continuation — manual fallback is `nightdrive-cli album publish-staggered --slug <s> --per-day 6 --publish-at <iso>`).
+
+### #3 — 13 future albums PRE-COMPOSED (no more drop-time cold-compose)
+Ran 13 `album-composer` subagents → `docs/albums/<slug>.json`; validated against the proven schema (parity vs the dropped agartha-vol-1) AND the exact `run_album`/`spec_from_album_track` runtime field contract (`scratch/validate_albums.py` + `scratch/check_runtime_fields.py`, ALL PASS); synced to cnc `/opt/nightdrive-ws/docs/albums/` (**27 JSONs total now**).
+- The 10 originally scoped: 9 vol-2s — `sunset-drive-vol-2`, `neo-tokyo-drive-vol-2`, `tron-drive-vol-2`, `sovetskiy-drive-vol-2`, `atompunk-drive-vol-2`, `tokyo-cyberpunk-vol-2`, `miami-vice-vol-2`, `blade-runner-2049-vol-2`, `berlin-wall-vol-2` — plus `dyson-tomb-vol-1` (**Lost Worlds II opener**: picks up Gate of Ra's A-Lydian→A-Aeolian seam, carries the saga crystal + stellar-furnace motifs as `saga_recurring:true`).
+- **Plus the 3 standalone vol-1s that actually drop FIRST** (~07-04 → 07-10, before the vol-2s): `abyssal-station-vol-1`, `chrome-mirage-vol-1`, `aurora-icebreaker-vol-1`.
+- Every vol-2 carries its Vol.1 motifs forward and honored the danger-zone double-hit rule (dodged e.g. "Nightcall"/"A Real Hero"/"Tears in Rain"/"Arena"/"Crockett's Theme"/"Sea Wall"/"Wind of Change"). Two post-compose fixes caught by validation: dyson-tomb was missing required top-level `track_count` (the `AlbumSpec` struct / cover-gen requires it — added); atompunk-v2 motifs lacked `saga_recurring` (added for uniformity; non-breaking since `recurring_motifs` is `Vec<serde_json::Value>`).
+
+### #3b — weather.rs routing for the 3 standalone vol-1s (DONE this session)
+The companion drop-time footgun: those 3 had no `region_for` branch → would hash-fall to a random US city's weather panel. Fixed in `crates/nightdrive-encoder/src/weather.rs`:
+- `chrome-mirage` → `us-southwest` (SoCal/SW desert, NWS), `aurora-icebreaker` → `ARCTIC`, and `abyssal-station` → a **new MARIANAS region** (Guam/Saipan/Koror/Yap, Open-Meteo + dark West-Pacific RainViewer basemap — on-theme for a two-miles-down album; matches `feedback_twc_cities_must_match_album_theme`).
+- Unit tests green: new `standalone_vol1_slugs_route` + `every_region_has_four_cities` (13/13 encoder tests pass). Orchestrator rebuilt from `/opt/nightdrive/src` (55s) + redeployed to `/opt/nightdrive/bin/nightdrive-orchestrator` (prior `.bak-20260617`); MARIANAS strings confirmed in the live binary. All 9 vol-2s already routed correctly (3 explicit vol-2 overrides + 6 via theme keyword; tron-v2 & dyson-tomb intentionally hashed/cosmic).
+
+### cnc build-tree map (non-obvious — see memory `reference_cnc_nightdrive_build_trees`)
+- **`/opt/nightdrive-ws`** = trimmed 7-crate workspace → builds **`nightdrive-cli`**; holds the **authoritative `docs/`** (backlog + albums). Drop runs with `WorkingDirectory=/opt/nightdrive-ws`.
+- **`/opt/nightdrive/src`** = full workspace → builds **`nightdrive-orchestrator`** (+ the encoder/weather code). drop-covers.sh stages the album JSON from `-ws` into this tree's `docs/albums` for cover-gen.
+- Deploy target for both binaries: `/opt/nightdrive/bin/`. A cli change must build from `-ws`; an encoder/orchestrator change must build from `/opt/nightdrive/src`. (Both were synced this session.)
+
+### Still open / next
+- **3 newly-promoted vol-1s still un-composed:** `obsidian-caldera-vol-1`, `neon-cathedral-vol-1`, `velvet-casino-vol-1` (cnc backlog `approved[]`, drop ~08-12+). Same pre-compose footgun — compose before they reach the head. (They DO have weather: all 3 lack a slug branch and will hash-fall to a US region; obsidian=volcano, neon-cathedral=gothic-neon, velvet-casino=noir-casino have no obvious real geography so a hashed US city is acceptable — revisit if you want themed cities.)
+- Backlog: repo ↔ cnc reconciled this session (pulled cnc's authoritative copy + the missing `tokyo-cyberpunk-vol-1.json`); cnc remains authoritative.
 
 ---
 

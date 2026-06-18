@@ -1407,6 +1407,7 @@ async fn album_publish_staggered(
         tracing::info!("{msg}");
         let _ = nightdrive_core::telegram::notify(&msg);
         println!("{msg}");
+        cleanup_stagger_continuation(slug);
     } else if progressed {
         schedule_stagger_continuation(slug, publish_at, per_day, remaining.len())?;
     } else {
@@ -1421,10 +1422,15 @@ async fn album_publish_staggered(
     Ok(())
 }
 
-/// Arm a durable +25h systemd timer that re-invokes `album publish-staggered`
-/// for the next batch (next Pacific day — clears both the rolling-24h channel
-/// cap and the per-day GCP project cap, since 25h always crosses one midnight).
-/// Best-effort; on failure prints the manual fallback command.
+/// Arm a reboot-durable +25h continuation that re-invokes `album publish-staggered`
+/// for the next batch (next Pacific day — clears both the rolling-24h channel cap
+/// and the per-day GCP project cap, since 25h always crosses one midnight). Writes
+/// an INSTALLED `nightdrive-stagger-<slug>.{service,timer}` pair to
+/// /etc/systemd/system with an absolute OnCalendar + Persistent=true, so — unlike
+/// the old transient `systemd-run --on-active=25h` unit, which lived in /run and was
+/// wiped on reboot — it survives a reboot and catches up on next boot if the box was
+/// down when it elapsed. Best-effort; on failure prints the manual fallback command.
+/// Torn down by `cleanup_stagger_continuation` once the album completes.
 fn schedule_stagger_continuation(
     slug: &str,
     publish_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -1434,44 +1440,80 @@ fn schedule_stagger_continuation(
     let exe = std::env::current_exe().context("current_exe")?;
     let cwd = std::env::current_dir().context("current_dir")?;
     let unit = format!("nightdrive-stagger-{slug}");
+    let service_path = format!("/etc/systemd/system/{unit}.service");
+    let timer_path = format!("/etc/systemd/system/{unit}.timer");
+
+    // Clear any failed state left by a prior batch (best-effort).
     let _ = std::process::Command::new("systemctl")
         .args(["reset-failed", &format!("{unit}.timer"), &format!("{unit}.service")])
         .status();
 
-    let mut args: Vec<String> = vec![
-        "--on-active=25h".into(),
-        format!("--unit={unit}"),
-        "--collect".into(),
-        format!("--property=WorkingDirectory={}", cwd.display()),
-        "--property=EnvironmentFile=/etc/nightdrive/nightdrive.env".into(),
-        exe.display().to_string(),
-        "album".into(),
-        "publish-staggered".into(),
-        "--slug".into(),
-        slug.into(),
-        "--per-day".into(),
-        per_day.to_string(),
-    ];
+    // Fire 25h out as an ABSOLUTE OnCalendar timestamp (UTC). +25h always crosses
+    // one Pacific midnight, clearing both the rolling-24h channel cap and the
+    // per-day GCP project video.insert cap. Absolute OnCalendar + Persistent=true
+    // is what makes this reboot-durable: the old transient `--on-active=25h` unit
+    // lived in /run (wiped on reboot) and its relative clock restarted from each
+    // boot; an installed timer with an absolute OnCalendar + Persistent=true fires
+    // at the real wall-clock time, or immediately on next boot if the box was down
+    // when it elapsed.
+    let fire_at = chrono::Utc::now() + chrono::Duration::hours(25);
+    let on_calendar = format!("{} UTC", fire_at.format("%Y-%m-%d %H:%M:%S"));
+
+    let mut exec_start = format!(
+        "{} album publish-staggered --slug {slug} --per-day {per_day}",
+        exe.display()
+    );
     if let Some(p) = publish_at {
-        args.push("--publish-at".into());
-        args.push(p.to_rfc3339());
+        exec_start.push_str(&format!(" --publish-at {}", p.to_rfc3339()));
     }
+
+    let service_unit = format!(
+        "[Unit]\nDescription=NightDrive staggered upload continuation for {slug}\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nWorkingDirectory={cwd}\nEnvironmentFile=/etc/nightdrive/nightdrive.env\nExecStart={exec_start}\nStandardOutput=append:/var/log/nightdrive/album-drop.log\nStandardError=append:/var/log/nightdrive/album-drop.log\n",
+        cwd = cwd.display()
+    );
+    let timer_unit = format!(
+        "[Unit]\nDescription=NightDrive staggered upload continuation timer for {slug}\n\n[Timer]\nOnCalendar={on_calendar}\nPersistent=true\nAccuracySec=1min\n\n[Install]\nWantedBy=timers.target\n"
+    );
 
     let manual = format!(
         "nightdrive-cli album publish-staggered --slug {slug} --per-day {per_day}{}",
         publish_at.map(|p| format!(" --publish-at {}", p.to_rfc3339())).unwrap_or_default()
     );
 
-    match std::process::Command::new("systemd-run").args(&args).status() {
-        Ok(s) if s.success() => {
-            let msg = format!("nightdrive: {slug} batch done; {remaining} tracks armed for +25h (next GCP day) via {unit}.");
+    // Best-effort install of the durable timer/service pair. enable = boot-
+    // persistence symlink; restart = (re)load the new OnCalendar whether the timer
+    // is fresh (first arm) or already active (re-arm for a later batch).
+    let armed: anyhow::Result<()> = (|| {
+        let sc = |args: &[&str]| -> anyhow::Result<()> {
+            let st = std::process::Command::new("systemctl")
+                .args(args)
+                .status()
+                .with_context(|| format!("spawn systemctl {args:?}"))?;
+            anyhow::ensure!(st.success(), "systemctl {args:?} exited {st}");
+            Ok(())
+        };
+        std::fs::write(&service_path, &service_unit)
+            .with_context(|| format!("write {service_path}"))?;
+        std::fs::write(&timer_path, &timer_unit)
+            .with_context(|| format!("write {timer_path}"))?;
+        sc(&["daemon-reload"])?;
+        sc(&["enable", &format!("{unit}.timer")])?;
+        sc(&["restart", &format!("{unit}.timer")])?;
+        Ok(())
+    })();
+
+    match armed {
+        Ok(()) => {
+            let msg = format!(
+                "nightdrive: {slug} batch done; {remaining} tracks armed for {on_calendar} via durable timer {unit} (survives reboot)."
+            );
             tracing::info!("{msg}");
             let _ = nightdrive_core::telegram::notify(&msg);
-            println!("scheduled +25h continuation for {remaining} remaining tracks ({unit}).");
+            println!("scheduled durable continuation for {remaining} remaining tracks ({unit} @ {on_calendar}).");
         }
-        other => {
+        Err(e) => {
             let msg = format!(
-                "nightdrive: {slug} — FAILED to arm continuation ({other:?}). {remaining} tracks pending. Manual: {manual}"
+                "nightdrive: {slug} — FAILED to arm durable continuation ({e:#}). {remaining} tracks pending. Manual: {manual}"
             );
             tracing::error!("{msg}");
             let _ = nightdrive_core::telegram::notify(&msg);
@@ -1479,6 +1521,34 @@ fn schedule_stagger_continuation(
         }
     }
     Ok(())
+}
+
+/// Tear down the installed continuation timer/service for `slug` once the album is
+/// fully uploaded, so per-album units don't accumulate in /etc/systemd/system.
+/// Best-effort — a leftover elapsed timer is harmless (it never re-fires), so this
+/// only logs and never fails the caller. No-ops if nothing was ever armed (e.g. the
+/// whole album uploaded in the first batch, so no continuation was installed).
+fn cleanup_stagger_continuation(slug: &str) {
+    let unit = format!("nightdrive-stagger-{slug}");
+    let service_path = format!("/etc/systemd/system/{unit}.service");
+    let timer_path = format!("/etc/systemd/system/{unit}.timer");
+    if !std::path::Path::new(&service_path).exists()
+        && !std::path::Path::new(&timer_path).exists()
+    {
+        return;
+    }
+    let _ = std::process::Command::new("systemctl")
+        .args(["disable", "--now", &format!("{unit}.timer")])
+        .status();
+    let _ = std::fs::remove_file(&timer_path);
+    let _ = std::fs::remove_file(&service_path);
+    let _ = std::process::Command::new("systemctl")
+        .arg("daemon-reload")
+        .status();
+    let _ = std::process::Command::new("systemctl")
+        .args(["reset-failed", &format!("{unit}.timer"), &format!("{unit}.service")])
+        .status();
+    tracing::info!(slug = %slug, unit = %unit, "cleaned up durable continuation units after album completion");
 }
 
 async fn stream_status() -> anyhow::Result<()> {
