@@ -23,6 +23,9 @@
 //! | `hong-kong`/`kowloon` | HONG KONG | Open-Meteo | RainViewer |
 //! | `shasta`/`telos` | SHASTA (Mt Shasta City/Weed/Dunsmuir/McCloud) | NWS | NWS Ridge2 GIF |
 //! | `abyssal` | MARIANAS (Guam/Saipan/Koror/Yap) | Open-Meteo | RainViewer\* |
+//! | `obsidian-caldera` | BIG ISLAND (Hilo/Kona/Volcano/Pahoa) | NWS | NWS Ridge2 GIF |
+//! | `neon-cathedral` | PARIS (Paris/Reims/Amiens/Chartres) | Open-Meteo | RainViewer |
+//! | `velvet-casino` | LAS VEGAS (Vegas/Henderson/Reno/Laughlin) | NWS | NWS Ridge2 GIF |
 //!
 //! \* RainViewer is fed by national radar networks. Japan/Iceland/most of
 //! Europe are covered; Russia, Greenland, and high-arctic Canada are NOT —
@@ -357,13 +360,60 @@ static MARIANAS: RegionDef = RegionDef {
     ],
 };
 
+/// obsidian-caldera Vol. 1 — active-volcano darksynth → the iconic US volcano,
+/// Hawaii's Big Island (Kilauea / Mauna Loa). NWS-native (US soil) → Ridge2 radar
+/// the encoder negates; PHWA is the Big Island South-Shore NEXRAD.
+static HAWAII: RegionDef = RegionDef {
+    key: "hawaii",
+    label: "BIG ISLAND",
+    backend: ForecastBackend::Nws,
+    radar: RadarSource::Nws("PHWA"),
+    cities: &[
+        CityDef { display: "HILO", full: "Hilo, HI", lat: 19.7297, lon: -155.0900 },
+        CityDef { display: "KONA", full: "Kailua-Kona, HI", lat: 19.6400, lon: -155.9969 },
+        CityDef { display: "VOLCANO", full: "Volcano, HI", lat: 19.4419, lon: -155.2356 },
+        CityDef { display: "PAHOA", full: "Pahoa, HI", lat: 19.4946, lon: -154.9492 },
+    ],
+};
+
+/// neon-cathedral Vol. 1 — gothic-cathedral hymn-synth → France, home of the great
+/// gothic cathedrals (Notre-Dame/Reims/Amiens/Chartres). Open-Meteo + dense
+/// Meteo-France radar via RainViewer (real echoes).
+static FRANCE: RegionDef = RegionDef {
+    key: "france",
+    label: "PARIS",
+    backend: ForecastBackend::OpenMeteo,
+    radar: RadarSource::RainViewer { z: 6, x: 32, y: 22 },
+    cities: &[
+        CityDef { display: "PARIS", full: "Paris, FR", lat: 48.8566, lon: 2.3522 },
+        CityDef { display: "REIMS", full: "Reims, FR", lat: 49.2583, lon: 4.0317 },
+        CityDef { display: "AMIENS", full: "Amiens, FR", lat: 49.8941, lon: 2.2958 },
+        CityDef { display: "CHARTRES", full: "Chartres, FR", lat: 48.4469, lon: 1.4890 },
+    ],
+};
+
+/// velvet-casino Vol. 1 — noir casino-strip lounge → the casino strip = Las Vegas
+/// (+ the other Nevada gambling towns). NWS-native; KESX is the Las Vegas NEXRAD.
+static LAS_VEGAS: RegionDef = RegionDef {
+    key: "las-vegas",
+    label: "LAS VEGAS",
+    backend: ForecastBackend::Nws,
+    radar: RadarSource::Nws("KESX"),
+    cities: &[
+        CityDef { display: "LAS VEGAS", full: "Las Vegas, NV", lat: 36.1699, lon: -115.1398 },
+        CityDef { display: "HENDERSON", full: "Henderson, NV", lat: 36.0395, lon: -114.9817 },
+        CityDef { display: "RENO", full: "Reno, NV", lat: 39.5296, lon: -119.8138 },
+        CityDef { display: "LAUGHLIN", full: "Laughlin, NV", lat: 35.1678, lon: -114.5736 },
+    ],
+};
+
 /// Slug-matched regions (matched by album-slug substring in [`region_for`]).
 /// All non-US use Open-Meteo + RainViewer; the US ones (SHASTA/INLAND_CA/
 /// SPACE_COAST) use NWS. `region_by_key` also searches this list to re-resolve
 /// the radar.
 static THEMED_REGIONS: &[&RegionDef] = &[
     &JAPAN, &SOVIET, &ARCTIC, &HONGKONG, &SHASTA, &MID_ATLANTIC, &EGYPT, &GERMANY,
-    &INLAND_CA, &KAZAKH_STEPPE, &SPACE_COAST, &MARIANAS,
+    &INLAND_CA, &KAZAKH_STEPPE, &SPACE_COAST, &MARIANAS, &HAWAII, &FRANCE, &LAS_VEGAS,
 ];
 
 /// Resolve the region for a track from the album slug embedded in its id.
@@ -414,6 +464,18 @@ pub fn region_for(track_id: &TrackId) -> &'static RegionDef {
     // abyssal-station — deep-sea outpost in the Marianas / West Pacific.
     if id.contains("abyssal") {
         return &MARIANAS;
+    }
+    // obsidian-caldera — active-volcano album → Hawaii's Big Island.
+    if id.contains("obsidian-caldera") {
+        return &HAWAII;
+    }
+    // neon-cathedral — gothic-cathedral album → France.
+    if id.contains("neon-cathedral") {
+        return &FRANCE;
+    }
+    // velvet-casino — casino-strip noir → Las Vegas.
+    if id.contains("velvet-casino") {
+        return &LAS_VEGAS;
     }
     // Lost Worlds #5 (Gate of Ra) — Heliopolis-hypertech desert → Egypt.
     if id.contains("gate-of-ra") || id.contains("gate_of_ra") || id.contains("egypt")
@@ -1073,6 +1135,25 @@ mod tests {
         // aurora-icebreaker → ARCTIC.
         let ai = TrackId("nd-aurora-icebreaker-vol-1-007".to_string());
         assert_eq!(region_for(&ai).key, "arctic");
+    }
+
+    #[test]
+    fn newly_promoted_vol1_slugs_route() {
+        // obsidian-caldera → Hawaii Big Island (NWS-native volcano region).
+        let o = TrackId("nd-obsidian-caldera-vol-1-001".to_string());
+        let r = region_for(&o);
+        assert_eq!(r.key, "hawaii");
+        assert_eq!(r.backend, ForecastBackend::Nws);
+        assert_eq!(r.cities[0].display, "HILO");
+        // neon-cathedral → France (Open-Meteo + RainViewer).
+        let n = TrackId("nd-neon-cathedral-vol-1-004".to_string());
+        let rn = region_for(&n);
+        assert_eq!(rn.key, "france");
+        assert_eq!(rn.backend, ForecastBackend::OpenMeteo);
+        assert!(rn.radar_prestyled());
+        // velvet-casino → Las Vegas (the casino strip, NWS).
+        let v = TrackId("nd-velvet-casino-vol-1-007".to_string());
+        assert_eq!(region_for(&v).key, "las-vegas");
     }
 
     #[test]

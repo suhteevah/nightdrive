@@ -3,7 +3,7 @@
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
 **Status:** 🟢 **Autonomous album queue LIVE and validated end-to-end.** The nightly album-drop timer now drives the whole pipeline hands-off: compose-skip (pre-composed JSON) → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore. Hollow Earth (Lost Worlds #2) shipped 12/12; **Agartha (#3) dropped fully autonomously 2026-06-16 with zero human intervention** — first time the loop ran start-to-finish unattended. Full catalog roadmap composed/approved (Lost Worlds saga complete + 9 standalone vol-1s + 10 vol-2/LW-II themes); 21-deep approved backlog. **See the 2026-06-16 session below.**
-**Last updated:** 2026-06-17 (PDT)
+**Last updated:** 2026-06-18 (PDT)
 
 ---
 
@@ -38,8 +38,12 @@ The companion drop-time footgun: those 3 had no `region_for` branch → would ha
 - **`/opt/nightdrive/src`** = full workspace → builds **`nightdrive-orchestrator`** (+ the encoder/weather code). drop-covers.sh stages the album JSON from `-ws` into this tree's `docs/albums` for cover-gen.
 - Deploy target for both binaries: `/opt/nightdrive/bin/`. A cli change must build from `-ws`; an encoder/orchestrator change must build from `/opt/nightdrive/src`. (Both were synced this session.)
 
+### #3c — last 3 vol-1s COMPOSED 2026-06-18 (entire approved backlog now pre-composed)
+`obsidian-caldera-vol-1` (darksynth volcano descent, BPM 94-118, Phrygian-dom eruption apex), `neon-cathedral-vol-1` (reverent hymn-synth, symmetric Em→Db-Lydian→Em arch), `velvet-casino-vol-1` (slow noir lounge, descending cycle-of-fifths, one D-maj hot-streak peak; kept distinct from Miami Vice, dodged Casino/Bond/Ocean's OST hits). Validated (schema + runtime contract, ALL PASS) + synced to cnc. **cnc now holds 30 album JSONs = every one of the 21 approved backlog albums + 9 history. The drop-time cold-compose footgun is fully closed.**
+- **Weather for these 3 — WIRED 2026-06-18** (per Matt's standing rule: composing an album includes repairing its weather region — memory `feedback_compose_album_includes_weather_region`). 3 new themed regions in `weather.rs`: `obsidian-caldera`→**HAWAII / Big Island** (Hilo/Kona/Volcano/Pahoa, NWS, PHWA — the iconic US volcano), `neon-cathedral`→**FRANCE** (Paris/Reims/Amiens/Chartres, Open-Meteo + Météo-France RainViewer — gothic-cathedral homeland), `velvet-casino`→**LAS VEGAS** (Vegas/Henderson/Reno/Laughlin, NWS, KESX — the casino strip). Test `newly_promoted_vol1_slugs_route` green (14/14 encoder tests), orchestrator rebuilt + redeployed (`.bak-20260618`), all 3 regions confirmed in the live binary. **Every approved album now has BOTH a JSON and a theme-matched weather region — zero hashed albums in the queue.**
+
 ### Still open / next
-- **3 newly-promoted vol-1s still un-composed:** `obsidian-caldera-vol-1`, `neon-cathedral-vol-1`, `velvet-casino-vol-1` (cnc backlog `approved[]`, drop ~08-12+). Same pre-compose footgun — compose before they reach the head. (They DO have weather: all 3 lack a slug branch and will hash-fall to a US region; obsidian=volcano, neon-cathedral=gothic-neon, velvet-casino=noir-casino have no obvious real geography so a hashed US city is acceptable — revisit if you want themed cities.)
+- Nothing required — loop runs unattended; whole approved backlog is pre-composed + correctly weather-routed (except the 3 above intentionally hashed).
 - Backlog: repo ↔ cnc reconciled this session (pulled cnc's authoritative copy + the missing `tokyo-cyberpunk-vol-1.json`); cnc remains authoritative.
 
 ---
