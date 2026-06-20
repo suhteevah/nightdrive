@@ -1443,10 +1443,16 @@ fn schedule_stagger_continuation(
     let service_path = format!("/etc/systemd/system/{unit}.service");
     let timer_path = format!("/etc/systemd/system/{unit}.timer");
 
-    // Clear any failed state left by a prior batch (best-effort).
-    let _ = std::process::Command::new("systemctl")
-        .args(["reset-failed", &format!("{unit}.timer"), &format!("{unit}.service")])
-        .status();
+    // Clear any failed state left by a prior batch (best-effort). Skip entirely on
+    // the first arm (no unit exists yet) so we don't log a spurious
+    // "reset-failed ... Unit not loaded" line, and null the output either way.
+    if std::path::Path::new(&timer_path).exists() || std::path::Path::new(&service_path).exists() {
+        let _ = std::process::Command::new("systemctl")
+            .args(["reset-failed", &format!("{unit}.timer"), &format!("{unit}.service")])
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status();
+    }
 
     // Fire 25h out as an ABSOLUTE OnCalendar timestamp (UTC). +25h always crosses
     // one Pacific midnight, clearing both the rolling-24h channel cap and the

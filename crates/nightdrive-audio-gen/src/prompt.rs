@@ -28,10 +28,11 @@ use nightdrive_core::CompositionSpec;
 /// Format the natural-language description ACE-Step takes as `caption`.
 ///
 /// Strategy: trust the album-composer's `musicgen_prompt` as the descriptive
-/// backbone (it already names instruments + mood + production), and append
-/// our hard requirements (instrumental, BPM, key) so they survive any
-/// elision the composer may have done. ACE-Step's 512-char cap is checked
-/// and the prompt is truncated with a `…` rather than silently dropped.
+/// backbone (it already names instruments + mood + production) and ensure an
+/// instrumental directive is present. BPM/key are NOT appended — ACE-Step 1.5
+/// takes those via its dedicated `bpm`/`keyscale` request fields (its docs say
+/// don't put tempo/BPM/key in the caption). The ~510-char cap is enforced with
+/// a `…` truncation rather than a silent drop. See docs/acestep-prompting.md.
 pub fn format_ace_step_caption(spec: &CompositionSpec) -> String {
     let mut caption = String::with_capacity(512);
     caption.push_str(spec.musicgen_prompt.trim());
@@ -45,12 +46,12 @@ pub fn format_ace_step_caption(spec: &CompositionSpec) -> String {
         push_separated(&mut caption, "no vocals, instrumental");
     }
 
-    // Hard metadata appended at the tail — ACE-Step's caption parser benefits
-    // from explicit numeric BPM + key hints even when its dedicated `bpm` and
-    // `keyscale` request fields are also populated.
-    push_separated(&mut caption, &format!("{} BPM", spec.bpm));
-    push_separated(&mut caption, &spec.musical_key);
-
+    // BPM + key are deliberately NOT appended here. ACE-Step 1.5's docs are
+    // explicit: tempo/BPM/key belong in the dedicated `bpm` / `keyscale` request
+    // fields (which the sidecar request populates), NOT the caption — repeating
+    // them is redundant. (The composer's prose may still mention them inline;
+    // that's a separate, future composer-prompt cleanup.) See
+    // docs/acestep-prompting.md.
     truncate_to_chars(caption, 510, "…")
 }
 
@@ -259,14 +260,20 @@ mod tests {
     }
 
     #[test]
-    fn ace_step_caption_appends_required_metadata() {
-        let spec = sample_spec_5_section();
+    fn ace_step_caption_does_not_append_bpm_or_key() {
+        // ACE-Step 1.5: tempo/BPM/key belong in the dedicated bpm/keyscale
+        // request fields, not the caption. With a prose that omits them, the
+        // caption must not introduce them.
+        let mut spec = sample_spec_5_section();
+        spec.musicgen_prompt =
+            "synthwave peak track, lush DX7 pad, bright analog lead, sidechained sub bass, instrumental"
+                .to_string();
         let cap = format_ace_step_caption(&spec);
-        assert!(cap.contains("108 BPM"));
-        assert!(cap.contains("D major"));
-        // musicgen_prompt already had "instrumental" so no extra "no vocals" added.
+        assert!(!cap.to_ascii_lowercase().contains("bpm"), "caption must not append BPM: {cap}");
+        assert!(!cap.contains("D major"), "caption must not append key: {cap}");
+        // The composer's instrumental directive survives.
         assert!(cap.contains("instrumental"));
-        // Caption respects the 512-char ACE-Step ceiling.
+        // Caption respects the ACE-Step length ceiling.
         assert!(cap.chars().count() <= 512, "caption longer than ACE-Step's 512-char cap");
     }
 

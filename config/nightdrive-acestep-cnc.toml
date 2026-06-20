@@ -39,9 +39,15 @@ channels = 2
 segment_seconds = 30
 overlap_seconds = 0
 continuation_prefix_seconds = 0.0
-guidance_scale = 7.0
+# CFG is base/SFT-only — the turbo model IGNORES guidance_scale (ACE-Step's
+# pre-flight auto-overrides it to 1.0). Kept at 1.0 to reflect reality; only
+# bump back toward ~7.0 alongside a switch to the base (non-turbo) model.
+# See docs/acestep-prompting.md.
+guidance_scale = 1.0
 # 8 steps for turbo; bump to 32-64 if we ever swap to the base (non-turbo) variant.
 inference_steps = 8
+# shift = 3.0 (author-recommended turbo value) is already applied by the ACE-Step
+# sidecar's DEFAULT_SHIFT / NIGHTDRIVE_ACESTEP_SHIFT — noted here for intent.
 
 [art]
 base_url = "http://127.0.0.1:8081"
