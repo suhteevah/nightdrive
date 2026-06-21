@@ -2,8 +2,40 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** 🟢 **Autonomous album queue LIVE and validated end-to-end.** The nightly album-drop timer now drives the whole pipeline hands-off: compose-skip (pre-composed JSON) → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore. Hollow Earth (Lost Worlds #2) shipped 12/12; **Agartha (#3) dropped fully autonomously 2026-06-16 with zero human intervention** — first time the loop ran start-to-finish unattended. Full catalog roadmap composed/approved (Lost Worlds saga complete + 9 standalone vol-1s + 10 vol-2/LW-II themes); 21-deep approved backlog. **See the 2026-06-16 session below.**
-**Last updated:** 2026-06-18 (PDT)
+**Status:** 🟢 **Autonomous album queue LIVE; durable-continuation fix validated in production; entire approved backlog pre-composed + weather-routed.** The nightly album-drop timer drives the whole pipeline hands-off (compose-skip → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore). Agartha (#3) was the first fully-unattended drop (2026-06-16); **atlantis (#4) dropped clean 2026-06-19 and was the first run of the new reboot-durable continuation timer — it armed an installed `Persistent=true` unit exactly as designed.** All 24 approved-backlog albums now have a pre-composed JSON AND a theme-matched weather region — zero cold-compose, zero hashed-weather footguns left. Two reference docs written this session (LLM prompting/orchestration + ACE-Step audio prompting). **See the 2026-06-19 session below.**
+**Last updated:** 2026-06-20 (PDT)
+
+---
+
+## 2026-06-19 — atlantis drop validated durable timer · 2 research passes · ACE-Step prod tuning
+
+### Live-loop validation
+- **atlantis (#4) dropped clean 06-19 02:04 PDT** (`Result=success`). 12/12 rendered, weather=MID_ATLANTIC/Azores ✓, 1–6 uploaded, **7–12 armed on the NEW reboot-durable continuation timer** (`nightdrive-stagger-atlantis-vol-1.timer`: installed in `/etc/systemd/system`, `active`+`enabled`, `Persistent=yes`, OnCalendar 06-20 05:02 PDT). The #2 fix from 06-17 worked on its first real run — the transient `systemd-run` unit is gone. Public sync-drop 06-22T00:00Z.
+- Channel verified public via Chrome MCP: **Hollow Earth** (full 12-video playlist) + **Agartha** both live; atlantis correctly still private. Channel 111 videos.
+- **Cosmetic fix shipped:** `schedule_stagger_continuation` no longer logs a spurious `reset-failed … Unit not loaded` on first-arm (gated on unit existence + nulled output). cli rebuilt+deployed (`.bak-20260619`).
+
+### Two verification-gated research passes → reference docs
+- **LLM prompting & orchestration 2026 field guide** (`wf_d7049d8c-3d4`; 12 confirmed / 13 killed). Canonical: `J:\llm-wiki\patterns\llm-prompting-and-orchestration-2026.md`; nightdrive pointer: `docs/prompting-and-orchestration.md`. Headline actionable: **Claude 4.6+ over-triggers under "CRITICAL/MUST/NEVER/ALWAYS"** — our CLAUDE.md imperatives should be softened (NOT yet done — see What's Next). Killed the famous "90.2% multi-agent uplift / 15× tokens" numbers (failed the bar; do not cite).
+- **ACE-Step prompting guide** (`wf_aac55964-c45`; 13 confirmed / 12 killed — most killed were stale-*v1* critiques). Canonical: `J:\llm-wiki\patterns\acestep-prompting-instrumental.md`; nightdrive: `docs/acestep-prompting.md`. Verdict: our v1.5-turbo setup is mostly right.
+
+### ACE-Step production tuning (3 changes shipped, live at the gate-of-ra drop 06-22)
+1. **Caption no longer appends BPM/key** (`crates/nightdrive-audio-gen/src/prompt.rs::format_ace_step_caption`) — ACE-Step docs say put tempo/key in the dedicated `bpm`/`keyscale` fields (which we populate), not the caption. Test `ace_step_caption_does_not_append_bpm_or_key` green. Orchestrator rebuilt+deployed (`.bak-20260619`).
+2. **`guidance_scale` 7.0 → 1.0** in prod `/etc/nightdrive/nightdrive.toml` (+ repo template, `.bak-20260619`). CFG is base-only; turbo's pre-flight already auto-overrode 7.0→1.0, so zero behavior change — config truthfulness only.
+3. **`shift=3.0`** documented in config (already applied via sidecar `DEFAULT_SHIFT`).
+- **A/B test (prose vs comma-tag caption): WASH → keep prose.** Coordinated through openclaw `main` (no antcolony contention — main checked live state, confirmed clear), took a ~4-min GPU window with a self-restoring fleet trap, rendered both at identical seed/BPM/key/lyrics/180s. Matt ear-compared: no clear winner (one melody stumble in the prose track ~2:05, but single-seed artifact, not a format signal). Confirms the encoder is format-agnostic; specificity is the lever. **Decision recorded — do NOT rewire the composer to tags; don't re-run this.** Harness kept at `scratch/run_acestep_ab.sh` + `scratch/acestep_ab_prompt_test.py`.
+
+### What's next (nothing blocking — loop runs unattended)
+- **Verify the atlantis 7–12 continuation actually fired** Sat 06-20 ~05:02 PDT (first durable-timer continuation; check `nightdrive-stagger-atlantis-vol-1` ran + atlantis is 12/12 uploaded). Then the timer self-cleans on completion.
+- **Next drop: gate-of-ra Mon 06-22 02:03 PDT** (Lost Worlds #5 finale) — first drop to exercise the 3 shipped ACE-Step changes. Sanity-check the first rendered track sounds right (caption no longer carries BPM/key).
+- **Optional / recommended:** audit the "CRITICAL/MUST/NEVER/ALWAYS" imperative density in global + nightdrive `CLAUDE.md` toward neutral phrasing (4.6+ over-trigger finding). Pure prompt hygiene, no code.
+- **Deferred experiments (only if a quality issue surfaces):** one-shot quality sweep at 4/5/6 min on the P100 turbo path (docs say >4 min may drift → repaint); re-validate composer after any openclaw main-model bump.
+
+---
+
+## 2026-06-18 — last 3 backlog vol-1s composed + weather-routed
+
+- **Composed the 3 newly-promoted standalone vol-1s** (album-composer subagents, validated schema + runtime contract, synced to cnc): `obsidian-caldera-vol-1` (darksynth volcano descent), `neon-cathedral-vol-1` (reverent hymn-synth Em→Db-Lydian arch), `velvet-casino-vol-1` (noir lounge, descending fifths, one D-maj hot-streak). cnc now holds 30 album JSONs.
+- **Weather-routed all 3** (per the standing "compose includes weather" rule): 3 new `region_for` regions in `weather.rs` — `obsidian-caldera`→**HAWAII/Big Island** (Hilo/Kona/Volcano/Pahoa, NWS PHWA), `neon-cathedral`→**FRANCE** (Paris/Reims/Amiens/Chartres, Open-Meteo), `velvet-casino`→**LAS VEGAS** (Vegas/Henderson/Reno/Laughlin, NWS KESX). Test `newly_promoted_vol1_slugs_route` green (14/14 encoder tests); orchestrator rebuilt+deployed (`.bak-20260618`), regions confirmed in the live binary. **Zero hashed-weather albums remain in the queue.**
 
 ---
 

@@ -28,7 +28,7 @@ Companion: this is the **audio-model** half of `docs/prompting-and-orchestration
 3. **Make `shift=3.0` explicit.** Author-recommended turbo value; we already get it via the sidecar `DEFAULT_SHIFT`, but it's not in `[audio_gen]`. Pin it in config so it's intentional, not an accidental default.
 
 ## 🧪 Worth an A/B (medium confidence, community-sourced — not verified)
-- **Tag-style caption vs prose.** The model is format-robust, but multiple community testers report ACE-Step adheres *marginally* better to clean comma-separated "control-signal" tags than to prose for tight genre control. Uncontrolled/blog-quality → test it: same spec + same seed, render (a) current prose vs (b) a tag list (`"synthwave, DX7 pad, analog lead, sidechained sub bass, gated reverb drums, neon, driving, instrumental"`), ear-compare adherence + mud. Cheap; could be a real lever for our single genre.
+- **Tag-style caption vs prose — TESTED 2026-06-19, verdict: WASH → keep prose.** Ran the controlled A/B (`scratch/run_acestep_ab.sh` / `acestep_ab_prompt_test.py`: identical seed 42 / BPM 104 / Am / lyrics / 180s, only caption syntax differed — prose vs comma-tags). Matt ear-compared both repeatedly: no clear winner. (One melody stumble in the prose track ~2:05, but that's a single-seed/single-trajectory artifact, not a format signal — and more likely structure/section-transition drift than caption format.) This confirms the high-confidence finding (the encoder is format-agnostic; the lever is *specificity*, not syntax). **Decision: keep the prose caption; do NOT rewire the composer to emit tags.** Don't re-run this experiment.
 - **One-shot quality at the long end.** 3–4 min is the documented "stable" band; 5–6 min "may have repetition/structure issues." Our tracks run 180–360 s, so the 5–6 min ones are at risk. Sweep quality at 4/5/6 min on the cnc P100 turbo path; if the long ones drift, either cap durations nearer ~4 min or use ACE-Step **repaint** (`repainting_start/end`) to fix sections in place instead of re-rolling.
 
 ## 🚫 Don't be fooled (killed claims — mostly stale v1)
@@ -40,7 +40,7 @@ The pass killed 12 claims; several would have wrongly "challenged" us because th
 
 ## Open questions
 - Exact v1.5 caption length cap (the 256-token claim was stale-v1; no confirmed v1.5 number) — verify there's no silent tail-truncation.
-- Does a tag caption measurably beat prose for *our* synthwave? (A/B above.)
+- ~~Does a tag caption measurably beat prose for *our* synthwave?~~ ANSWERED 2026-06-19: wash (see A/B above) — keep prose.
 - Where exactly does one-shot quality degrade on the P100 turbo path — 4/5/6 min?
 - Worth ever switching the monetized channel to the base/SFT model (active APG CFG ~50 steps) for fidelity, at higher render cost? If so, tune `guidance_scale` + `guidance_interval` + `min_guidance_scale` together — the turbo findings don't transfer.
 
