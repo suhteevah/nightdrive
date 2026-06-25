@@ -2,8 +2,140 @@
 
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
-**Status:** 🟢 **Autonomous album queue LIVE; durable-continuation fix validated in production; entire approved backlog pre-composed + weather-routed.** The nightly album-drop timer drives the whole pipeline hands-off (compose-skip → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore). Agartha (#3) was the first fully-unattended drop (2026-06-16); **atlantis (#4) dropped clean 2026-06-19 and was the first run of the new reboot-durable continuation timer — it armed an installed `Persistent=true` unit exactly as designed.** All 24 approved-backlog albums now have a pre-composed JSON AND a theme-matched weather region — zero cold-compose, zero hashed-weather footguns left. Two reference docs written this session (LLM prompting/orchestration + ACE-Step audio prompting). **See the 2026-06-19 session below.**
-**Last updated:** 2026-06-20 (PDT)
+**Status:** 🟢 **Autonomous album queue LIVE; durable-continuation fix validated in production; entire approved backlog pre-composed + weather-routed.** The nightly album-drop timer drives the whole pipeline hands-off (compose-skip → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore). Agartha (#3) was the first fully-unattended drop (2026-06-16); **atlantis (#4) dropped clean 2026-06-19 and was the first run of the new reboot-durable continuation timer — it armed an installed `Persistent=true` unit exactly as designed.** All 24 approved-backlog albums now have a pre-composed JSON AND a theme-matched weather region — zero cold-compose, zero hashed-weather footguns left. Two reference docs written this session (LLM prompting/orchestration + ACE-Step audio prompting). **2026-06-22: found + fixed a systemic upload bug — YT titles over 100 chars were silently 400-rejected, leaving atlantis publicly live at 9/12; capped the title builder, redeployed, re-armed atlantis, and confirmed gate-of-ra (#5) golden. See the 2026-06-22 session below.**
+**Last updated:** 2026-06-24 (PDT)
+
+---
+
+## 2026-06-24 — full-album compilation garble fixed (two bugs: loudnorm 192k leak + concat-demuxer mixed-rate)
+
+**Trigger:** Matt watched the public gate-of-ra "Full Album" comp (auto-published
+06-25T00:00Z) and heard several tracks "super fast-forwarded mess" (City of the
+Sun-Priests=t4, The Gate Opens=t7, +t9/t11/t12).
+
+**Root cause (two bugs):**
+1. **`nightdrive-audio-master` loudnorm 192k leak.** Pass-2 filter had no
+   output-rate pin → loudnorm's internal 192 kHz leaks onto every track that
+   takes the dynamic (non-linear) path. So an album's `master.flac` set is mixed
+   48 kHz / 192 kHz (all `raw.wav` were a clean 48 kHz). Also why final.mp4 AAC
+   was 96 kHz. **Fixed:** appended `,aresample=48000` to the filter; rebuilt +
+   redeployed orchestrator on cnc (`/opt/nightdrive/bin/...bak-20260624`).
+2. **`make-album-compilation.sh` concat DEMUXER can't resample.** It fed the 12
+   mixed-rate FLACs through `-f concat -i audio.txt`; the demuxer locks output to
+   the first file's rate and the single resampler destroys off-rate tracks (48k
+   tracks collapse to a sped sliver → audio 8.5 min shorter than video → desync).
+   **Fixed:** per-input `aresample=48000` + concat FILTER + a hard A/V-skew guard
+   (>1s → exit). Deployed `/opt/nightdrive/tools/` (`.bak-20260624`).
+
+**Blast radius:** only MIXED-rate albums break. Scanned all comps by video-vs-audio
+stream-duration skew: gate-of-ra/agartha/hollow-earth were BROKEN → regenerated →
+0.0s skew. telos/atlantis/atompunk/sovetskiy/tokyo were fine (uniform masters).
+agartha+hollow-earth hadn't uploaded yet → the drip now posts the fixed files.
+
+**Broken gate-of-ra comp `xE7wjewCMEc`:** auto-published public ~2h (1 view = Matt)
+before being pulled **private + schedule cleared**. Existing on-disk masters stay
+mixed (Bug B only fixes future renders); the comp fix (Bug A) is robust to them.
+
+**ARMED:** `nightdrive-gate-reupload.timer` (installed, Persistent=true) → **Thu
+2026-06-25 00:05 PDT** (post-Pacific-midnight, fresh videos.insert quota) runs
+`reupload-gate-of-ra-comp.sh`: re-uploads the FIXED comp **public** + unlists the
+broken `xE7wjewCMEc` + telegram-notifies. Self-cleans on success (ExecStartPost);
+leaves units on 429/failure. Dry-run validated (882.6 MB, title 91 chars, OAuth OK).
+**06-25 FOLLOW-UP:** confirm the telegram fired + units self-cleaned; if they linger,
+the midnight upload 429'd → manual retry `reupload-gate-of-ra-comp.sh`.
+
+---
+
+## 2026-06-22 — title-length bug found + fixed (systemic), gate-of-ra golden, atlantis re-armed
+
+**Trigger:** health-check the pipeline so the next public post is golden (gate-of-ra,
+Lost Worlds #5, dropped this morning; public sync-drop 06-25T00:00Z).
+
+### Root-caused a SILENT, SYSTEMIC upload bug (the headline)
+- **atlantis (#4) is publicly live but only 9/12.** Tracks 009/010/012 rendered fine
+  (final.mp4 on disk since 06-19) but **never uploaded** — `failed` state, `queued`
+  uploads, `error` column null (the per-track failure is swallowed by `warn!(...continuing)`
+  in `album_publish_staggered`, so nothing reached the DB).
+- **Cause (from `/var/log/nightdrive/album-drop.log`):** `videos.insert` 400 Bad Request
+  — *"The request metadata specifies an invalid or empty video title."* The constructed
+  YT title `{track} — {album} (Track NN) [Synthwave for Coding]` exceeds **YouTube's
+  100-char limit**. Boundary is exact: ≤100 uploads, ≥101 → 400. NOT quota, OAuth,
+  network, or file size (track 11 @48MB uploaded while track 10 @44MB failed).
+- **Fleet-wide scan** of all 30 album JSONs: 5 albums have >100 titles — atlantis (3),
+  **gate-of-ra (1: track 11 @103)**, dyson-tomb (3), miami-vice-vol-2 (11, worst 111),
+  sunset-drive-vol-2 (5). No album's *bare* `{track} — {album}` exceeds 100.
+
+### Fix (shipped + deployed + tested)
+- `crates/nightdrive-orchestrator/src/main.rs` (on cnc `/opt/nightdrive/src` — the
+  authoritative tree; this album code is NOT in the J: repo, see drift note): extracted
+  `build_youtube_title()`. Builds the full title; if >100 chars, sheds segments in order:
+  drop `(Track NN)` → drop `[Synthwave for Coding]` → hard char-truncate. Since no bare
+  title >100, the SEO suffix always survives in practice. Added `#[cfg(test)] mod title_tests`
+  (3 tests, all green). Built release (52.6s), deployed to `/opt/nightdrive/bin/nightdrive-orchestrator`
+  (prior `.bak-20260622`; source `.bak` at `/root/main.rs.bak-20260622`). Patch script:
+  `scratch/patch_title_cap.py`.
+- **Why a code fix, not a data fix:** `run-album` re-derives the spec (and rebuilds the
+  title) on every invocation (main.rs:439), so editing spec.json would be clobbered at
+  upload. The deployed binary fixes ALL current + future albums automatically.
+
+### gate-of-ra (#5) — GOLDEN for tomorrow
+- 12/12 rendered (all final.mp4 present), weather=**CAIRO** ✓ (Cairo EG, OpenMeteo, 4 cities),
+  rendered under the new ACE-Step config. 1–6 uploaded+scheduled (publishAt 06-25T00:00Z).
+- 7–12 (incl. the doomed track 11) upload via the durable continuation **Tue 06-23 04:40 PDT**
+  (`nightdrive-stagger-gate-of-ra-vol-1.timer`, Persistent=true) — now using the FIXED binary,
+  so track 11's title caps to ≤100. Upload path skips re-render for `video_encoded` tracks
+  (proven: atlantis 7/8/11 uploaded in seconds with ACE-Step down).
+
+### atlantis (#4) — REMEDIATION ARMED
+- Re-armed `nightdrive-stagger-atlantis-vol-1.{service,timer}` → **Wed 06-24 05:00 PDT**
+  (12:00 UTC), publishAt 06-24T13:00Z, fixed binary. Uploads 009/010/012 and flips them
+  public. Scheduled for 06-24 because the 6/day quota is spoken for: 06-22 gate-of-ra 1–6,
+  06-23 gate-of-ra 7–12, 06-24 atlantis ×3 (no day >6, clears the rolling-24h channel cap too).
+- NOTE: playlist order after the late uploads may be 1–8,11,9,10,12 (append, not insert) —
+  cosmetic; verify/resort after 06-24 if it matters.
+
+### Verified healthy
+- OAuth refresh token **valid** (probe returned access_token, expires_in 3599) — silent-killer
+  not active. Fleet restored clean (openclaw embed/scout/workhorse + aether-serve/vision active,
+  no orphan ACE-Step on the P100s). Catalog census: only atlantis (9/12) + gate-of-ra (6/12,
+  in-progress) incomplete; all other public albums 12/12; only 3 `failed` tracks anywhere (the
+  atlantis ones, now armed).
+
+### Drift / risk notes
+- **Source drift:** the orchestrator album-mode code (incl. the title builder) lives only on
+  cnc `/opt/nightdrive/src`; the J: repo's `crates/nightdrive-orchestrator/src/main.rs` is a
+  stale scaffold without it. Production source-of-truth is cnc; no VCS backup beyond cnc local
+  + my `/root/main.rs.bak-20260622`. Worth reconciling someday.
+- **Quota bump:** Matt asked about requesting a YT Data API quota increase. Corrected the old
+  walkthrough's unit math (insert = 1,600 units, not 100 → 10,000/day = ~6 uploads; the "6/day"
+  IS the unit quota, not a separate cap). Draft + honest-odds writeup at
+  `scratch/yt-quota-request-2026-06-22.md`. **Recommendation: hold** — low approval odds for an
+  autonomous-AI-uploader profile, the stagger already makes 6/day work, and filing invites
+  audit scrutiny that could revoke API access (asymmetric downside). Revisit post-traction.
+
+### What's next
+- **Tue 06-23 ~04:45 PDT:** confirm gate-of-ra 7–12 uploaded 12/12 (esp. track 11) + continuation self-cleaned.
+- **Wed 06-24 ~05:05 PDT:** confirm atlantis 009/010/012 uploaded → 12/12 public; resort playlist if needed.
+- **Wed 06-24 ~06:35 PDT:** confirm the gate-of-ra **compilation** uploaded (timer below) → check `compilations/gate-of-ra-vol-1/upload.json`; scheduled public 06-25T00:00Z with the album. On success the timer/service self-clean ~15s later — confirm the units are gone (if they linger, the upload failed; check album-drop.log).
+- **Thu 06-25 02:02 PDT:** next album drop = **miami-vice-vol-1** (titles fit; fixed binary covers it regardless).
+
+### Growth campaign (NEW 2026-06-22 — Matt greenlit all 4 lanes, "lean into the AI story")
+Full plan + status: `scratch/growth-campaign-2026-06-22.md`. New standalone tools in `/opt/nightdrive/tools/`:
+- **`make-album-compilation.sh <slug>`** — stitches an album's 12 tracks → one ~50-min "Full Album" video (video copy from final.mp4, audio re-encoded from master.flac; the mp4 AAC is mixed 48/96k and the 96k breaks ffmpeg's decoder). Built + validated on gate-of-ra.
+- **`upload-compilation.py <slug> [--privacy] [--publish-at] [--dry-run]`** — OAuth + 8MB chunked resumable upload + thumbnail; caps title at 100 chars. Dry-validated.
+- **`make-track-short.py <track_id>`** + **`make-album-shorts.sh <slug> [par]`** — 1080×1920 vertical Shorts: cover backdrop + a re-laid-out "Local on the 8s" weather panel (radar loop + 5-day HI/LO, locked VT323/magenta/cyan) + 40s hook (audio at 40% of track). All 12 gate-of-ra Shorts batched to `/var/lib/nightdrive/shorts/`.
+- **ARMED:** `nightdrive-compilation-gate-of-ra-vol-1.timer` (installed, Persistent=true) → 06-24 06:30 PDT uploads the gate-of-ra compilation, scheduled public 06-25T00:00Z. **Self-cleans on success**: the service's `ExecStartPost` (only runs if the upload succeeded) fires a deferred `systemd-run` → `cleanup-compilation-timer.sh <slug>` removes the .service/.timer/symlink ~15s later. Failed uploads leave the units for inspection. Reuse this ExecStartPost pattern for every future compilation timer.
+- **X / @nightdriveAI:** creds in cnc env (`NIGHTDRIVE_X_USER`/`_PASSWORD`); content engine drafted (`scratch/x-content-engine.md`). Account still warming — posting harness + first login BLOCKED on Matt's "warm, go" + 2FA route (TOTP-with-seed preferred).
+- **Bottleneck:** every upload (albums/compilations/Shorts) shares the 6/day `videos.insert` cap → growth uploads drip into spare slots. Quota-bump rec: HOLD (`scratch/yt-quota-request-2026-06-22.md`).
+- **Compilation auto-wiring DONE (2026-06-23):** `album_publish_staggered` complete branch → `schedule_compilation_upload(slug, publish_at)` (nightdrive-cli, built from -ws, deployed `/opt/nightdrive/bin/nightdrive-cli.bak-20260623`). On album 12/12, arms a self-cleaning compilation gen+upload timer ~25h out (spare-quota day), scheduled public at the album's publish_at. Dedup-guarded (timer/service/upload.json exists → skip). Validated: re-running publish-staggered on complete gate-of-ra → guard skipped, no dup timer (it DID re-fire the COMPLETE telegram — harmless). First real exercise: **miami-vice-vol-1** (drops 06-25 → compilation auto-arms ~06-26 → public with the album).
+- **Title-fix validated in prod 2026-06-23:** gate-of-ra 12/12 — track 011 (103-char title) uploaded clean as `6k-sJKu4bVk`; stagger self-cleaned.
+- **Back-catalog + SEO DONE (2026-06-23):**
+  - **Back-catalog compilations:** generated for 7 eligible albums (telos/hollow-earth/agartha/tokyo-cyberpunk/atompunk/sovetskiy/atlantis). `nightdrive-compilation-drip.timer` (daily 10:00 PT, Persistent=false) → `drip-compilation-upload.sh` uploads ONE/day PUBLIC, self-throttling (uploader exits 75 on quota-429 → drip defers to next day). Drains over spare-quota days from 06-24. Old May albums (sunset/neo-tokyo/tron) ineligible — track assets wiped (re-render needed).
+  - **SEO pass:** ran `album playlist-sync` across back-catalog. Only atompunk needed it (no playlist → fixed); rest already synced. atlantis playlist auto-completes 06-24. Uses no video.insert → quota-safe.
+  - **May albums playlist'd (2026-06-23):** `list-channel-videos.py` (inventory uploads feed) + `build-playlist.py` (build playlist from raw video IDs, DB-less) → Tron 12/12, Sunset 12/12, Neo-Tokyo 9 (missing 6/8/12, assets wiped) + description links. Tools in /opt/nightdrive/tools.
+  - **FINDINGS to surface:** (1) **atompunk title "Atiom Punikn" is from the COVER** — SDXL garbled "atompunk 1958 album cover" into title text "ATIOM PUNIKN" baked on all 12 covers; the title was matched to the art. DO NOT naive-rename (desyncs from covers); real fix = regen covers + re-render (not worth it on a live album; arguably on-brand). Forward guard: suppress text in cover prompts (negative: text/letters/words/title). (2) **Neo-Tokyo-vol-1 is 9/12 public** (6/8/12 missing). RENDER FEASIBLE: JSON specs + covers for 6/8/12 present on disk (no SDXL needed); render via `run-album --slug neo-tokyo-drive-vol-1 --from-track N --to-track N` per single track (avoids re-rendering the 9 live ones). Needs a GPU window (evicts openclaw+aether — Matt OK'd standalone eviction). **ARMED: `nightdrive-neotokyo-fix.{service,timer}` → Sat 06-27 03:00 PDT** — mirrors the drop (deadman+evict+acestep+render+restore), runs `neotokyo-render.sh` (run-album single-track 6/8/12, --publish-at now+90m → public), self-cleans on success (ExecStartPost). Verified armed-not-fired (fleet intact). **06-27 FOLLOW-UP: verify the 3 uploaded + rebuild the Neo-Tokyo playlist (PLc304hwLOBm9UgGIFCK4lSIZ88BHAhCEJ) with all 12 in order** (build-playlist appends, so re-order; the 9 existing IDs are in list-channel-videos output). (3) Sunset track-11 DUP `1pIv19zJHpE` → **UNLISTED 2026-06-23** ✓. (4) 4 orphan 05-12 singles → **"NightDrive — Early Singles" playlist** (PLc304hwLOBm9csaAt5Mo16wo96wbZe-18) ✓. (5) end-screens have no Data API support. New tools: `list-channel-videos.py`, `build-playlist.py`, `set-video-privacy.py`.
+  - **X first post:** `scratch/x-launch-post.txt` (3 options + posting notes) for Matt to hand-post from @nightdriveAI.
+- **Next growth steps:** Shorts upload path (quota-gated); X posting harness when account's warm; optional: fix the "Atiom Punikn" title; reconstruct old-album playlists.
 
 ---
 

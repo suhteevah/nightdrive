@@ -125,10 +125,20 @@ impl FfmpegMaster {
         let duration = probe_duration_seconds(&self.ffmpeg_path, input).await?;
         let fade_out_start = (duration - self.cfg.fade_out_seconds).max(0.0);
 
+        // NOTE the trailing `aresample=48000`: ffmpeg's `loudnorm` filter runs at
+        // 192 kHz internally and, when it cannot normalize linearly (so it falls
+        // back to dynamic mode — a per-track, loudness-dependent decision), it
+        // EMITS at that 192 kHz unless we pin the rate. Without this, an album's
+        // masters come out a mix of 48 kHz (linear path) and 192 kHz (dynamic
+        // path). That heterogeneity then (a) makes the final-mux AAC 96 kHz —
+        // which ffmpeg's native decoder chokes on — and (b) destroys the
+        // full-album compilation, whose concat cannot resample per file. Pin
+        // every master to a uniform 48 kHz at the source.
         let filter = format!(
             "loudnorm=I={i}:TP={tp}:LRA={lra}:measured_I={mi}:measured_TP={mtp}:\
              measured_LRA={mlra}:measured_thresh={mt}:offset={off}:linear=true,\
-             afade=t=in:st=0:d={fade_in},afade=t=out:st={fade_out_start}:d={fade_out}",
+             afade=t=in:st=0:d={fade_in},afade=t=out:st={fade_out_start}:d={fade_out},\
+             aresample=48000",
             i = self.cfg.target_lufs,
             tp = self.cfg.true_peak_db,
             lra = self.cfg.loudness_range,
