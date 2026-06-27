@@ -3,7 +3,37 @@
 **Project:** `nightdrive`
 **Owner:** Matt Gates / Ridge Cell Repair LLC / OpenClaw
 **Status:** 🟢 **Autonomous album queue LIVE; durable-continuation fix validated in production; entire approved backlog pre-composed + weather-routed.** The nightly album-drop timer drives the whole pipeline hands-off (compose-skip → SDXL covers → render-all-12 → staggered upload → 3-day private→public sync-drop → fleet restore). Agartha (#3) was the first fully-unattended drop (2026-06-16); **atlantis (#4) dropped clean 2026-06-19 and was the first run of the new reboot-durable continuation timer — it armed an installed `Persistent=true` unit exactly as designed.** All 24 approved-backlog albums now have a pre-composed JSON AND a theme-matched weather region — zero cold-compose, zero hashed-weather footguns left. Two reference docs written this session (LLM prompting/orchestration + ACE-Step audio prompting). **2026-06-22: found + fixed a systemic upload bug — YT titles over 100 chars were silently 400-rejected, leaving atlantis publicly live at 9/12; capped the title builder, redeployed, re-armed atlantis, and confirmed gate-of-ra (#5) golden. See the 2026-06-22 session below.**
-**Last updated:** 2026-06-24 (PDT)
+**Last updated:** 2026-06-27 (PDT)
+
+---
+
+## 2026-06-27 — status check + compilation auto-arm timeout race fixed
+
+**Trigger:** status check. Found the 06-24 fixes all held in prod; ran down why miami-vice's comp never auto-armed.
+
+**Confirmed healthy:** gate-of-ra comp re-uploaded public 06-25 (`Dg6Tmw1SntE`),
+broken `xE7wjewCMEc` unlisted, units self-cleaned. **Bug B validated in prod** —
+miami-vice (rendered 06-25 on the post-fix orchestrator) has ALL-48 kHz masters;
+loudnorm leak gone. agartha+hollow-earth fixed comps auto-healed via the drip
+(`QYkqs_S_cq0`, `UgVf4mf7CNo`). 105 published / 3 (known) failed. 18 albums queued.
+
+**New bug found + fixed — comp auto-arm never fired:** miami-vice published 12/12
+but no compilation armed. Root cause: `nightdrive-stagger-<slug>.service` (+ the
+comp gen/upload service) are `Type=oneshot` with **no `TimeoutStartSec`** → inherit
+systemd's ~163s default. The completion run's final-batch uploads eat the budget;
+systemd SIGTERMs the service AFTER "COMPLETE" + stagger-cleanup but BEFORE
+`schedule_compilation_upload` (the last step). Journal: `start operation timed out`.
+Because every album finishes via the stagger path, the auto-arm had NEVER worked
+(prior comp timers were hand-armed). **Fix:** `TimeoutStartSec=1800` on both oneshot
+templates in `-ws cli/main.rs`; rebuilt + redeployed `nightdrive-cli` (`.bak-20260627`).
+miami remediated manually: comp generated (0.0s skew) + uploaded scheduled-public
+06-28 (`ysaEzuXOqRk`). **Next album drop (06-28) is the first real test of the
+auto-arm fix — verify a `nightdrive-compilation-<slug>` timer arms on its 12/12.**
+
+**⚠ DRIFT:** `-ws cli/main.rs` has diverged AHEAD of the git repo — the entire
+compilation-wiring + stagger + this timeout fix exist ONLY in `-ws`, never
+committed to `J:\nightdrive`. Repo's `nightdrive-cli` is stale; don't rebuild cli
+from it. Reconciling `-ws` → repo is an open follow-up.
 
 ---
 
