@@ -1408,6 +1408,9 @@ async fn album_publish_staggered(
         let _ = nightdrive_core::telegram::notify(&msg);
         println!("{msg}");
         cleanup_stagger_continuation(slug);
+        if let Err(e) = schedule_compilation_upload(slug, publish_at) {
+            tracing::warn!(error = %e, "compilation arming failed (non-fatal)");
+        }
     } else if progressed {
         schedule_stagger_continuation(slug, publish_at, per_day, remaining.len())?;
     } else {
@@ -1474,7 +1477,7 @@ fn schedule_stagger_continuation(
     }
 
     let service_unit = format!(
-        "[Unit]\nDescription=NightDrive staggered upload continuation for {slug}\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nWorkingDirectory={cwd}\nEnvironmentFile=/etc/nightdrive/nightdrive.env\nExecStart={exec_start}\nStandardOutput=append:/var/log/nightdrive/album-drop.log\nStandardError=append:/var/log/nightdrive/album-drop.log\n",
+        "[Unit]\nDescription=NightDrive staggered upload continuation for {slug}\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nTimeoutStartSec=1800\nWorkingDirectory={cwd}\nEnvironmentFile=/etc/nightdrive/nightdrive.env\nExecStart={exec_start}\nStandardOutput=append:/var/log/nightdrive/album-drop.log\nStandardError=append:/var/log/nightdrive/album-drop.log\n",
         cwd = cwd.display()
     );
     let timer_unit = format!(
@@ -1524,6 +1527,86 @@ fn schedule_stagger_continuation(
             tracing::error!("{msg}");
             let _ = nightdrive_core::telegram::notify(&msg);
             println!("{msg}");
+        }
+    }
+    Ok(())
+}
+
+/// After an album reaches 12/12 uploaded, arm a self-cleaning timer that GENERATES
+/// the full-album compilation video and uploads it to YouTube, scheduled public at
+/// the album's `publish_at` (so it lands alongside the tracks). Fires ~25h out — the
+/// day after completion, a spare-quota day — so the single compilation
+/// `videos.insert` never contends with a track-upload batch. Guarded against
+/// duplicates (skips if a compilation timer is already installed or the album's
+/// compilation was already uploaded). Best-effort; never fails the caller. The
+/// service self-cleans on success via ExecStartPost (see cleanup-compilation-timer.sh).
+fn schedule_compilation_upload(
+    slug: &str,
+    publish_at: Option<chrono::DateTime<chrono::Utc>>,
+) -> anyhow::Result<()> {
+    let unit = format!("nightdrive-compilation-{slug}");
+    let service_path = format!("/etc/systemd/system/{unit}.service");
+    let timer_path = format!("/etc/systemd/system/{unit}.timer");
+    let upload_record = format!("/var/lib/nightdrive/compilations/{slug}/upload.json");
+
+    // Dedup: already armed (e.g. a manual arm) or already uploaded.
+    if std::path::Path::new(&timer_path).exists()
+        || std::path::Path::new(&service_path).exists()
+        || std::path::Path::new(&upload_record).exists()
+    {
+        tracing::info!(slug = %slug, "compilation already armed/uploaded; skipping arm");
+        return Ok(());
+    }
+
+    let fire_at = chrono::Utc::now() + chrono::Duration::hours(25);
+    let on_calendar = format!("{} UTC", fire_at.format("%Y-%m-%d %H:%M:%S"));
+    let publish_arg = publish_at
+        .map(|p| format!(" --publish-at {}", p.to_rfc3339()))
+        .unwrap_or_default();
+
+    // Two ExecStart (oneshot runs them in order): generate the compilation from the
+    // already-rendered final.mp4s, then upload. If generation fails, upload is
+    // skipped and ExecStartPost (cleanup) does NOT run, leaving units for inspection.
+    let service_unit = format!(
+        "[Unit]\nDescription=NightDrive compilation gen+upload for {slug}\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nTimeoutStartSec=1800\nWorkingDirectory=/opt/nightdrive/tools\nEnvironmentFile=/etc/nightdrive/nightdrive.env\nExecStart=/opt/nightdrive/tools/make-album-compilation.sh {slug}\nExecStart=/opt/nightdrive/tools/upload-compilation.py {slug}{publish_arg}\nExecStartPost=/usr/bin/systemd-run --on-active=15s --collect /opt/nightdrive/tools/cleanup-compilation-timer.sh {slug}\nStandardOutput=append:/var/log/nightdrive/album-drop.log\nStandardError=append:/var/log/nightdrive/album-drop.log\n"
+    );
+    let timer_unit = format!(
+        "[Unit]\nDescription=NightDrive compilation upload timer for {slug}\n\n[Timer]\nOnCalendar={on_calendar}\nPersistent=true\nAccuracySec=1min\n\n[Install]\nWantedBy=timers.target\n"
+    );
+
+    let armed: anyhow::Result<()> = (|| {
+        let sc = |args: &[&str]| -> anyhow::Result<()> {
+            let st = std::process::Command::new("systemctl")
+                .args(args)
+                .status()
+                .with_context(|| format!("spawn systemctl {args:?}"))?;
+            anyhow::ensure!(st.success(), "systemctl {args:?} exited {st}");
+            Ok(())
+        };
+        std::fs::write(&service_path, &service_unit)
+            .with_context(|| format!("write {service_path}"))?;
+        std::fs::write(&timer_path, &timer_unit)
+            .with_context(|| format!("write {timer_path}"))?;
+        sc(&["daemon-reload"])?;
+        sc(&["enable", &format!("{unit}.timer")])?;
+        sc(&["start", &format!("{unit}.timer")])?;
+        Ok(())
+    })();
+
+    match armed {
+        Ok(()) => {
+            let msg = format!(
+                "nightdrive: {slug} compilation armed for {on_calendar} (public {}).",
+                publish_at.map(|p| p.to_rfc3339()).unwrap_or_else(|| "private".into())
+            );
+            tracing::info!("{msg}");
+            let _ = nightdrive_core::telegram::notify(&msg);
+        }
+        Err(e) => {
+            tracing::error!(
+                "nightdrive: {slug} — FAILED to arm compilation upload ({e:#}). \
+                 Manual: make-album-compilation.sh {slug} && upload-compilation.py {slug}{publish_arg}"
+            );
         }
     }
     Ok(())

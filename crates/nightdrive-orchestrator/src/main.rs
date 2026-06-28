@@ -458,6 +458,29 @@ async fn run_album(
     Ok(())
 }
 
+/// Assemble a YouTube-safe video title. YouTube hard-rejects titles over 100
+/// characters with a 400 "invalid or empty video title", so build the full
+/// decorated title and, only if it overflows, shed the least-essential
+/// segments in order: first "(Track NN)" (recoverable from playlist order),
+/// then the "[Synthwave for Coding]" SEO suffix, and finally a hard
+/// char-boundary truncation as a last resort. Counts Unicode chars (em dash = 1).
+fn build_youtube_title(title: &str, album_title: &str, track_number: u32) -> String {
+    let full =
+        format!("{title} — {album_title} (Track {track_number:02}) [Synthwave for Coding]");
+    if full.chars().count() <= 100 {
+        return full;
+    }
+    let no_track = format!("{title} — {album_title} [Synthwave for Coding]");
+    if no_track.chars().count() <= 100 {
+        return no_track;
+    }
+    let bare = format!("{title} — {album_title}");
+    if bare.chars().count() <= 100 {
+        return bare;
+    }
+    bare.chars().take(100).collect()
+}
+
 /// Build a [`CompositionSpec`] from one entry in `docs/albums/<slug>.json`.
 /// Maps the album JSON's loose schema (which has extras like `composer_notes`,
 /// `key_relationship_to_prior`, etc) into the strict CompositionSpec the
@@ -505,9 +528,7 @@ fn spec_from_album_track(
 
     // YouTube metadata: build a presentable title + description from album
     // context. Title format mirrors the manual tracks already on the channel.
-    let yt_title = format!(
-        "{title} — {album_title} (Track {track_number:02}) [Synthwave for Coding]"
-    );
+    let yt_title = build_youtube_title(&title, album_title, track_number);
     let yt_description = format!(
         "Track {track_number:02} of {album_title}.\n\n\
          Key: {musical_key} · {bpm} BPM · {duration_seconds}s\n\n\
@@ -964,4 +985,53 @@ async fn status(_cfg: &AppConfig) -> anyhow::Result<()> {
     //   - count of tracks in each TrackState
     //   - is livestream service up
     bail!("status not yet implemented in N1.1; see ROADMAP.md N1.12")
+}
+
+#[cfg(test)]
+mod title_tests {
+    use super::build_youtube_title;
+
+    #[test]
+    fn youtube_title_never_exceeds_100_chars() {
+        let cases = [
+            ("Down Into the Deepest Dark", "Atlantis: The Drowned Motherland, Vol. 1", 12u32),
+            ("Among the Stars (Homecoming)", "Gate of Ra: The Outward Flight, Vol. 1", 11),
+            ("Through the Water Column", "Atlantis: The Drowned Motherland, Vol. 1", 9),
+            (
+                "An Extremely Long Track Title That Should Force Hard Truncation No Matter What",
+                "Some Equally Verbose Album Subtitle That Keeps Going And Going, Vol. 1",
+                11,
+            ),
+            ("Short", "Tiny", 1),
+        ];
+        for (t, a, n) in cases {
+            let title = build_youtube_title(t, a, n);
+            assert!(
+                title.chars().count() <= 100,
+                "title too long ({}): {title}",
+                title.chars().count()
+            );
+            assert!(!title.is_empty(), "title empty");
+        }
+    }
+
+    #[test]
+    fn youtube_title_keeps_full_form_when_it_fits() {
+        let title =
+            build_youtube_title("The Deluge", "Atlantis: The Drowned Motherland, Vol. 1", 7);
+        assert!(title.contains("(Track 07)"));
+        assert!(title.contains("[Synthwave for Coding]"));
+    }
+
+    #[test]
+    fn youtube_title_drops_track_tag_first_when_over() {
+        let title = build_youtube_title(
+            "Among the Stars (Homecoming)",
+            "Gate of Ra: The Outward Flight, Vol. 1",
+            11,
+        );
+        assert!(title.chars().count() <= 100);
+        assert!(!title.contains("(Track 11)"), "should drop track tag: {title}");
+        assert!(title.contains("[Synthwave for Coding]"), "should keep SEO suffix: {title}");
+    }
 }

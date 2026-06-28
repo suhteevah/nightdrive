@@ -30,10 +30,29 @@ miami remediated manually: comp generated (0.0s skew) + uploaded scheduled-publi
 06-28 (`ysaEzuXOqRk`). **Next album drop (06-28) is the first real test of the
 auto-arm fix — verify a `nightdrive-compilation-<slug>` timer arms on its 12/12.**
 
-**⚠ DRIFT:** `-ws cli/main.rs` has diverged AHEAD of the git repo — the entire
-compilation-wiring + stagger + this timeout fix exist ONLY in `-ws`, never
-committed to `J:\nightdrive`. Repo's `nightdrive-cli` is stale; don't rebuild cli
-from it. Reconciling `-ws` → repo is an open follow-up.
+**DRIFT — STRUCTURALLY FIXED 2026-06-27.** Found the repo had drifted from the cnc
+build trees in BOTH directions (repo behind `-ws` on cli comp-wiring+timeout-fix;
+behind `/opt/nightdrive/src` on orchestrator `build_youtube_title`; AHEAD of `src`
+on core telegram/backlog + youtube chunked-upload). Reconciled the repo to the
+UNION of all good code: cli copied from `-ws`; **orchestrator/main.rs MERGED**
+(title-cap from `src` + kept the repo's newer no-pinned-comment description) —
+`cargo check` green, 3 title tests pass. Then built the sanctioned deploy path so
+it can't recur:
+- **`scripts/deploy-cnc.sh`** — mirrors repo crate sources → both trees + rebuilds/installs
+  both binaries (`.bak-<stamp>`); `--sync-only` = mirror sources only (safe; drop runs
+  prebuilt binaries). **`scripts/check-cnc-drift.sh`** — green = trees match repo.
+- Ran `deploy-cnc.sh --sync-only` → both trees now mirror the repo; `check-cnc-drift.sh` GREEN.
+
+**Standing rule: edit the REPO, then `deploy-cnc.sh`. Never hand-edit the cnc trees.**
+
+**Both binaries rebuilt-from-repo + redeployed 2026-06-27.** Orchestrator was
+smoke-tested before install (built but not installed → `--help`/`--version` OK,
+`status` loaded prod config IDENTICALLY to the prior build, `run-album --dry-run`
+parsed miami's album JSON + ran migrations + completed clean) → then installed
+(`.bak-20260627-orch`). It's de-risked ahead of the 06-28 drop.
+**deploy-cnc.sh fix:** mirrors `src/` SOURCE only, never per-crate Cargo.toml — syncing
+manifests pulled cli's album-composer path-dep into the src tree (which lacks it) and
+broke the build; the src tree now drops vestigial cli entirely (cli builds only from `-ws`).
 
 ---
 

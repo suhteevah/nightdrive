@@ -345,6 +345,24 @@ The schema in `HANDOFF.md` §7 and the actual migration file have
 `last_streamed_at`). The migration file is authoritative — fix the
 drift the next time the spec is touched.
 
+## Deploying to cnc — repo is the single source of truth
+
+The two cnc build trees (`/opt/nightdrive-ws` builds `nightdrive-cli`,
+`/opt/nightdrive/src` builds `nightdrive-orchestrator`) are **plain projections of
+this repo, not authoritative**. **Never hand-edit them** — that's what caused the
+2026-06-27 drift. Edit the repo, then deploy with the sanctioned script:
+
+```bash
+# from kokonoe (Git Bash):
+scripts/deploy-cnc.sh                 # sync repo sources -> both trees + rebuild + install both binaries
+scripts/deploy-cnc.sh --sync-only     # mirror sources only, no rebuild (safe even mid-drop; drop runs prebuilt bins)
+scripts/deploy-cnc.sh orch            # restrict to the orchestrator tree (or: cli)
+scripts/check-cnc-drift.sh            # green = trees match repo; run before/after any cnc work
+```
+
+If you ever must patch a tree directly in a pinch, reconcile it back into the repo
+immediately and re-run `check-cnc-drift.sh`. See the build-trees + drift memories.
+
 ## Commands (when there's actually code)
 
 ```bash
